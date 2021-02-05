@@ -1,10 +1,10 @@
 import { DriveConnector } from "./driveConnector";
-import { ooSpreadsheets, ooTables } from "./enums0001";
+import { ooFiles, ooTables } from "./enums0001";
 
 export class BusinessModel{
     private hostFileId:string;
     private dc:DriveConnector;
-    constructor(hostFileId:string,hostSpreadsheet:ooSpreadsheets){
+    constructor(hostFileId:string,hostSpreadsheet:ooFiles){
         this.hostFileId=hostFileId;
         this.dc=new DriveConnector(hostFileId,hostSpreadsheet);
         this.install();

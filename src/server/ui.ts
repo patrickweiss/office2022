@@ -1,5 +1,5 @@
 import { BusinessModel } from "./oo21lib/businessModel";
-import { ooSpreadsheets, ooTables } from "./oo21lib/enums0001";
+import { ooFiles, ooTables } from "./oo21lib/enums0001";
 
 export const onOpen = () => {
   const menu = SpreadsheetApp.getUi()
@@ -12,7 +12,7 @@ export const onOpen = () => {
 export const installOO22 = () => {
   SpreadsheetApp.getUi().alert("Your system will be installed or updated now. This may take up to 5 minutes");
   const fileId = SpreadsheetApp.getActive().getId();
-  const bm = new BusinessModel(fileId,ooSpreadsheets.SalesFunnel);
+  const bm = new BusinessModel(fileId,ooFiles.SalesFunnel);
   SpreadsheetApp.getUi().alert("Your system is now up to date and running");
 };
 
