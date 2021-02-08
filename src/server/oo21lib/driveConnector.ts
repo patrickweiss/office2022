@@ -21,7 +21,7 @@ export class DriveConnector {
         const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.system);
         const yearFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.year);
         const installCallFile = DriveApp.getFileById(this.hostFileId);
-        yearFolder.addFile(installCallFile);
+        systemFolder.addFile(installCallFile);
         DriveApp.getRootFolder().removeFile(installCallFile);
     }
     public getProperyFromTable(table: ooTables, propertyName: string): string {
@@ -47,7 +47,7 @@ export class DriveConnector {
         }
     }
     private getFileName(file: ooFiles): string {
-        return this.getProperyFromTable(ooTables.SystemConfiguration, file)
+        return this.getProperyFromTable(ooTables.SystemConfiguration, file)+" - Version:"+ooVersion;
 
     }
 }
@@ -58,6 +58,7 @@ export class DriveConnector {
 
 export function deleteSystem() {
     DriveApp.getRootFolder().getFoldersByName(ooFolders.system).next().setTrashed(true);
+    DriveApp.getRootFolder().getFoldersByName(ooFolders.year).next().setTrashed(true);
 }
 
 function getOrCreateFolderIn(inFolder: GoogleAppsScript.Drive.Folder, returnFolderName: ooFolders) {
