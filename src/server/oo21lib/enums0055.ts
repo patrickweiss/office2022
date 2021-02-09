@@ -14,6 +14,7 @@ export enum ooFolders{
 }
 export enum ooTables{
     systemMasterConfiguration = "systemMasterConfiguration",
+    systemConfiguration = "systemConfiguration",
     businessConfiguration = "businessConfiguration",
     email="email"
 }

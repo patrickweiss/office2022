@@ -22,9 +22,14 @@ export class DriveConnector {
         //correct the name of the hostFile
         DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
         const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.system);
+ 
+        const SystemConfigurationSpreadsheet = DriveApp
+        .getFileById(this.getMasterId(ooTables.systemConfiguration))
+        .makeCopy(this.getFileName(ooTables.systemConfiguration), systemFolder)
+
         const yearFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.year);
         const installCallFile = DriveApp.getFileById(this.hostFileId);
-        systemFolder.addFile(installCallFile);
+        yearFolder.addFile(installCallFile);
         DriveApp.getRootFolder().removeFile(installCallFile);
     }
     public getProperyFromTable(table: ooTables, propertyName: string): string {
@@ -54,8 +59,13 @@ export class DriveConnector {
 
     private getFileName(table: ooTables): string {
         const tableFile = this.getProperyFromTable(ooTables.systemMasterConfiguration,table+"_TableFile");
-        const table_FileName = this.getProperyFromTable(ooTables.systemMasterConfiguration,tableFile+"_Name");
-        return this.getProperyFromTable(ooTables.systemMasterConfiguration, table_FileName)+" - Version:"+this.version;
+        const table_FileName = this.getProperyFromTable(ooTables.systemMasterConfiguration,tableFile+"Name");
+        return table_FileName+" - Version:"+this.version;
+    }
+    private getMasterId(table:ooTables):string{
+        const tableFile = this.getProperyFromTable(ooTables.systemMasterConfiguration,table+"_TableFile");
+        const table_FileId = this.getProperyFromTable(ooTables.systemMasterConfiguration,tableFile+"Id");
+        return table_FileId;
     }
     public getFolderName(folder:ooFolders){
         return folder+" "+this.version;
