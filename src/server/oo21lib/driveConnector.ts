@@ -1,4 +1,4 @@
-import { ooFolders, ooFiles, ooTables, ooVersions, systemTemplateId } from "./enums0055";
+import { ooFolders, ooFiles, ooTables, ooVersions, systemMasterId } from "./enums0055";
 
 
 
@@ -43,8 +43,8 @@ export class DriveConnector {
     }
     public getTableData(table: ooTables):any[][] {
         let tableData = this.tableDataCache[table];
-        if (!tableData) if (table === ooTables.businessConfiguration) {
-            const tableData = SpreadsheetApp.openById(systemTemplateId).getSheetByName("TemplateConfiguration").getDataRange().getValues();
+        if (!tableData) if (table === ooTables.systemMasterConfiguration) {
+            const tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
             this.tableDataCache[table] = tableData;
             return tableData
         } else {
@@ -53,9 +53,9 @@ export class DriveConnector {
     }
 
     private getFileName(table: ooTables): string {
-        const tableFile = this.getProperyFromTable(ooTables.businessConfiguration,table+"_TableFile");
-        const table_FileName = this.getProperyFromTable(ooTables.businessConfiguration,tableFile+"_Name");
-        return this.getProperyFromTable(ooTables.businessConfiguration, table_FileName)+" - Version:"+this.version;
+        const tableFile = this.getProperyFromTable(ooTables.systemMasterConfiguration,table+"_TableFile");
+        const table_FileName = this.getProperyFromTable(ooTables.systemMasterConfiguration,tableFile+"_Name");
+        return this.getProperyFromTable(ooTables.systemMasterConfiguration, table_FileName)+" - Version:"+this.version;
     }
     public getFolderName(folder:ooFolders){
         return folder+" "+this.version;

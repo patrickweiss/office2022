@@ -1,4 +1,4 @@
-export const systemTemplateId = "1IeAoshmD8nSkYkgqmjt9x545LFgvvyq5oqj6CMkw7e0";
+export const systemMasterId = "1IeAoshmD8nSkYkgqmjt9x545LFgvvyq5oqj6CMkw7e0";
 
 export enum ooVersions{
     oo55="0055"
@@ -13,6 +13,7 @@ export enum ooFolders{
     year = "2021 My Business.Office 0055"
 }
 export enum ooTables{
+    systemMasterConfiguration = "systemMasterConfiguration",
     businessConfiguration = "businessConfiguration",
     email="email"
 }
