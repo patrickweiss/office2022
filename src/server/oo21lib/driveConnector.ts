@@ -1,23 +1,26 @@
-import { ooFolders, ooFiles, ooTables, ooVersion, systemTemplateId } from "./enums0001";
+import { ooFolders, ooFiles, ooTables, ooVersions, systemTemplateId } from "./enums0055";
 
 
 
 export class DriveConnector {
     private hostFileId: string;
-    private hostFile: ooFiles;
+    private hostTable:ooTables;
+    private version:ooVersions;
+
     private spreadsheetCache: Object={};
     private tableDataCache: Object={};
-    private propertyDataCache: Object={};
-    constructor(hostFileId: string, hostFile: ooFiles) {
+    private ooConfigurationCache: Object={};
+    constructor(hostFileId: string, hostTable: ooTables,version:ooVersions) {
         this.hostFileId = hostFileId;
-        this.hostFile = hostFile;
+        this.hostTable = hostTable;
+        this.version = version;
     }
     public systemInstalled(): boolean {
-        return DriveApp.getRootFolder().getFoldersByName(ooFolders.system).hasNext();
+        return DriveApp.getRootFolder().getFoldersByName(this.getFolderName(ooFolders.system)).hasNext();
     }
     public installSystem() {
         //correct the name of the hostFile
-        DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostFile));
+        DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
         const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.system);
         const yearFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),ooFolders.year);
         const installCallFile = DriveApp.getFileById(this.hostFileId);
@@ -26,19 +29,21 @@ export class DriveConnector {
     }
     public getProperyFromTable(table: ooTables, propertyName: string): string {
         console.log("getProperyFromTable"+" "+table+" "+propertyName);
-        let propertyData: ValuesCache = this.propertyDataCache[table];
+        let propertyData: ValuesCache = this.ooConfigurationCache[table];
         if (!propertyData) {
             const data = this.getTableData(table);
             console.log(data);
             propertyData = new ValuesCache(data);
             console.log(propertyData);
-            this.propertyDataCache[table] = propertyData;
+            this.ooConfigurationCache[table] = propertyData;
         }
-        return propertyData.getValueByName(propertyName);
+        const result = propertyData.getValueByName(propertyName);
+        console.log(result)
+        return result;
     }
     public getTableData(table: ooTables):any[][] {
         let tableData = this.tableDataCache[table];
-        if (!tableData) if (table === ooTables.SystemConfiguration) {
+        if (!tableData) if (table === ooTables.businessConfiguration) {
             const tableData = SpreadsheetApp.openById(systemTemplateId).getSheetByName("TemplateConfiguration").getDataRange().getValues();
             this.tableDataCache[table] = tableData;
             return tableData
@@ -46,9 +51,14 @@ export class DriveConnector {
 
         }
     }
-    private getFileName(file: ooFiles): string {
-        return this.getProperyFromTable(ooTables.SystemConfiguration, file)+" - Version:"+ooVersion;
 
+    private getFileName(table: ooTables): string {
+        const tableFile = this.getProperyFromTable(ooTables.businessConfiguration,table+"_TableFile");
+        const table_FileName = this.getProperyFromTable(ooTables.businessConfiguration,tableFile+"_Name");
+        return this.getProperyFromTable(ooTables.businessConfiguration, table_FileName)+" - Version:"+this.version;
+    }
+    public getFolderName(folder:ooFolders){
+        return folder+" "+this.version;
     }
 }
 

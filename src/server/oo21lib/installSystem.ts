@@ -1,6 +1,6 @@
 import { BusinessModel } from "./businessModel";
-import { ooFiles } from "./enums0001";
+import { ooTables, ooVersions } from "./enums0055";
 
-export function installSystem(fileId:string){
-    const bm = new BusinessModel(fileId,ooFiles.SystemConfiguration);
+export function installSystem(fileId:string,table:ooTables){
+    const bm = new BusinessModel(fileId,table,ooVersions.oo55);
 }
