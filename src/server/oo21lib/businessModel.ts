@@ -1,5 +1,5 @@
 import { DriveConnector } from "./driveConnector";
-import { ooFiles, ooTables, ooVersions } from "./enums0055";
+import {  ooTables, ooVersions } from "./enums0055";
 
 export class BusinessModel{
     private hostFileId:string;
