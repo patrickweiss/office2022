@@ -10,7 +10,9 @@ export enum ooFiles{
 }*/
 export enum ooFolders{
     system = "00 System",
-    office = "2021 My Business.Office"
+    office = "2021 My Business.Office",
+    archive = "9 Archiv",
+    version = "Version:"
 }
 
 export enum systemObject{
@@ -18,7 +20,8 @@ export enum systemObject{
 }
 
 export enum office{
-    searchForOffice = "searchForOffice"
+    searchForOffice = "searchForOffice",
+    subversion = "subversion"
 }
 export enum ooTables{
     systemMasterConfiguration = "systemMasterConfiguration", //

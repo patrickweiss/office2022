@@ -6,6 +6,7 @@ export class DriveConnector {
     private hostFileId: string;
     private hostTable: ooTables;
     private version: ooVersions;
+    public officeFolder:GoogleAppsScript.Drive.Folder;
 
     private spreadsheetCache: Object = {};
     private tableDataCache: Object = {};
@@ -17,7 +18,16 @@ export class DriveConnector {
     }
     public systemInstalled(): boolean {
         //if there is a system folder, we asume the system is correctly installed ... more checks may be added in future
-        return DriveApp.getRootFolder().getFoldersByName(this.getFolderName(ooFolders.system)).hasNext();
+        const systemFolderIterator = DriveApp.getRootFolder().getFoldersByName(this.getFolderNameWithVersion(ooFolders.system))
+        const installed =  systemFolderIterator.hasNext();
+        if (!installed)return false;
+        //initialize driveConnector with system spreadsheet and office folder
+        const systemFolder = systemFolderIterator.next()
+        const systemSpreadsheetName = this.getFileName(ooTables.systemConfiguration)
+        this.spreadsheetCache[systemSpreadsheetName] = SpreadsheetApp.openById(
+                systemFolder.getFilesByName(systemSpreadsheetName).next().getId()
+        )
+        this.officeFolder = DriveApp.getFolderById(this.getSystemObject(systemObject.officeArray)[0])
     }
     public installSystem() {
         //load hostTable data in tableData Cache
@@ -30,17 +40,17 @@ export class DriveConnector {
 
         const officeName = this.getOfficeProperty(office.searchForOffice)
         const officeFolderIterator = DriveApp.getFoldersByName(officeName);
-        let officeFolder: GoogleAppsScript.Drive.Folder;
-        if (officeFolderIterator.hasNext()) officeFolder = officeFolderIterator.next();
-        else officeFolder = getOrCreateFolderIn(DriveApp.getRootFolder(), ooFolders.office);
+        
+        if (officeFolderIterator.hasNext()) this.officeFolder = officeFolderIterator.next();
+        else this.officeFolder = getOrCreateFolderIn(DriveApp.getRootFolder(), this.getFolderNameWithVersion(ooFolders.office));
 
         //move office Configuration or landing Page ???? in office Folder
         const installCallFile = DriveApp.getFileById(this.hostFileId);
-        officeFolder.addFile(installCallFile);
+        this.officeFolder.addFile(installCallFile);
         DriveApp.getRootFolder().removeFile(installCallFile);
 
         //create system folder
-        const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(), ooFolders.system);
+        const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(),this.getFolderNameWithVersion(ooFolders.system));
 
         //copy system spreadsheet in system folder
         const systemSpreadsheetName = this.getFileName(ooTables.systemConfiguration)
@@ -52,7 +62,7 @@ export class DriveConnector {
 
         //register new office instance in system spreadsheet
         // ...
-        this.addOffice(officeFolder.getId());
+        this.addOffice(this.officeFolder.getId());
 
 
     }
@@ -60,6 +70,7 @@ export class DriveConnector {
     public getSheetName(table: ooTables): string { return this.getProperyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
 
     private addOffice(folderId: string) {
+        console.log("addOffice:"+folderId);
         const officeArray: string[] = this.getSystemObject(systemObject.officeArray) as unknown as string[]
         officeArray.push(folderId);
         this.setSystemObject(systemObject.officeArray,officeArray);
@@ -73,12 +84,13 @@ export class DriveConnector {
             .getSheetByName(this.getSheetName(ooTables.systemConfiguration))
             .getDataRange()
             .setValues(systemDataTable);
+        SpreadsheetApp.flush()
   }
 
     private getSpreadsheet(table: ooTables):GoogleAppsScript.Spreadsheet.Spreadsheet {
         const spreadsheet = this.spreadsheetCache[this.getFileName(ooTables.systemConfiguration)] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet;
         if (!spreadsheet) {
-            throw new Error("implement office spreadsheet caching")
+            throw new Error("implement office spreadsheet caching for "+table);
         }
         return spreadsheet;
     }
@@ -108,22 +120,15 @@ export class DriveConnector {
         let tableData = this.tableDataCache[table] as unknown as any[][];
         if (!tableData && table === ooTables.systemMasterConfiguration) {
             tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
-            console.log("getTableData " + table );
-            console.log(tableData);
             this.tableDataCache[table] = tableData;
             return tableData
         }
         if (!tableData && table === ooTables.systemConfiguration) {
-            console.log("getTableData " + table );
             const sheetName = this.getSheetName(ooTables.systemConfiguration)
-            console.log("sheetName "+sheetName);
             const spreadsheet =  this.getSpreadsheet(ooTables.systemConfiguration)
-            console.log(spreadsheet.getName());
             tableData =spreadsheet
                 .getSheetByName(sheetName)
                 .getDataRange().getValues(); 
-                console.log("getTableData " + table );
-                console.log(tableData);
                 this.tableDataCache[table] = tableData;
                 return tableData
         }
@@ -142,17 +147,31 @@ export class DriveConnector {
         const table_FileId = this.getMasterProperty(tableFile + "Id");
         return table_FileId;
     }
-    public getFolderName(folder: ooFolders) {
+    public getFolderNameWithVersion(folder: ooFolders) {
         return folder + " " + this.version;
+    }
+    public isDeprecated():boolean{
+        const masterConfigFileId = this.getMasterId(this.hostTable);
+        const masterProperties = new ValuesCache(SpreadsheetApp.openById(masterConfigFileId).getDataRange().getValues())
+        const subversion = masterProperties.getValueByName(office.subversion);
+        return (subversion>this.getOfficeProperty(office.subversion));
+    }
+    public archiveHostFile(){
+           //move office Host File in Archive Folder
+           const installCallFile = DriveApp.getFileById(this.hostFileId);
+           const archiveFolder = getOrCreateFolderIn(this.officeFolder,ooFolders.archive);
+           const versionFolder = getOrCreateFolderIn(archiveFolder,ooFolders.version+this.version);
+           versionFolder.addFile(installCallFile);
+           this.officeFolder.removeFile(installCallFile);
     }
 }
 
-export function deleteSystem() {
-    DriveApp.getRootFolder().getFoldersByName(ooFolders.system).next().setTrashed(true);
-    DriveApp.getRootFolder().getFoldersByName(ooFolders.office).next().setTrashed(true);
+export function deleteSystem0055() {
+    DriveApp.getRootFolder().getFoldersByName(ooFolders.system+" "+ooVersions.oo55).next().setTrashed(true);
+    DriveApp.getRootFolder().getFoldersByName(ooFolders.office+" "+ooVersions.oo55).next().setTrashed(true);
 }
 
-function getOrCreateFolderIn(inFolder: GoogleAppsScript.Drive.Folder, returnFolderName: ooFolders) {
+function getOrCreateFolderIn(inFolder: GoogleAppsScript.Drive.Folder, returnFolderName: ooFolders|string) {
     const folderIterator = inFolder.getFoldersByName(returnFolderName);
     if (folderIterator.hasNext()) return folderIterator.next();
     return inFolder.createFolder(returnFolderName);
