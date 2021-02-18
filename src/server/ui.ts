@@ -1,5 +1,4 @@
-import { BusinessModel } from "./oo21lib/businessModel";
-import {  ooTables } from "./oo21lib/enums0055";
+import { ooTables } from "./oo21lib/enums0055";
 import { installSystem } from "./oo21lib/installSystem";
 
 export const onOpen = () => {

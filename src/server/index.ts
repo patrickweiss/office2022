@@ -1,5 +1,4 @@
 import { deleteSystem } from './oo21lib/driveConnector';
-import { installSystem } from './oo21lib/installSystem';
 import * as publicUiFunctions from './ui';
 
 // Expose public functions by attaching to `global`

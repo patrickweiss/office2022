@@ -7,7 +7,6 @@ export class DriveConnector {
     private hostTable: ooTables;
     private version: ooVersions;
 
-
     private spreadsheetCache: Object = {};
     private tableDataCache: Object = {};
     private ooConfigurationCache: Object = {};
@@ -17,6 +16,7 @@ export class DriveConnector {
         this.version = version;
     }
     public systemInstalled(): boolean {
+        //if there is a system folder, we asume the system is correctly installed ... more checks may be added in future
         return DriveApp.getRootFolder().getFoldersByName(this.getFolderName(ooFolders.system)).hasNext();
     }
     public installSystem() {
@@ -146,10 +146,6 @@ export class DriveConnector {
         return folder + " " + this.version;
     }
 }
-
-
-
-
 
 export function deleteSystem() {
     DriveApp.getRootFolder().getFoldersByName(ooFolders.system).next().setTrashed(true);
