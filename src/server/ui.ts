@@ -1,10 +1,10 @@
-import { currentOOversion, ooTables } from "./oo21lib/enums0055";
+import { currentOOversion, ooTables } from "./oo21lib/systemEnums";
 import { installSystem, tryCodeUpdate } from "./oo21lib/systemFunction";
 
 export const onOpen = () => {
   const menu = SpreadsheetApp.getUi()
     .createMenu('Office One 2022') // edit me!
-    .addItem('System starten', 'installOO22')
+    .addItem('System installieren', 'installOO22')
     .addItem('System aktualisieren', 'updateOO22')
     .addItem('System löschen', 'deleteSystem')
   menu.addToUi();

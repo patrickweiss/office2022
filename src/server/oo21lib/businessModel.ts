@@ -1,5 +1,5 @@
 import { DriveConnector } from "./driveConnector";
-import {  ooTables, ooVersions } from "./enums0055";
+import {  ooTables, ooVersions } from "./systemEnums";
 
 export class BusinessModel{
     private dc:DriveConnector;

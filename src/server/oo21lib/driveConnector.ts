@@ -1,10 +1,10 @@
-import { office, ooFolders, ooTables, ooVersions, systemMasterId, systemObject } from "./enums0055";
+import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
 
 export class DriveConnector {
     private hostFileId: string;
-    private hostTable: ooTables;
+    public hostTable: ooTables;
     private version: ooVersions;
     public officeFolder: GoogleAppsScript.Drive.Folder;
 
@@ -17,94 +17,78 @@ export class DriveConnector {
         this.version = version;
     }
     public systemInstalled(): boolean {
-        //if there is a system folder, we asume the system is correctly installed ... more checks may be added in future
-        const systemFolderIterator = DriveApp.getRootFolder().getFoldersByName(this.getFolderNameWithVersion(ooFolders.system))
-        const installed = systemFolderIterator.hasNext();
-        if (!installed) return false;
-        //initialize driveConnector with system spreadsheet 
-        const systemFolder = systemFolderIterator.next()
-        const systemSpreadsheetName = this.getFileName(ooTables.systemConfiguration)
-        this.spreadsheetCache[systemSpreadsheetName] = SpreadsheetApp.openById(
-            systemFolder.getFilesByName(systemSpreadsheetName).next().getId()
-        )
+        //if the host file is named like the master file, we assume the system is correctly installed
+        const hostSpreadsheetName = this.getFileName(this.hostTable);
+        if (hostSpreadsheetName !== DriveApp.getFileById(this.hostFileId).getName()) return false;
 
         //intialize office folder
-        this.officeFolder = DriveApp.getFolderById(this.getSystemObject(systemObject.officeArray)[0])
+        const officeFolderIterator = DriveApp.getFileById(this.hostFileId).getParents();
+        if (officeFolderIterator.hasNext())
+            this.officeFolder = officeFolderIterator.next();
+        else
+            // if there is no file with this id, then the id must be officeFolderId
+            this.officeFolder = DriveApp.getFolderById(this.hostFileId);
 
-        //get host file from drive host file or create host file from master
-        const hostSpreadsheetName = this.getFileName(this.hostTable);
-        if (this.hostFileId === "") {
-            //Host file has to be created by copying the master file of the host table
-            console.log("spreadsheetCache filled:" + hostSpreadsheetName);
+        //this can go into 
+        //this.getTableData ---------------------------------------------------------------------------------
+        const spreadsheetFileIterator = this.officeFolder.getFilesByName(hostSpreadsheetName);
+        //if there is no spreadsheet, we'll copy it from the master
+        if (spreadsheetFileIterator.hasNext) {
+            this.spreadsheetCache[hostSpreadsheetName] = SpreadsheetApp.openById(
+                spreadsheetFileIterator.next().getId()
+            )
+        } else {
             this.spreadsheetCache[hostSpreadsheetName] = SpreadsheetApp.openById(
                 DriveApp
                     .getFileById(this.getMasterId(this.hostTable))
                     .makeCopy(hostSpreadsheetName, this.officeFolder).getId()
             )
             this.hostFileId = (this.spreadsheetCache[hostSpreadsheetName] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet).getId()
-        } else {
-            this.spreadsheetCache[hostSpreadsheetName] = SpreadsheetApp.openById(
-                this.officeFolder.getFilesByName(hostSpreadsheetName).next().getId()
-            )
-
         }
+
         //load data from host file
         this.tableDataCache[this.hostTable] = this.spreadsheetCache[hostSpreadsheetName].getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues()
+        //---------------------------------------------------------------------------------------------------
         return true;
     }
     public installSystem() {
         //load hostTable data in tableData Cache
         this.tableDataCache[this.hostTable] = SpreadsheetApp.getActive().getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues();
 
-        //correct the name of the hostFile
-        DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
 
-        //create new office folder or search for office folder from version 2021 from eins.stein 
+        this.officeFolder = copyFolder(
+            this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
+            DriveApp.getRootFolder().getId(),
+            currentOOversion,
+            currentOOversion
+        )
+        // delete the copy of the hostfile
+        this.officeFolder.getFilesByName(this.getFileName(this.hostTable)).next().setTrashed(true);
 
-        const officeName = this.getOfficeProperty(office.searchForOffice)
-        const officeFolderIterator = DriveApp.getFoldersByName(officeName);
-
-        if (officeFolderIterator.hasNext()) this.officeFolder = officeFolderIterator.next();
-        else this.officeFolder = getOrCreateFolderIn(DriveApp.getRootFolder(), this.getFolderNameWithVersion(ooFolders.office));
+        this.officeFolder.setName(
+            this.getOfficeProperty(office.geschaeftsjahr) + " " +
+            this.getOfficeProperty(office.firma) + ".Office " +
+            currentOOversion)
 
         //move office Configuration or landing Page ???? in office Folder
         const installCallFile = DriveApp.getFileById(this.hostFileId);
         this.officeFolder.addFile(installCallFile);
         DriveApp.getRootFolder().removeFile(installCallFile);
 
-        //create system folder
-        const systemFolder = getOrCreateFolderIn(DriveApp.getRootFolder(), this.getFolderNameWithVersion(ooFolders.system));
-
-        //copy system spreadsheet in system folder
-        const systemSpreadsheetName = this.getFileName(ooTables.systemConfiguration)
-        this.spreadsheetCache[systemSpreadsheetName] = SpreadsheetApp.openById(
-            DriveApp
-                .getFileById(this.getMasterId(ooTables.systemConfiguration))
-                .makeCopy(systemSpreadsheetName, systemFolder).getId()
-        )
-
-        //register new office instance in system spreadsheet
-        // ...
-        this.addOffice(this.officeFolder.getId());
-
+        //correct the name of the hostFile
+        DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
 
     }
 
     public getSheetName(table: ooTables): string { return this.getProperyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
 
-    private addOffice(folderId: string) {
-        console.log("addOffice:" + folderId);
-        const officeArray: string[] = this.getSystemObject(systemObject.officeArray) as unknown as string[]
-        officeArray.push(folderId);
-        this.setSystemObject(systemObject.officeArray, officeArray);
-    }
 
-    public setSystemObject(systemObject: systemObject, object: Object): void {
-        const systemDataTable = this.tableDataCache[ooTables.systemConfiguration] as unknown as any[][]
+    public setOfficeObject(systemObject: systemObject, object: Object): void {
+        const systemDataTable = this.tableDataCache[ooTables.officeConfiguration] as unknown as any[][]
         const propertyRow = systemDataTable.filter(row => row[0] === systemObject)[0]
         propertyRow[1] = JSON.stringify(object);
-        this.getSpreadsheet(ooTables.systemConfiguration)
-            .getSheetByName(this.getSheetName(ooTables.systemConfiguration))
+        this.getSpreadsheet(ooTables.officeConfiguration)
+            .getSheetByName(this.getSheetName(ooTables.officeConfiguration))
             .getDataRange()
             .setValues(systemDataTable);
         SpreadsheetApp.flush()
@@ -127,18 +111,17 @@ export class DriveConnector {
         }
         return spreadsheet;
     }
-    public getSystemObject(systemObject: systemObject): Object {
-        return JSON.parse(this.getSystemProperty(systemObject));
+    public getOfficeObject(officeObject: office): Object {
+        return JSON.parse(this.getOfficeProperty(officeObject));
     }
 
-    public getMasterProperty(name: string) { return this.getProperyFromTable(ooTables.systemMasterConfiguration, name); }
-    public getSystemProperty(name: string) { return this.getProperyFromTable(ooTables.systemConfiguration, name); }
+    public getMasterProperty(name: systemMasterProperty | string) { return this.getProperyFromTable(ooTables.systemMasterConfiguration, name); }
     public getOfficeProperty(name: office) { return this.getProperyFromTable(ooTables.officeConfiguration, name); }
 
     private getValuesCache(table: ooTables) {
         let valuesCache = this.ooConfigurationCache[table];
         if (!valuesCache) {
-            console.log("Fill Configuration Cache:"+table);
+            console.log("Fill Configuration Cache:" + table);
             const data = this.getTableData(table);
             valuesCache = new ValuesCache(data);
             this.ooConfigurationCache[table] = valuesCache;
@@ -155,18 +138,9 @@ export class DriveConnector {
     }
     public getTableData(table: ooTables): any[][] {
         let tableData = this.tableDataCache[table] as unknown as any[][];
-        console.log("getTableData:"+table);
+        console.log("getTableData:" + table);
         if (!tableData && table === ooTables.systemMasterConfiguration) {
             tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
-            this.tableDataCache[table] = tableData;
-            return tableData
-        }
-        if (!tableData && table === ooTables.systemConfiguration) {
-            const sheetName = this.getSheetName(ooTables.systemConfiguration)
-            const spreadsheet = this.getSpreadsheet(ooTables.systemConfiguration)
-            tableData = spreadsheet
-                .getSheetByName(sheetName)
-                .getDataRange().getValues();
             this.tableDataCache[table] = tableData;
             return tableData
         }
@@ -176,7 +150,7 @@ export class DriveConnector {
         return tableData;
     }
     public saveTableData(table: ooTables, data: any[][]) {
-        this.tableDataCache[table]=data;
+        this.tableDataCache[table] = data;
         const spreadsheet = this.getSpreadsheet(table);
         const sheetName = this.getSheetName(table);
         spreadsheet.getSheetByName(sheetName).getDataRange().setValues(data);
@@ -184,15 +158,15 @@ export class DriveConnector {
     }
 
 
-    private getFileName(table: ooTables): string {
+    public getFileName(table: ooTables): string {
         const tableFile = this.getMasterProperty(table + "_TableFile");
-        const table_FileName = this.getMasterProperty(tableFile + "Name");
-        return table_FileName + " - Version:" + this.version;
+        const table_FileName = this.getMasterProperty(tableFile + "Name") + " - Version:" + this.version;
+        console.log(table+" --> "+table_FileName);
+        return table_FileName;
     }
     private getMasterId(table: ooTables): string {
-        const tableFile = this.getMasterProperty(table + "_TableFile");
-        const table_FileId = this.getMasterProperty(tableFile + "Id");
-        console.log(table + " " + tableFile + " " + table_FileId);
+        const templateFolder = DriveApp.getFolderById(this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId))
+        const table_FileId = templateFolder.getFilesByName(this.getFileName(table)).next().getId();
         return table_FileId;
     }
     public getFolderNameWithVersion(folder: ooFolders) {
@@ -238,4 +212,47 @@ class ValuesCache {
     public getValueByName(name: string) {
         return this.dataHash[name];
     }
+}
+
+
+export function getNextVersion(): ooVersions {
+    let oooNextVersion = (parseInt(currentOOversion, 10) + 1).toString();
+    let nix = "";
+    for (let nullen = 0; nullen < 4 - oooNextVersion.length; nullen++) {
+        nix += "0";
+    }
+    oooNextVersion = nix + oooNextVersion;
+    return oooNextVersion as ooVersions;
+}
+
+export function copyFolder(folderToCopyId: string, parentFolderId: string, oldVersion: ooVersions, newVersion: ooVersions): GoogleAppsScript.Drive.Folder {
+    if (folderToCopyId === parentFolderId) throw new Error("copying a folder in itself would result in an endless loop");
+    const parentFolder = DriveApp.getFolderById(parentFolderId);
+    const folderToCopy = DriveApp.getFolderById(folderToCopyId);
+    //create new Folder
+    const folderCopy = parentFolder.createFolder(getNewName(folderToCopy.getName(), oldVersion, newVersion));
+
+    //copy all files from the folder
+    const fileIterator = folderToCopy.getFiles()
+    while (fileIterator.hasNext()) {
+        const fileToCopy = fileIterator.next();
+        fileToCopy.makeCopy(getNewName(fileToCopy.getName(), oldVersion, newVersion), folderCopy);
+    }
+
+    //copy all folders from the folder
+    const folderIterator = folderToCopy.getFolders();
+    while (folderIterator.hasNext()) {
+        const folderToCopy = folderIterator.next();
+        copyFolder(folderToCopy.getId(), folderCopy.getId(), oldVersion, newVersion);
+    }
+    return folderCopy;
+}
+
+function getNewName(oldName: string, oldVersion: ooVersions, newVersion: ooVersions): string {
+    let folderToCopyName = oldName;
+    //rename folder if it ends with version number
+    if (oldVersion === folderToCopyName.substr(folderToCopyName.length - 4)) {
+        folderToCopyName = folderToCopyName.substr(0, folderToCopyName.length - 4) + newVersion;
+    }
+    return folderToCopyName
 }
