@@ -56,19 +56,29 @@ export class DriveConnector {
         this.tableDataCache[this.hostTable] = SpreadsheetApp.getActive().getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues();
 
 
-        this.officeFolder = copyFolder(
-            this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
-            DriveApp.getRootFolder().getId(),
-            currentOOversion,
-            currentOOversion
-        )
-        // delete the copy of the hostfile
-        this.officeFolder.getFilesByName(this.getFileName(this.hostTable)).next().setTrashed(true);
-
-        this.officeFolder.setName(
-            this.getOfficeProperty(office.geschaeftsjahr) + " " +
-            this.getOfficeProperty(office.firma) + ".Office " +
-            currentOOversion)
+        if (this.getOfficeProperty(office.importFrom2021_FolderId) === "") {
+            this.officeFolder = copyFolder(
+                this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
+                DriveApp.getRootFolder().getId(),
+                currentOOversion,
+                currentOOversion
+            )
+            // delete the copy of the hostfile
+            this.officeFolder.getFilesByName(this.getFileName(this.hostTable)).next().setTrashed(true);
+            // name the office folder according to naming convention
+            this.officeFolder.setName(
+                this.getOfficeProperty(office.geschaeftsjahr) + " " +
+                this.getOfficeProperty(office.firma) + ".Office " +
+                currentOOversion)
+        }else{
+            //copy oo2021 0055 version into new folder
+            this.officeFolder = copyFolder(
+                this.getOfficeProperty(office.importFrom2021_FolderId),
+                DriveApp.getRootFolder().getId(),
+                ooVersions.oo55,
+                ooVersions.oo55
+                )
+        }
 
         //move office Configuration or landing Page ???? in office Folder
         const installCallFile = DriveApp.getFileById(this.hostFileId);
@@ -161,7 +171,7 @@ export class DriveConnector {
     public getFileName(table: ooTables): string {
         const tableFile = this.getMasterProperty(table + "_TableFile");
         const table_FileName = this.getMasterProperty(tableFile + "Name") + " - Version:" + this.version;
-        console.log(table+" --> "+table_FileName);
+        console.log(table + " --> " + table_FileName);
         return table_FileName;
     }
     private getMasterId(table: ooTables): string {

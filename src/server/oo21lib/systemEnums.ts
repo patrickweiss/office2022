@@ -27,7 +27,8 @@ export enum systemObject{
 export enum office{
     geschaeftsjahr = "zeitraumJahr",
     firma = "bezeichnung",
-    subversion = "subversion"
+    subversion = "subversion",
+    importFrom2021_FolderId = "importFrom2021_FolderId"
 }
 export enum ooTables{
     systemMasterConfiguration = "systemMasterConfiguration", //
