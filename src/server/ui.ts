@@ -23,10 +23,14 @@ export const installOO22 = () => {
 };
 
 export const updateOO22 = () => {
-  const fileId = SpreadsheetApp.getActive().getId();
-  if (tryCodeUpdate(fileId,ooTables.officeConfiguration,currentOOversion))
+  if (tryUpdateWithoutParameters())
     SpreadsheetApp.getUi().alert("Tabelle wurde archiviert und aktualisiert");
     else
     SpreadsheetApp.getUi().alert("Tabelle ist noch aktuell");
+}
+
+export function tryUpdateWithoutParameters():boolean{
+  const fileId = SpreadsheetApp.getActive().getId();
+  return tryCodeUpdate(fileId,ooTables.officeConfiguration,currentOOversion)
 }
 

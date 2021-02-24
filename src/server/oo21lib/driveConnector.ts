@@ -1,3 +1,4 @@
+import { log } from "./spreadsheerLogger";
 import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
@@ -15,12 +16,14 @@ export class DriveConnector {
         this.hostFileId = hostFileId;
         this.hostTable = hostTable;
         this.version = version;
+        log(new Date(),"new DC for "+this.hostFileId+" "+this.hostTable+" "+this.version)
     }
     public systemInstalled(): boolean {
         //if the host file is named like the master file, we assume the system is correctly installed
         const hostSpreadsheetName = this.getFileName(this.hostTable);
-        if (hostSpreadsheetName !== DriveApp.getFileById(this.hostFileId).getName()) return false;
-
+        if (hostSpreadsheetName !== DriveApp.getFileById(this.hostFileId).getName()){ 
+            return false;
+        }
         //intialize office folder
         const officeFolderIterator = DriveApp.getFileById(this.hostFileId).getParents();
         if (officeFolderIterator.hasNext())
@@ -28,7 +31,6 @@ export class DriveConnector {
         else
             // if there is no file with this id, then the id must be officeFolderId
             this.officeFolder = DriveApp.getFolderById(this.hostFileId);
-
         //this can go into 
         //this.getTableData ---------------------------------------------------------------------------------
         const spreadsheetFileIterator = this.officeFolder.getFilesByName(hostSpreadsheetName);
@@ -45,7 +47,6 @@ export class DriveConnector {
             )
             this.hostFileId = (this.spreadsheetCache[hostSpreadsheetName] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet).getId()
         }
-
         //load data from host file
         this.tableDataCache[this.hostTable] = this.spreadsheetCache[hostSpreadsheetName].getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues()
         //---------------------------------------------------------------------------------------------------
@@ -54,8 +55,6 @@ export class DriveConnector {
     public installSystem() {
         //load hostTable data in tableData Cache
         this.tableDataCache[this.hostTable] = SpreadsheetApp.getActive().getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues();
-
-
         if (this.getOfficeProperty(office.importFrom2021_FolderId) === "") {
             this.officeFolder = copyFolder(
                 this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
@@ -70,29 +69,23 @@ export class DriveConnector {
                 this.getOfficeProperty(office.geschaeftsjahr) + " " +
                 this.getOfficeProperty(office.firma) + ".Office " +
                 currentOOversion)
-        }else{
+        } else {
             //copy oo2021 0055 version into new folder
             this.officeFolder = copyFolder(
                 this.getOfficeProperty(office.importFrom2021_FolderId),
                 DriveApp.getRootFolder().getId(),
                 ooVersions.oo55,
                 ooVersions.oo55
-                )
+            )
         }
-
         //move office Configuration or landing Page ???? in office Folder
         const installCallFile = DriveApp.getFileById(this.hostFileId);
         this.officeFolder.addFile(installCallFile);
         DriveApp.getRootFolder().removeFile(installCallFile);
-
         //correct the name of the hostFile
         DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
-
     }
-
-    public getSheetName(table: ooTables): string { return this.getProperyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
-
-
+    public getSheetName(table: ooTables): string { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
     public setOfficeObject(systemObject: systemObject, object: Object): void {
         const systemDataTable = this.tableDataCache[ooTables.officeConfiguration] as unknown as any[][]
         const propertyRow = systemDataTable.filter(row => row[0] === systemObject)[0]
@@ -113,7 +106,6 @@ export class DriveConnector {
             .setValues(officeDataTable);
         SpreadsheetApp.flush()
     }
-
     private getSpreadsheet(table: ooTables): GoogleAppsScript.Spreadsheet.Spreadsheet {
         const spreadsheet = this.spreadsheetCache[this.getFileName(table)] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet;
         if (!spreadsheet) {
@@ -124,31 +116,26 @@ export class DriveConnector {
     public getOfficeObject(officeObject: office): Object {
         return JSON.parse(this.getOfficeProperty(officeObject));
     }
-
-    public getMasterProperty(name: systemMasterProperty | string) { return this.getProperyFromTable(ooTables.systemMasterConfiguration, name); }
-    public getOfficeProperty(name: office) { return this.getProperyFromTable(ooTables.officeConfiguration, name); }
-
+    public getMasterProperty(name: systemMasterProperty | string) { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, name); }
+    public getOfficeProperty(name: office) { return this.getPropertyFromTable(ooTables.officeConfiguration, name); }
     private getValuesCache(table: ooTables) {
         let valuesCache = this.ooConfigurationCache[table];
         if (!valuesCache) {
-            console.log("Fill Configuration Cache:" + table);
             const data = this.getTableData(table);
             valuesCache = new ValuesCache(data);
             this.ooConfigurationCache[table] = valuesCache;
         }
         return valuesCache;
     }
-    private getProperyFromTable(table: ooTables, propertyName: string): string {
+    private getPropertyFromTable(table: ooTables, propertyName: string): string {
         const property = this.getValuesCache(table).getValueByName(propertyName);
         if (!property) {
-            console.log(this.getTableData(table));
             throw new Error("Variable missing in Configuration:" + table + " " + propertyName);
         }
         return property;
     }
     public getTableData(table: ooTables): any[][] {
         let tableData = this.tableDataCache[table] as unknown as any[][];
-        console.log("getTableData:" + table);
         if (!tableData && table === ooTables.systemMasterConfiguration) {
             tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
             this.tableDataCache[table] = tableData;
@@ -166,12 +153,9 @@ export class DriveConnector {
         spreadsheet.getSheetByName(sheetName).getDataRange().setValues(data);
         SpreadsheetApp.flush();
     }
-
-
     public getFileName(table: ooTables): string {
         const tableFile = this.getMasterProperty(table + "_TableFile");
         const table_FileName = this.getMasterProperty(tableFile + "Name") + " - Version:" + this.version;
-        console.log(table + " --> " + table_FileName);
         return table_FileName;
     }
     private getMasterId(table: ooTables): string {
@@ -195,6 +179,8 @@ export class DriveConnector {
         const versionFolder = getOrCreateFolderIn(archiveFolder, ooFolders.version + this.version);
         versionFolder.addFile(installCallFile);
         this.officeFolder.removeFile(installCallFile);
+
+        log(new Date(),"This file was archived, this should be the last log entry!!!")
     }
 }
 

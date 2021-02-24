@@ -8,6 +8,7 @@ interface IglobalFuntions {
     installOO22: () => void;
     updateOO22:() => void;
     deleteSystem:()=>void;
+    tryUpdateWithoutParameters:()=>boolean;
 }
 
 declare let global: IglobalFuntions;
@@ -16,3 +17,4 @@ global.onOpen = publicUiFunctions.onOpen;
 global.installOO22 = publicUiFunctions.installOO22;
 global.updateOO22 = publicUiFunctions.updateOO22
 global.deleteSystem = deleteSystem0055;
+global.tryUpdateWithoutParameters = publicUiFunctions.tryUpdateWithoutParameters
