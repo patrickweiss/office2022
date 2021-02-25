@@ -324,7 +324,7 @@ export class BusinessModel {
         faelligeMehrwertsteuerVorsteuer.setText("Fällige Umsatzsteuer - VORSTEUER = Fällige Jahresmehrwertsteuer");
 
         //jahresumsatzsteuer auf Verbindlichkeiten Umsatzsteuer buchen
-        let mwstAufVerbindlichkeiten = this.getOrCreateUmbuchung("mwstJahresmehrwertsteuerAusVerbindlichkeiten");
+        let mwstAufVerbindlichkeiten = this.getOrCreateUmbuchung("mwstJahrAufVerbindlichkeiten");
         mwstAufVerbindlichkeiten.setDatum(this.endOfYear());
         mwstAufVerbindlichkeiten.setKonto("Jahresmehrwertsteuer");
         mwstAufVerbindlichkeiten.setBetrag(fealligeUmsatzsteuer - vorsteuer);
