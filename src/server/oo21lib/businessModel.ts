@@ -12,4 +12,7 @@ export class BusinessModel {
         this.dc.installSystem();
     }
     public getDriveConnector(): DriveConnector { return this.dc; }
+    public scanDriveForNewDocuments(){
+        
+    }
 }

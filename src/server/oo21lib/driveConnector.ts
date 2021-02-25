@@ -1,4 +1,4 @@
-import { log } from "./spreadsheerLogger";
+import { oolog } from "./spreadsheerLogger";
 import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
@@ -16,7 +16,7 @@ export class DriveConnector {
         this.hostFileId = hostFileId;
         this.hostTable = hostTable;
         this.version = version;
-        log(new Date(),"new DC for "+this.hostFileId+" "+this.hostTable+" "+this.version)
+        oolog.addMessage("new DC for "+this.hostFileId+" "+this.hostTable+" "+this.version)
     }
     public systemInstalled(): boolean {
         //if the host file is named like the master file, we assume the system is correctly installed
@@ -180,7 +180,7 @@ export class DriveConnector {
         versionFolder.addFile(installCallFile);
         this.officeFolder.removeFile(installCallFile);
 
-        log(new Date(),"This file was archived, this should be the last log entry!!!")
+        oolog.addMessage("This file was archived, this should be the last log entry!!!")
     }
 }
 
@@ -252,3 +252,10 @@ function getNewName(oldName: string, oldVersion: ooVersions, newVersion: ooVersi
     }
     return folderToCopyName
 }
+
+export function getOrCreateFolder(rootFolder: GoogleAppsScript.Drive.Folder, folderName: string): GoogleAppsScript.Drive.Folder {
+    var folderIterator = rootFolder.getFoldersByName(folderName);
+    if (folderIterator.hasNext()) return folderIterator.next();
+    else return rootFolder.createFolder(folderName);
+  }
+  
