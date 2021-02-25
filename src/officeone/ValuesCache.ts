@@ -1,4 +1,4 @@
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
 
 
 export class ValuesCache {

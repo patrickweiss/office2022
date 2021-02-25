@@ -1,32 +1,34 @@
-import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
+import { IOfficeWindow } from '../framework/OfficeWindow';
 
+declare let window: IOfficeWindow;
 
-export class TableCache<RowType extends TableRow> {
-  dataArray: Object[][];
+// Basis Klasse für alle Tabellen Caches. Konstruktor um Daten aus Redux Store zu lesen! nur für den Client!!!!!!!!!
+class TableCache<RowType extends TableRow> {
+  dataArray: any[][];
   backgroundArray: string[][];
   formulaArray: string[][];
   formatsArray: string[][];
   columnIndex: {};
-  private loadRowCount: number;
-  private rootId: string;
+  //private loadRowCount: number;
+  //private rootId: string;
   private tableName: string;
+//  private rowHashTable: { [x: string]: TableRow; } | undefined;
   private rowHashTable;
   private columnHashTable = {};
+
   private rowArray: RowType[];
   constructor(rootId: string, tableName: string) {
-    let data = {}
-    if (tableName === "RechnungSchreibenD" || tableName === "RechnungenD") {
-      data = DriveConnector.getNamedRangeDataAndFormat(rootId, tableName, oooVersion)
-      this.formatsArray = data[3];
-    }
-    else
-      data = DriveConnector.getNamedRangeData(rootId, tableName, oooVersion);
+
+    let data = window.store.getState().BM[rootId][tableName];
+    if (data === undefined) window.serverProxy.loadNamedRange(tableName);
+    if (data === "loading") throw new Error(tableName + " is loading");
     this.dataArray = data[0];
     this.backgroundArray = data[1];
     this.formulaArray = data[2];
+    this.formatsArray = data[3];
     this.columnIndex = this.getColumnIndex(this.dataArray[0]);
-    this.loadRowCount = this.dataArray.length;
-    this.rootId = rootId;
+    //  this.loadRowCount = this.dataArray.length;
+    //  this.rootId = rootId;
     this.tableName = tableName;
   }
   public getData() {
@@ -43,7 +45,7 @@ export class TableCache<RowType extends TableRow> {
     }
     return this.rowHashTable;
   }
-  public getOrCreateHashTable(columnName: string): Object {
+  public getOrCreateHashTable(columnName: string):Object {
     if (this.columnHashTable[columnName] === undefined) {
       this.columnHashTable[columnName] = {};
       for (let index in this.dataArray) {
@@ -53,29 +55,29 @@ export class TableCache<RowType extends TableRow> {
         }
       }
     }
-    return this.columnHashTable[columnName]
+    return  this.columnHashTable[columnName]
   }
   protected addRowToHash(tableRow: TableRow) {
-    this.rowHashTable[tableRow.getId()] = tableRow;
+    this.getRowHashTable()[tableRow.getId()] = tableRow;
   }
   public getRowArray() {
     if (this.rowArray === undefined) {
       this.rowArray = [];
       for (var index in this.dataArray) {
-        if (index !== "0") {
-          const currentRow = this.getRowByIndex(index);
+        if (index !== "0"){
+          const currentRow = this.getRowByIndex(index)
           //direkt nach Installation gibt es leere Zeilen, die werden nicht zurueck gegeben
-          if (currentRow.getId() !== "") this.rowArray.push(currentRow);
+          if (currentRow.getId()!=="")this.rowArray.push(currentRow);
         }
       }
     }
     return this.rowArray;
   }
-
-  public getRowByIndex(rowIndex: string): RowType {
+  public getRowByIndex(rowIndex: string):RowType {
     return new TableRow(this, rowIndex) as RowType;
   }
-  public createNewRow(): RowType {
+
+  public createNewRow():RowType {
     let newDataArray = Array.apply(null, Array(this.dataArray[0].length)).map(String.prototype.valueOf, "")
     let newFormulaArray = new Array(this.formulaArray[0].length);
     let newBackgroundArray = Array.apply(null, Array(this.backgroundArray[0].length)).map(String.prototype.valueOf, "white");
@@ -89,33 +91,33 @@ export class TableCache<RowType extends TableRow> {
     this.columnHashTable = {};
     if (this.rowArray) delete this.rowArray;
     this.getRowHashTable();
-    this.dataArray[0][0] = this.dataArray[0][0].toString().substr(0, 6) + padToFive(parseInt(this.dataArray[0][0].toString().substr(6, 5), 10) + 1);
+    this.dataArray[0][0] = this.dataArray[0][0].toString().substr(0, 6) + padToFive(parseInt(this.dataArray[0][0].toString().substr(6, 5),10) + 1);
     return tableRow as RowType;
   }
   public getOrCreateRowById(id: string): RowType {
-    if (id === "") throw new Error("Empty string is not allowed as id:" + this.tableName + new Error().stack);
+    if (id === "") throw new Error("Empty string is not allowed as id:"+ this.tableName+ new Error().stack);
     let tableRow = this.getRowHashTable()[id];
     if (tableRow === undefined) {
       let newDataArray = Array.apply(null, Array(this.dataArray[0].length)).map(String.prototype.valueOf, "")
-      let newFormulaArray = new Array(this.formulaArray[0].length);
-      let newBackgroundArray = Array.apply(null, Array(this.backgroundArray[0].length)).map(String.prototype.valueOf, "white");
+      let newFormulaArray = new Array(this.dataArray[0].length);
+      let newBackgroundArray = Array.apply(null, Array(this.dataArray[0].length)).map(String.prototype.valueOf, "white");
       this.dataArray.splice(1, 0, newDataArray);
       this.formulaArray.splice(1, 0, newFormulaArray);
       this.backgroundArray.splice(1, 0, newBackgroundArray);
       tableRow = this.getRowByIndex("1");
       tableRow.setId(id);
       delete this.rowHashTable;
-      delete this.columnHashTable;
-      this.columnHashTable = {};
       if (this.rowArray) delete this.rowArray;
       this.getRowHashTable();
     }
     return tableRow as RowType;
   }
+
+ 
   public save() {
-    DriveConnector.saveNamedRangeData(this.rootId, this.tableName, this.loadRowCount, this.dataArray, this.backgroundArray, this.formulaArray, oooVersion);
+    //das wird lustig...
   }
-  public deleteAll() {
+  public deleteAll(){
     this.dataArray = [this.dataArray[0]];
     this.formulaArray = [this.formulaArray[0]];
     this.backgroundArray = [this.backgroundArray[0]];
@@ -124,16 +126,15 @@ export class TableCache<RowType extends TableRow> {
     this.deleteAll();
     this.dataArray[0][0] = this.dataArray[0][0].toString().substr(0, 6) + padToFive(1);
   }
-  private getColumnIndex(dataColumnNames) {
-    var spalte = {};
-    for (var index in dataColumnNames) {
-      spalte[dataColumnNames[index]] = index;
+  private getColumnIndex(dataColumnNames: Object[]) {
+    const spalte = {};
+    // tslint:disable-next-line:forin
+    for (const index in dataColumnNames) {
+      spalte[dataColumnNames[index].toString()] = index;
     }
     return spalte;
   }
 }
-
-
 // Generic code for client and server identical
 function padToFive(number: number) { return ("0000" + number).slice(-5); }
 //Abstrakte Basisklasse fuer Tabellenzeilen

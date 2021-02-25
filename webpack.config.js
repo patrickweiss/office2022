@@ -43,16 +43,10 @@ const devDialogEntry = './dev/index.js';
 // define client entry points and output names
 const clientEntrypoints = [
   {
-    name: 'CLIENT - Dialog Demo',
-    entry: './src/client/dialog-demo/index.js',
-    filename: 'dialog-demo', // we'll add the .html suffix to these
-    template: './src/client/dialog-demo/index.html',
-  },
-  {
-    name: 'CLIENT - Dialog Demo Bootstrap',
-    entry: './src/client/dialog-demo-bootstrap/index.js',
-    filename: 'dialog-demo-bootstrap',
-    template: './src/client/dialog-demo-bootstrap/index.html',
+    name: 'CLIENT - office-one-2021 Page',
+    entry: './src/client/office-one-2021/index.tsx',
+    filename: 'office-one-2021',
+    template: './src/client/office-one-2021/index.html',
   },
   {
     name: 'CLIENT - Sidebar About Page',
@@ -61,7 +55,6 @@ const clientEntrypoints = [
     template: './src/client/sidebar-about-page/index.html',
   },
 ];
-
 // define certificate locations
 // see "npm run setup:https" script in package.json
 const keyPath = path.resolve(__dirname, './certs/key.pem');

@@ -1,4 +1,4 @@
-import { ausgabenFolderScannen } from "./ausgabenFolderScannen";
+import { ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { BusinessModel } from "./businessModel";
 import { oolog } from "./spreadsheerLogger";
 import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
@@ -19,6 +19,7 @@ export function installSystem(fileId: string, table: ooTables, version: ooVersio
         if (triggerMode === triggerModes.test)  ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
         if (triggerMode === triggerModes.production)   ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
 
+        bm.getDriveConnector().setOfficeProperty(office.OfficeRootID,bm.getDriveConnector().officeFolder.getId());
         oolog.logEnd("System installiert für:" +triggerMode+" "+ bm.getDriveConnector().getOfficeProperty(office.firma));
     }
     catch (e) {
@@ -34,9 +35,7 @@ export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersio
             oolog.logEnd("Datei wurde archiviert, Trigger gestoppt");
             return true;
         }
-
         ausgabenFolderScannen(bm.getDriveConnector().officeFolder.getId(),"01");
-        
         oolog.logEnd("Ausgaben wurden gescannt")
         return false;
     }

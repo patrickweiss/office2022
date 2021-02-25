@@ -1,4 +1,4 @@
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -62,9 +62,6 @@ export class BusinessModel {
     constructor(rootfolderId: string) { this.rootFolderId = rootfolderId; }
 
     private endOfYearCache: Date;
-    private getValueByName(name:string){
-        return DriveConnector.getValueByName(this.rootFolderId, name, oooVersion);
-    }
     public getRootFolderId() { return this.rootFolderId; }
 
     // Generic code for client and server identical 
@@ -109,7 +106,6 @@ export class BusinessModel {
             neueGutschrift.setGegenkonto(action.gegenkonto);
         }
     }
-
     public getEinnahmenRechnungArray(): EinnahmenRechnung[] { return this.getEinnahmenRechnungTableCache().getRowArray() as EinnahmenRechnung[]; }
     public getEURechnungArray():EURechnung[] {return this.getEURechnungTableCache().getRowArray()as EURechnung[];}
     public getOrCreateEinnahmenRechnung(id: string) { return this.getEinnahmenRechnungTableCache().getOrCreateRowById(id); }
@@ -124,7 +120,6 @@ export class BusinessModel {
         });
     }
     public getImGeschaeftsjahrBezahlteEinnahmenRechnungen(): EinnahmenRechnung[] { return this.getEinnahmenRechnungArray().filter(rechnung => { return rechnung.isBezahlt() }) }
-
     public getGutschriftenArray(): Gutschrift[] { return this.getGutschriftenTableCache().getRowArray() as Gutschrift[]; }
     public createGutschrift() { return this.getGutschriftenTableCache().createNewRow(); }
     public getOrCreateGutschrift(id: string) { return this.getGutschriftenTableCache().getOrCreateRowById(id); }
@@ -137,7 +132,6 @@ export class BusinessModel {
         });
     }
     public getImGeschaeftsjahrBezahlteGutschriften(): Gutschrift[] { return this.getGutschriftenArray().filter(gutschrift => { return gutschrift.isBezahlt(); }) }
-
     public getAusgabenRechnungArray(): AusgabenRechnung[] { return this.getAusgabenTableCache().getRowArray() as AusgabenRechnung[]; }
     public createAusgabenRechnung() { return this.getAusgabenTableCache().createNewRow(); }
     public getOrCreateAusgabenRechnung(id: string):AusgabenRechnung { return this.getAusgabenTableCache().getOrCreateRowById(id); }
@@ -179,12 +173,10 @@ export class BusinessModel {
         }
         else beleg.setBezahltAm(action.datum);
     }
-
     public getBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeTableCache().getRowArray() as Bewirtungsbeleg[] }
     public createBewirtungsbeleg(): Bewirtungsbeleg { return this.getBewirtungsbelegeTableCache().createNewRow() };
     public getOrCreateBewirtungsbeleg(id: string) { return this.getBewirtungsbelegeTableCache().getOrCreateRowById(id); }
     public getOffeneBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeArray().filter(bewirtung => { return (bewirtung.nichtBezahlt() && bewirtung.getId() !== ""); }) }
-
     public getAbschreibungenArray(): Abschreibung[] { return this.getAbschreibungenTableCache().getRowArray() as Abschreibung[]; }
     public getOrCreateAbschreibung(id: string) { return this.getAbschreibungenTableCache().getOrCreateRowById(id); }
     public getAbschreibungenZuAnlageArray(anlageKonto: string): Abschreibung[] {
@@ -193,13 +185,10 @@ export class BusinessModel {
         })
         return abschreibungenZuAnlageKonto;
     }
-
     public getVerpflegungsmehraufwendungenArray(): Verpflegungsmehraufwendung[] { return this.getVerpflegungsmehraufwendungenTableCache().getRowArray() as Verpflegungsmehraufwendung[]; }
-    
     public getVertraegeArray(): Vertrag[] { return this.getVertraegeTableCache().getRowArray() as Vertrag[] }
     public getOrCreateVertrag(id: string) { return this.getVertraegeTableCache().getOrCreateRowById(id); }
     public getOffeneVertraegeArray(): Vertrag[] { return this.getVertraegeArray() };
-
     public getBankbuchungenArray(): Bankbuchung[] { return this.getBankbuchungenTableCache().getRowArray() as Bankbuchung[]; }
     public getOrCreateBankbuchung(id: string): Bankbuchung { return this.getBankbuchungenTableCache().getOrCreateRowById(id) };
     public getBankbuchungenNichtZugeordnetArray(): Bankbuchung[] { return this.getBankbuchungenArray().filter(bankbuchung => { return bankbuchung.getId() !== "" && bankbuchung.getBelegID() === ""; }) }
@@ -217,7 +206,6 @@ export class BusinessModel {
         })
         return latestEntry;
     }
-
     public getUmbuchungenArray(): Umbuchung[] { return this.getUmbuchungenTableCache().getRowArray() as Umbuchung[]; }
     public createUmbuchung() { return this.getUmbuchungenTableCache().createNewRow() };
     public getOrCreateUmbuchung(id: string) { return this.getUmbuchungenTableCache().getOrCreateRowById(id); }
@@ -230,7 +218,6 @@ export class BusinessModel {
             return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat) - 1);
         });
     }
-
     public getKontenArray(): Konto[] { return this.getKontenTableCache().getRowArray() as Konto[]; }
     public getOrCreateKonto(id: string): Konto { return this.getKontenTableCache().getOrCreateRowById(id); }
     public getBilanzkontenArray(): Konto[] { return this.getKontenArray().filter(konto => { return konto.isBilanzkonto(); }) }
@@ -255,10 +242,8 @@ export class BusinessModel {
         konto.setBeispiel(ausgabe.getLink());
         if (kontoArt === "Au") { konto.setKontentyp("GuV"); konto.setSubtyp("Aufwand"); } else { konto.setKontentyp("Bilanz"); konto.setSubtyp("Anlage") }
     }
-
     public getNormalisierteBuchungenArray(): NormalisierteBuchung[] { return this.getNormalisierteBuchungenTableCache().getRowArray() as NormalisierteBuchung[]; }
     public getGdpduArray():Gdpdu[] {return this.getGdpduTableCache().getRowArray()}
-
     public kontoSummenAktualisieren() {
         //weitere Buchungen zum Eintragen siehe legacy Version 0050 function buchungenAktualisieren()
         console.log("BM.kontoSummenAktualisieren");
@@ -296,7 +281,6 @@ export class BusinessModel {
             }
         }
     }
-    
     public umsatzsteuerJahresabrechnung() {
         let fealligeUmsatzsteuer = 0;
         this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(rechnung => { fealligeUmsatzsteuer += rechnung.getMehrwertsteuer() });

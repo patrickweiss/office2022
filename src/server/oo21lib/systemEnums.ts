@@ -29,7 +29,8 @@ export enum office{
     firma = "bezeichnung",
     subversion = "subversion",
     importFrom2021_FolderId = "importFrom2021_FolderId",
-    triggerMode="triggerMode"
+    triggerMode="triggerMode",
+    OfficeRootID="OfficeRootID"
 }
 export enum triggerModes{
     production = "Produktion",
