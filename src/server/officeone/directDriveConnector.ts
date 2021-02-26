@@ -1,58 +1,21 @@
-import { webApp } from "..";
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
 
 
 export function getOrCreateOfficeOneFolders() {
-  var ooRootFolderIterator = DriveApp.getRootFolder().getFolders();
   var foldersHash = {};
   let result = {};
   //is funktion invoked from within an office one spreadheet?
 
   //Look for folders in GDrive root if function is invoked by WebApp
-  if (webApp) {
-    try {
-      while (ooRootFolderIterator.hasNext()) {
-        let folder = ooRootFolderIterator.next();
-        let folderName = folder.getName().toString();
-        if (folderName.indexOf(".Office") !== -1 && folderName.substr(-4) === oooVersion) {
-          const version = folderName.slice(-4);
-          foldersHash[folder.getId()] = { name: folderName.slice(0, -5), version: version };
-        }
-      }
-      //add shared Offices
-      var shortcutIterator = DriveApp.getRootFolder().getFilesByType("application/vnd.google-apps.shortcut");
-      while (shortcutIterator.hasNext()) {
-        let sharedOffice = shortcutIterator.next();
-        if (sharedOffice.getName().toString().indexOf(".Office") !== -1) {
-          const officeFolderName = sharedOffice.getName() + " " + oooVersion;//debugging
-          console.log("name:" + sharedOffice.getName());
-          console.log("id:" + sharedOffice.getId());
-          const folderIterator = DriveApp.getFoldersByName(officeFolderName);
-          console.log("gibt's das?" + folderIterator.hasNext());
-          if (folderIterator.hasNext()) {
-            let folder = folderIterator.next();
-            const version = folder.getName().slice(-4);
-            foldersHash[folder.getId()] = { name: folder.getName().slice(0, -5), version: version };
-          }
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      result = { error: e }
-      return JSON.stringify(result);
-    }
-  } else  // if function is invoked by dialog open location in root Folder of the dialog
-  {
     const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
     const ooFolderId = location[0][0]
     const leaf = location[0][1];
     const folder = DriveApp.getFolderById(ooFolderId);
     const version = folder.getName().slice(-4);
     foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: leaf };
-  }
-
+ 
   result = {
     serverFunction: ServerFunction.getOrCreateOfficeOneFolders,
     foldersArray: foldersHash

@@ -1,5 +1,5 @@
 import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
-import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
+import { getOrCreateFolder } from "./directDriveConnector";
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
@@ -33,7 +33,7 @@ export function updateDriveMaster(rootFolderId: string) {
     }
   }
 }
-
+/*
 export function updateDrive(rootFolderId: string) {
 
   let oooPreviousVersion = getPreviousVersion();
@@ -139,14 +139,10 @@ export function updateDrive(rootFolderId: string) {
   }
 
   return getOrCreateOfficeOneFolders();
-  /* 
-   var result = {
-       serverFunction: ServerFunction.UStVAberechnen,
-       UStVAD: BM.getUStVATableCache().getData(),
-   }
-     return JSON.stringify(result);
-     */
+ 
 }
+*/
+
 
 function importToBiggerTable(dataOldVersion: any[][][], rootFolderId: string, rangeName: string) {
   const data: any[][] = dataOldVersion[0];

@@ -1,6 +1,3 @@
-
-
-
 //new system
 import { deleteSystem0055 } from './oo21lib/driveConnector';
 import * as newUiFunctions from './ui';
@@ -8,8 +5,8 @@ import * as newUiFunctions from './ui';
 //old system
 import * as publicUiFunctions from './menu';
 import { generateAndMailTableRow, generateAndMailoooVersionsFileNameIdMap } from './officeone/driveconnector';
-import { getOrCreateOfficeOneFolders, getNamedRangeData } from './officeone/directDriveConnector';
-import { updateDrive } from './officeone/updateDrive';
+import { getNamedRangeData, getOrCreateOfficeOneFolders } from './officeone/directDriveConnector';
+//import { updateDrive } from './officeone/updateDrive';
 import { UStVAberechnen } from './officeone/UStVAberechnen';
 import { UStVAverschicken } from './officeone/UStVAverschicken';
 import { UStVAbuchen } from './officeone/UStVAbuchen';
@@ -43,9 +40,6 @@ global.deleteSystem = deleteSystem0055;
 global.tryUpdateWithoutParameters = newUiFunctions.tryUpdateWithoutParameters
 
 
-
-
-export const webApp = false;
 
 
 interface IOfficeGlobal {
@@ -91,10 +85,7 @@ interface IOfficeGlobal {
 }
 
 declare let global: IOfficeGlobal;
-if (webApp)
-    global.doGet = publicUiFunctions.doGet;
-else
-    global.doGet = doGet;
+global.doGet = publicUiFunctions.doGet;
 //
 global.onOpen = publicUiFunctions.onOpen;
 global.openAboutSidebar = publicUiFunctions.openAboutSidebar;
@@ -102,11 +93,11 @@ global.openOfficeOne2021 = publicUiFunctions.openOfficeOne2021;
 global.generateAndMailTableRow = generateAndMailTableRow;
 global.getOrCreateOfficeOneFolders = getOrCreateOfficeOneFolders;
 global.getNamedRangeData = getNamedRangeData;
-global.updateDrive = updateDrive;
+//global.updateDrive = updateDrive;
 global.UStVAberechnen = UStVAberechnen;
 global.UStVAverschicken = UStVAverschicken;
 global.UStVAbuchen = UStVAbuchen;
-global.updateOfficeOne = publicUiFunctions.updateOfficeOne;
+//global.updateOfficeOne = publicUiFunctions.updateOfficeOne;
 global.newOfficeOneVersion = newOfficeOneVersion;
 global.generateAndMailoooVersionsFileNameIdMap = generateAndMailoooVersionsFileNameIdMap;
 global.ausgabenFolderScannen = ausgabenFolderScannen;
@@ -133,7 +124,5 @@ global.mrechnungErstellen = mrechnungErstellen;
 //E Mail Form
 global.addEmailId = addEmailId;
 global.vertraegeFolderScannen = vertraegeFolderScannen;
-
-// Expose public functions by attaching to `global`
 
 

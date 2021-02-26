@@ -1,6 +1,8 @@
 import { Installation, InstallationenTableCache } from "../officeone/BusinessDataFacade";
+import { doGetApplicant } from "../officetwo/application/doGetApplicant";
+import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
 import { DriveConnector, oooVersion } from "./officeone/driveconnector";
-import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
+//import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
 
 export const onOpen = () => {
   try {
@@ -59,13 +61,13 @@ export const openAboutSidebar = () => {
 };
 
 export const doGet = (e: GoogleAppsScript.Events.DoGet) => {
-  console.log("doGet(e)");
-  console.log(e);
+  if (e.parameters["email"])return doGetLastschriftmandat(e);
+  if (e.parameters["applicant"])return doGetApplicant(e);
   const html = HtmlService.createHtmlOutputFromFile('office-one-2021').setTitle("OfficeOne.2021");
   html.addMetaTag('viewport', 'width=device-width, initial-scale=1');
   return html;
 }
-
+/*
 export const updateOfficeOne = () => {
   const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
   const ooFolderId = location[0][0]
@@ -85,3 +87,4 @@ export const updateOfficeOne = () => {
 
 }
 
+*/
