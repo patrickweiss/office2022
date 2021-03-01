@@ -7,7 +7,7 @@ export class TableCache<RowType extends TableRow> {
   formulaArray: string[][];
   formatsArray: string[][];
   columnIndex: {};
-  private loadRowCount: number;
+  public loadRowCount: number;
   private rootId: string;
   private tableName: string;
   private rowHashTable;

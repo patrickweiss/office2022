@@ -1,4 +1,5 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { oolog } from "../oo21lib/spreadsheerLogger";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { months, ServerFunction } from "./enums";
 import { CSVToArray } from "./O1";
@@ -11,40 +12,46 @@ enum csvTypes {
 }
 
 export function bankbuchungenFolderScannen(rootFolderId: string, month: string) {
-    console.log("bankbuchungenFolderScannen,rootFolderID:" + rootFolderId + " monat:" + month);
-    let BM = new BusinessModel(rootFolderId);
+    oolog.logBeginn("bankbuchungenFolderScannen,rootFolderID:" + rootFolderId + " monat:" + month)
+    try {
 
-    var rootFolder = DriveApp.getFolderById(rootFolderId);
-    var bankkontenFolder = getOrCreateFolder(rootFolder, "3 Bankkonten");
-    var monthFolder = getOrCreateFolder(bankkontenFolder, months[month]);
+        let BM = new BusinessModel(rootFolderId);
+
+        var rootFolder = DriveApp.getFolderById(rootFolderId);
+        var bankkontenFolder = getOrCreateFolder(rootFolder, "3 Bankkonten");
+        var monthFolder = getOrCreateFolder(bankkontenFolder, months[month]);
 
 
-    var belegIterator = monthFolder.getFiles();
-    let vorgemerkteBuchungen = {}; //das macht natürlich gar keinen Sinn als Rückgabewert!!! bei Refactoring umbauen
-
-    while (belegIterator.hasNext()) {
-        var beleg = belegIterator.next();
-        console.log(beleg.getName());
-        let belegDaten = beleg.getName().split(" ");
-        if (belegDaten[0].substr(0, 1) !== "✔") {
-            let konto = belegDaten[0];
-            if (BM.isBankkonto(konto)) {
-                vorgemerkteBuchungen[beleg.getName()] = bankbuchungenImportieren(beleg, BM, monthFolder);
-            } else if (konto === "Gehalt") vorgemerkteBuchungen[beleg.getName()] = gehaltsbuchungenImportieren(beleg, BM);
+        var belegIterator = monthFolder.getFiles();
+  
+        while (belegIterator.hasNext()) {
+            var beleg = belegIterator.next();
+            console.log(beleg.getName());
+            let belegDaten = beleg.getName().split(" ");
+            if (belegDaten[0].substr(0, 1) !== "✔") {
+                let konto = belegDaten[0];
+                if (BM.isBankkonto(konto)) {
+                    bankbuchungenImportieren(beleg, BM, monthFolder);
+                } else if (konto === "Gehalt")gehaltsbuchungenImportieren(beleg, BM);
+            }
         }
+
+        BM.save();
+        var result = {
+            serverFunction: ServerFunction.bankbuchungenFolderScannen,
+            BankbuchungenD: BM.getBankbuchungenTableCache().getData(),
+        }
+        oolog.logEnd("Bankbuchungen korrekt importiert");
+        return JSON.stringify(result);
+    }
+    catch (e) {
+        oolog.logEnd(e.toString())
     }
 
-    BM.save();
-    var result = {
-        serverFunction: ServerFunction.bankbuchungenFolderScannen,
-        BankbuchungenD: BM.getBankbuchungenTableCache().getData(),
-        vorgemerkteBuchungen: vorgemerkteBuchungen
-    }
-    return JSON.stringify(result);
 }
 
 
-function gehaltsbuchungenImportieren(beleg, BM: BusinessModel) {
+function gehaltsbuchungenImportieren(beleg, BM: BusinessModel):void {
     // let belegDaten = beleg.getName().split(" ");
     // let konto = belegDaten[0];
     let datenString = beleg.getBlob().getDataAsString("ISO-8859-1");
@@ -69,10 +76,9 @@ function gehaltsbuchungenImportieren(beleg, BM: BusinessModel) {
     });
     beleg.setName("✔_" + beleg.getName());
 
-    return "Gehaltsbuchungen";
 }
 
-function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: BusinessModel, monthFolder: GoogleAppsScript.Drive.Folder) {
+function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: BusinessModel, monthFolder: GoogleAppsScript.Drive.Folder):void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     console.log("Geschäftsjahr:" + geschaeftsjahr);
 
@@ -80,12 +86,12 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     if (belegDaten[0] === "✔") return;
     let konto = belegDaten[0];
     const datenFormat = (BM.getConfigurationCache().getValueByName(konto + "Is") as csvTypes)
-    console.log("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
+    oolog.addMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
     var datenString = beleg.getBlob().getDataAsString("utf-8");
     let neuerBankbestand = parseFloat(beleg.getName().split(" ")[1].replace(".", "").replace(",", "."));
     let alterBankbestand = BM.getBankbestand(konto);
     let aktuellerBankbestand = alterBankbestand;
-    console.log("alter Bankbestand:" + alterBankbestand);
+    oolog.addMessage("alter Bankbestand:" + alterBankbestand);
 
     var datenArray = CSVToArray(datenString, ";");
     removeUncompleteRowOf2dArray(datenArray);
@@ -98,7 +104,6 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let transaction2dArray: any[][] = transactionArray.map(transaction => {
         return [
             transaction.WertstellungsDatum,
-            transaction.datumString,
             transaction.Buchungstext,
             transaction.Betrag,
             transaction.isPlanned,
@@ -115,9 +120,8 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let letzteBuchung = BM.getBankbuchungLatest(konto);
     //durch das Array iterieren:
     let index: string = "";
-    let vorgemerkteBuchungen = 0;
     if (letzteBuchung !== undefined) {
-        console.log("letzte Buchung Id:" + letzteBuchung.getId());
+        oolog.addMessage("letzte Buchung Id:" + letzteBuchung.getId());
         let foundFlag = false;
         for (index in transactionArray) {
             let transaction: CSVTransaction = transactionArray[index];
@@ -125,9 +129,9 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
 
             //Wenn die beiden Datumsspalten und die Umsatzart leer sind, dann ist der Umsatz nur vorgemerkt und nicht gebucht. 
             //Um den Endbestand zu bestimmen, muss die Buchung berücksichtigt werden, aber gebucht werden darf sie nicht (Datum fehlt, und vielleicht wird sie nie gebucht)
-            if (transaction.isPlanned) {
+            if (transaction.isPlanned && datenFormat!==csvTypes.KSK) {
+                //bei KSK darf is planned nicht zum Betrag addiert werden ... :(
                 betrag = transaction.Betrag;
-                vorgemerkteBuchungen += betrag;
             }
 
             if (transaction.isValid) {
@@ -136,10 +140,10 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                 betrag = transaction.Betrag;
                 //Wenn der Bestand nach der vorigen Buchung stimmt und die aktuelle Buchung identisch zur letzten gespeicherten Buchung ist, dann gehe ich davon aus,
                 //dass die aktuelle Buchung und die zuletzt gespeicherte identisch sind
-                console.log(index + " " + "Datum:" + formatDate(datumNeu) + " Betrag:" + betrag + " Saldendifferenz:" + Math.abs(aktuellerBankbestand - neuerBankbestand));
+                console.log(index + " " + "Datum:" + formatDate(datumNeu) + " Betrag:" + betrag + " Saldendifferenz:" + (aktuellerBankbestand - neuerBankbestand));
 
                 console.log(
-                    index +" " +(Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001).toString() +
+                    index + " " + (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001).toString() +
                     "&&" + (datumNeu.toString() === letzteBuchung.getDatum().toString()) +
                     "&&" + (betrag === letzteBuchung.getBetrag()).toString() +
                     "&&" + (buchungsText === letzteBuchung.getText()).toString()
@@ -168,7 +172,6 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
             "Die Buchungen der CSV-Datei " + beleg.getName() +
             "führen nicht zum Endbestand von " + neuerBankbestand +
             "sondern: " + aktuellerBankbestand +
-            "Datum erste Banktransaktion" + transactionArray[transactionArray.length - 2].datumString +
             "Geschäftsjahr" + geschaeftsjahr);
     } else {
         //Dieses Konto wurde noch nie importiert
@@ -214,7 +217,6 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         elementIndex--;
     }
     beleg.setName("✔_" + beleg.getName());
-    return vorgemerkteBuchungen;
 }
 
 class CSVTransaction {
@@ -224,8 +226,7 @@ class CSVTransaction {
     public Buchungstext: string;
     public isValid: boolean;
     public isPlanned: boolean;
-    public datumString: string;
-
+ 
     constructor(element, konto, geschaeftsjahr, datenFormat: csvTypes) {
         let datumString = "";
 
@@ -237,13 +238,13 @@ class CSVTransaction {
 
             this.isValid = (valueDate != "" && valueDate !== "Valutadatum" && valueDate != undefined);
             this.isPlanned = element[16] === "Umsatz vorgemerkt";
+            if (this.isPlanned)this.isValid = false;//zweifelhafte Buchung soll einfach ignoriert werden. Geht bei KSK, weil im Endbestand sowieso nicht berücksichtigt
             if (this.isPlanned || this.isValid) this.Betrag = parseFloat(amount.replace(",", "."));
             if (this.isValid) {
                 datumString = valueDate;
-                this.Buchungstext =element[3]+" "+ purpose+" "+ element[11];
+                this.Buchungstext = element[3] + " " + purpose + " " + element[11];
             }
             var datum = datumString.split(".");
-            this.datumString = datumString;
             this.WertstellungsDatum = new Date(parseInt("20" + datum[2], 10), parseInt(datum[1], 10) - 1, parseInt(datum[0], 10));
         }
         if (datenFormat === csvTypes.Commerzbank) {
@@ -255,7 +256,6 @@ class CSVTransaction {
                 this.Buchungstext = element[3];
             }
             var datum = datumString.split(".");
-            this.datumString = datumString;
             this.WertstellungsDatum = new Date(parseInt(datum[2], 10), parseInt(datum[1], 10) - 1, parseInt(datum[0], 10));
 
         }
@@ -270,7 +270,6 @@ class CSVTransaction {
                 this.Buchungstext = element[3];
             }
             var datum = datumString.split(".");
-            this.datumString = datumString;
             this.WertstellungsDatum = new Date(parseInt(datum[2], 10), parseInt(datum[1], 10) - 1, parseInt(datum[0], 10));
         }
 

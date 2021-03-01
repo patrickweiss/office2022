@@ -30,7 +30,8 @@ export enum office{
     subversion = "subversion",
     importFrom2021_FolderId = "importFrom2021_FolderId",
     triggerMode="triggerMode",
-    OfficeRootID="OfficeRootID"
+    officeRootID_FolderId="officeRootID_FolderId",
+    vorjahrOfficeRootID_FolderId="vorjahrOfficeRootID_FolderId"
 }
 export enum triggerModes{
     production = "Produktion",

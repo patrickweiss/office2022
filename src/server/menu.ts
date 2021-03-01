@@ -31,20 +31,14 @@ export const onOpen = () => {
         .addItem('Über OfficeOne.2021', 'openAboutSidebar');
       menu.addToUi();
     }
-    else if (name.substr(0, 3) === "00 ") {
+    else {
       const menu = SpreadsheetApp.getUi()
-        .createMenu('Office One 2022') // edit me!
-        .addItem('System installieren', 'installOO22')
-        .addItem('System aktualisieren', 'updateOO22')
-        .addItem('System löschen', 'deleteSystem')
-        .addItem("OfficeOne.2021", "openOfficeOne2021")
-      menu.addToUi();
-    } else {
-      const menu = SpreadsheetApp.getUi()
-        .createMenu('OfficeOne') // edit me!
-        .addItem("OfficeOne.2021", "openOfficeOne2021")
-        .addItem('Über OfficeOne.2021', 'openAboutSidebar');
-      menu.addToUi();
+      .createMenu('Office One 2022') // edit me!
+      .addItem('System installieren', 'installOO22')
+      .addItem('System aktualisieren', 'updateOO22')
+      .addItem('System löschen', 'deleteSystem')
+      .addItem("OfficeOne.2021", "openOfficeOne2021")
+    menu.addToUi();
     }
   } catch (e) { console.log(e) }
 };

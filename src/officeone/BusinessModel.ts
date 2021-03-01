@@ -137,9 +137,10 @@ export class BusinessModel {
     public getOrCreateAusgabenRechnung(id: string):AusgabenRechnung { return this.getAusgabenTableCache().getOrCreateRowById(id); }
     public getOffeneAusgabenRechnungArray(): AusgabenRechnung[] { return this.getAusgabenRechnungArray().filter(ausgabe => { return (ausgabe.nichtBezahlt() && ausgabe.getId() !== ""); }) }
     public getAusgabenFuerMonat(monat: string): AusgabenRechnung[] {
+        if (parseInt(monat,10)>12 ||parseInt(monat,10) < 1)throw new Error("getAusgabenFuerMonat:"+monat);
         return this.getAusgabenRechnungArray().filter(ausgabe => {
             const ausgabeDatum = ausgabe.getDatum();
-            return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat) - 1);
+            return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat,10) - 1);
         });
     }
     public getAnlagenAusAusgabenRechnungArray(): AusgabenRechnung[] {

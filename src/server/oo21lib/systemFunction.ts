@@ -1,5 +1,7 @@
-import { ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
+import { alleAusgabenFolderScannen, ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
+import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { BusinessModel } from "./businessModel";
+import { sendStatusMail } from "./sendStatusMail";
 import { oolog } from "./spreadsheerLogger";
 import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
 
@@ -19,7 +21,7 @@ export function installSystem(fileId: string, table: ooTables, version: ooVersio
         if (triggerMode === triggerModes.test)  ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
         if (triggerMode === triggerModes.production)   ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
 
-        bm.getDriveConnector().setOfficeProperty(office.OfficeRootID,bm.getDriveConnector().officeFolder.getId());
+        bm.getDriveConnector().setOfficeProperty(office.officeRootID_FolderId,bm.getDriveConnector().officeFolder.getId());
         oolog.logEnd("System installiert für:" +triggerMode+" "+ bm.getDriveConnector().getOfficeProperty(office.firma));
     }
     catch (e) {
@@ -27,20 +29,36 @@ export function installSystem(fileId: string, table: ooTables, version: ooVersio
     }
 }
 export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersions): boolean {
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(1))return;
     oolog.logBeginn("tryCodeUpdate")
     try {
+    
+
         const bm = new BusinessModel(fileId, table, version);
         if (bm.getDriveConnector().isDeprecated()) {
             archiveHostfile(bm,table,version);
             oolog.logEnd("Datei wurde archiviert, Trigger gestoppt");
             return true;
         }
-        ausgabenFolderScannen(bm.getDriveConnector().officeFolder.getId(),"01");
-        oolog.logEnd("Ausgaben wurden gescannt")
+        const bmAusgaben = alleAusgabenFolderScannen(bm.getDriveConnector().officeFolder.getId());
+        const bmGutschriften = alleGutschriftenFolderScannen(bm.getDriveConnector().officeFolder.getId());
+        //wenn neue Belege gefunden wurden, Mail schicken
+        if (bmAusgaben.getAusgabenTableCache().loadRowCount < bmAusgaben.getAusgabenTableCache().dataArray.length ||
+        bmGutschriften.getGutschriftenTableCache().loadRowCount < bmAusgaben.getGutschriftenTableCache().dataArray.length){
+            //Mail schicken, mit aktuellem Monat
+            sendStatusMail(bmGutschriften);
+            oolog.addMessage("Mail mit neuen Buchungen versendet");
+        }
+        oolog.logEnd("System Jobs wurden durchgeführt");
+        SpreadsheetApp.flush();
+        lock.releaseLock();
         return false;
     }
     catch (e) {
         oolog.logEnd(e.toString())
+        SpreadsheetApp.flush();
+        lock.releaseLock();
     }
 }
 

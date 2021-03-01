@@ -448,7 +448,7 @@ function EURechnungKopierenOhneBezahltAmzuUeberschreiben(vorjahrRechnung: EURech
   aktuelleRechnung.setZahlungsziel(vorjahrRechnung.getZahlungsziel());
 
 //Korrekturtbuchung
-  aktuelleRechnung = BMnow.getOrCreateEinnahmenRechnung(vorjahrRechnung.getId()+"KO");
+  aktuelleRechnung = BMnow.getOrCreateEURechnung(vorjahrRechnung.getId()+"KO");
   aktuelleRechnung.setFileId(vorjahrRechnung.getFileId());
   aktuelleRechnung.setLink(vorjahrRechnung.getLink());
   aktuelleRechnung.setStatus("offener Posten");

@@ -3,6 +3,41 @@ import { BusinessModel } from "../../officeone/BusinessModel";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { months, ServerFunction } from "./enums";
 
+ 
+
+export function alleAusgabenFolderScannen(rootFolderId: string):BusinessModel {
+    let BM = new BusinessModel(rootFolderId);
+    let geschaeftsjahr = BM.endOfYear().getFullYear();
+    var datumZuOrdner = {
+        "01": new Date(geschaeftsjahr, 0, 1),
+        "02": new Date(geschaeftsjahr, 1, 1),
+        "03": new Date(geschaeftsjahr, 2, 1),
+        "04": new Date(geschaeftsjahr, 3, 1),
+        "05": new Date(geschaeftsjahr, 4, 1),
+        "06": new Date(geschaeftsjahr, 5, 1),
+        "07": new Date(geschaeftsjahr, 6, 1),
+        "08": new Date(geschaeftsjahr, 7, 1),
+        "09": new Date(geschaeftsjahr, 8, 1),
+        "10": new Date(geschaeftsjahr, 9, 1),
+        "11": new Date(geschaeftsjahr, 10, 1),
+        "12": new Date(geschaeftsjahr, 11, 1),
+    }
+    var rootFolder = DriveApp.getFolderById(rootFolderId);
+    var ausgabenFolder = getOrCreateFolder(rootFolder, "2 Ausgaben");
+    for (let month in datumZuOrdner) {
+        var monatsOrdner = getOrCreateFolder(ausgabenFolder, months[month]);
+        var belegIterator = monatsOrdner.getFiles();
+        while (belegIterator.hasNext()) {
+            var beleg = belegIterator.next();
+            wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
+        }
+    }
+    BM.save();
+  
+    return BM;
+
+}
+
 export function ausgabenFolderScannen(rootFolderId: string, month: string) {
     let BM = new BusinessModel(rootFolderId);
     let geschaeftsjahr = BM.endOfYear().getFullYear();
@@ -26,7 +61,6 @@ export function ausgabenFolderScannen(rootFolderId: string, month: string) {
     var belegIterator = monatsOrdner.getFiles();
     while (belegIterator.hasNext()) {
         var beleg = belegIterator.next();
-        Logger.log(beleg.getName);
         wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
     }
 
@@ -37,11 +71,9 @@ export function ausgabenFolderScannen(rootFolderId: string, month: string) {
         BewirtungsbelegeD: BM.getBewirtungsbelegeTableCache().getData()
     }
     return JSON.stringify(result);
-
 }
 
 function wennBelegNeuIstEintragen(beleg, datum, BM: BusinessModel) {
-    Logger.log("belegID" + beleg.getId());
     //Ist Beleg schon in Ausgabetabelle eingetragen?
     var ausgabeDaten = BM.getAusgabenTableCache().getOrCreateHashTable("ID")[beleg.getId()];
     if (ausgabeDaten != null) {
@@ -109,7 +141,7 @@ function updateNameFromDataAndTemplate(ausgabeRow: Buchung, template: string) {
 export function checkParsedFile(buchungRow: Umbuchung) {
     const file = DriveApp.getFileById(buchungRow.getFileId());
     const oldName = file.getName();
-    if (oldName.indexOf("✔")===0) return;
+    if (oldName.indexOf("✔") === 0) return;
     const newName = `✔_${oldName}`;
     buchungRow.createLink(buchungRow.getFileId(), newName);
     file.setName(newName);
@@ -140,14 +172,10 @@ function neuenBewirtungsbelegEintragen(beleg, belegWoerter, monat, BM: BusinessM
     neuerBewirtungsbelegRow.setText(beleg.getName());
     //Corona Mehrtwertsteuer
     if (monat > new Date(2020, 5, 30) && monat < new Date(2021, 6, 1)) {
-        Logger.log(`Corona: Wortindex:${index} Wort${belegWoerter[index]}`)
-        while (isNaN(belegWoerter[index].charAt(0)))
-        {
-            Logger.log(`Corona: Wortindex:${index} Wort${belegWoerter[index]}`)
+        while (isNaN(belegWoerter[index].charAt(0))) {
             index++;
         }
         const mwstString = belegWoerter[index];
-        Logger.log(`Corona MwSt:${mwstString}`);
         neuerBewirtungsbelegRow.setMehrwertsteuer(parseFloat(mwstString.replace(".", "").replace(",", ".")))
         neuerBewirtungsbelegRow.setNettoBetrag(neuerBewirtungsbelegRow.getBetrag() - neuerBewirtungsbelegRow.getMehrwertsteuer());
     }
@@ -188,7 +216,6 @@ function neueAusgabeEintragen(beleg, belegWoerter, datum, BM: BusinessModel) {
         //Wenn die Datei nicht umbenannt wurde, wird sie mit aktuellem Dateinamen und richtigem Monat abgelegt
         var index = 1;
         var konto = belegWoerter[0];
-        Logger.log("BelegWoerter:" + belegWoerter);
         while (isNaN(belegWoerter[index].charAt(0)) && belegWoerter[index].charAt(0) != "-") {
             konto += " " + belegWoerter[index];
             index++;
@@ -196,12 +223,10 @@ function neueAusgabeEintragen(beleg, belegWoerter, datum, BM: BusinessModel) {
         neueAusgabeRow.setBetrag(parseFloat(belegWoerter[index].replace(".", "").replace(",", ".")));
         var prozent = "0%";
         var belegName = beleg.getName();
-        Logger.log("Index 19%" + belegName.indexOf("19%"));
         if (belegName.indexOf("19%") != -1) prozent = "19%";
         if (belegName.indexOf("7%") != -1) prozent = "7%";
         if (belegName.indexOf("16%") != -1) prozent = "16%";
         if (belegName.indexOf("5%") != -1) prozent = "5%";
-        Logger.log("Prozent:" + prozent);
 
         neueAusgabeRow.setNettoBetrag(netto(neueAusgabeRow.getValue("brutto Betrag"), prozent));
         neueAusgabeRow.setMehrwertsteuer(vorsteuer(neueAusgabeRow.getValue("brutto Betrag"), prozent));
