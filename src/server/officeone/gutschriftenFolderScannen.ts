@@ -4,8 +4,7 @@ import { getOrCreateFolder } from "./directDriveConnector";
 import { months, ServerFunction } from "./enums";
 
 
-export function alleGutschriftenFolderScannen(rootFolderId: string):BusinessModel {
-    let BM = new BusinessModel(rootFolderId);
+export function alleGutschriftenFolderScannen(BM:BusinessModel):void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     var datumZuOrdner = {
         "01": new Date(geschaeftsjahr, 0, 1),
@@ -22,7 +21,7 @@ export function alleGutschriftenFolderScannen(rootFolderId: string):BusinessMode
         "12": new Date(geschaeftsjahr, 11, 1),
     }
 
-    var rootFolder = DriveApp.getFolderById(rootFolderId);
+    var rootFolder = DriveApp.getFolderById(BM.getRootFolderId());
     var gutschriftenFolder = getOrCreateFolder(getOrCreateFolder(rootFolder, "1 Einnahmen"), "4 Gutschriften");
     for (let month in datumZuOrdner) {
         var monatsOrdner = getOrCreateFolder(gutschriftenFolder, months[month]);
@@ -33,10 +32,7 @@ export function alleGutschriftenFolderScannen(rootFolderId: string):BusinessMode
         }
     }
 
-    BM.save();
-  
-    return BM;
-
+   
 }
 
 export function gutschriftenFolderScannen(rootFolderId: string, month: string) {

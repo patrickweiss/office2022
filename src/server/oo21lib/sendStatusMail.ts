@@ -3,25 +3,24 @@ import { formatDate, formatMoney } from "../officeone/rechnungSchreiben";
 import * as OO2022 from "./businessModel" ;
 import { currentOOversion, office, ooTables } from "./systemEnums";
 
-export function sendStatusMail(bm: BusinessModel) {
+export function sendStatusMail(bm: BusinessModel,bm2022:OO2022.BusinessModel) {
     const monat = getTestDatum().getMonth();
     const userEmail = Session.getActiveUser().getEmail()
+    const vorjahrID = bm2022.getDriveConnector().getOfficeProperty(office.vorjahrOfficeRootID_FolderId);
 
     let html = "<body><table>";
-    html=outerHtmlFuerMonat(html,bm,monat-1);//html für vor vor monat
+    html=outerHtmlFuerMonat(html,bm,monat-1,vorjahrID);//html für vor vor monat
     html+= `<tr><td>-</td><td>-<td>-</td><td>-</td></tr>`;
-    html=outerHtmlFuerMonat(html,bm,monat);//html für monat vor aktuellem monat
+    html=outerHtmlFuerMonat(html,bm,monat,vorjahrID);//html für monat vor aktuellem monat
     html+= "</table></body>";
 
     const ImageBlob = null;
     GmailApp.sendEmail(userEmail, "Neue Belege geparst", html, { htmlBody: html });
 }
 
-function outerHtmlFuerMonat (html: string, bm: BusinessModel, monat: number):string{
+function outerHtmlFuerMonat (html: string, bm: BusinessModel, monat: number,vorjahrID:string):string{
     if (monat>0)html = htmlFuerMonat(html,bm,monat.toString());
     else {
-        const bm2022 = new OO2022.BusinessModel(SpreadsheetApp.getActive().getId(),ooTables.officeConfiguration,currentOOversion);
-        const vorjahrID = bm2022.getDriveConnector().getOfficeProperty(office.vorjahrOfficeRootID_FolderId);
         if (vorjahrID!==""){
             const vorjahrBM=new BusinessModel(vorjahrID);
             html=htmlFuerMonat(html,vorjahrBM,(monat+12).toString())

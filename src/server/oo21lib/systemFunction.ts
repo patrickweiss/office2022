@@ -4,6 +4,8 @@ import { BusinessModel } from "./businessModel";
 import { sendStatusMail } from "./sendStatusMail";
 import { oolog } from "./spreadsheerLogger";
 import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
+import * as OO2021 from "../../officeone/BusinessModel" ;
+
 
 export function installSystem(fileId: string, table: ooTables, version: ooVersions) {
     oolog.logBeginn("installSystem")
@@ -41,14 +43,15 @@ export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersio
             oolog.logEnd("Datei wurde archiviert, Trigger gestoppt");
             return true;
         }
-        const bmAusgaben = alleAusgabenFolderScannen(bm.getDriveConnector().officeFolder.getId());
-        const bmGutschriften = alleGutschriftenFolderScannen(bm.getDriveConnector().officeFolder.getId());
+        const bm2021 = new OO2021.BusinessModel(bm.getDriveConnector().officeFolder.getId());
+        alleAusgabenFolderScannen(bm2021);
+       alleGutschriftenFolderScannen(bm2021);
         //wenn neue Belege gefunden wurden, Mail schicken
-        if (bmAusgaben.getAusgabenTableCache().loadRowCount < bmAusgaben.getAusgabenTableCache().dataArray.length ||
-        bmGutschriften.getGutschriftenTableCache().loadRowCount < bmAusgaben.getGutschriftenTableCache().dataArray.length){
-            //Mail schicken, mit aktuellem Monat
-            sendStatusMail(bmGutschriften);
-            oolog.addMessage("Mail mit neuen Buchungen versendet");
+        if (bm2021.getAusgabenTableCache().loadRowCount < bm2021.getAusgabenTableCache().dataArray.length ||
+        bm2021.getGutschriftenTableCache().loadRowCount < bm2021.getGutschriftenTableCache().dataArray.length){
+            //Mail schicken, mit aktuellem Status
+            sendStatusMail(bm2021,bm);
+            oolog.addMessage("Mail mit neuem Status versendet");
         }
         oolog.logEnd("System Jobs wurden durchgeführt");
         SpreadsheetApp.flush();

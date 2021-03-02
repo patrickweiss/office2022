@@ -5,8 +5,7 @@ import { months, ServerFunction } from "./enums";
 
  
 
-export function alleAusgabenFolderScannen(rootFolderId: string):BusinessModel {
-    let BM = new BusinessModel(rootFolderId);
+export function alleAusgabenFolderScannen(BM:BusinessModel):void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     var datumZuOrdner = {
         "01": new Date(geschaeftsjahr, 0, 1),
@@ -22,7 +21,7 @@ export function alleAusgabenFolderScannen(rootFolderId: string):BusinessModel {
         "11": new Date(geschaeftsjahr, 10, 1),
         "12": new Date(geschaeftsjahr, 11, 1),
     }
-    var rootFolder = DriveApp.getFolderById(rootFolderId);
+    var rootFolder = DriveApp.getFolderById(BM.getRootFolderId())
     var ausgabenFolder = getOrCreateFolder(rootFolder, "2 Ausgaben");
     for (let month in datumZuOrdner) {
         var monatsOrdner = getOrCreateFolder(ausgabenFolder, months[month]);
@@ -32,9 +31,7 @@ export function alleAusgabenFolderScannen(rootFolderId: string):BusinessModel {
             wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
         }
     }
-    BM.save();
   
-    return BM;
 
 }
 
