@@ -5,7 +5,7 @@ import { ServerFunction } from "./enums";
 
 
 
-export function UStVAverschickenFromBackend(BM:BusinessModel, ustvaID: string){
+export function UStVAverschickenFromBackend(BM:BusinessModel, ustvaID: string):string{
   ustvaID=ustvaID.substr(0,2)+"aktuell";
   let ustva = BM.getUStVATableCache().getOrCreateRowById(ustvaID);
 
@@ -56,6 +56,7 @@ export function UStVAverschickenFromBackend(BM:BusinessModel, ustvaID: string){
   verschicktUStVA.set36( ustva.get36());
   verschicktUStVA.set83( ustva.get83());
   BM.save();
+  return  ustvaElster["zeitraum"];
 }
 
 export function UStVAverschicken(rootFolderId: string, ustvaID: string) {

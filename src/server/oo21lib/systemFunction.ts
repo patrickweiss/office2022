@@ -35,8 +35,6 @@ export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersio
     if (!lock.tryLock(1)) return;
     oolog.logBeginn("tryCodeUpdate")
     try {
-
-
         const bm = new BusinessModel(fileId, table, version);
         if (bm.getDriveConnector().isDeprecated()) {
             archiveHostfile(bm, table, version);

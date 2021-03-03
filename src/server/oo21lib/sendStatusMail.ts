@@ -1,7 +1,7 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { formatDate, formatMoney } from "../officeone/rechnungSchreiben";
 import * as OO2022 from "./businessModel" ;
-import { currentOOversion, months, office, ooTables } from "./systemEnums";
+import { currentOOversion, months, office, ooTables, systemMasterProperty } from "./systemEnums";
 
 export function sendStatusMail(bm: BusinessModel,bm2022:OO2022.BusinessModel) {
     const monat = getTestDatum().getMonth();
@@ -22,7 +22,7 @@ export function sendStatusMail(bm: BusinessModel,bm2022:OO2022.BusinessModel) {
     html+= `</tbody>
     </table></body>`;
 
-    const doGetUrl = ScriptApp.getService().getUrl()+"?ustva="+getTestDatum().getMonth();
+    const doGetUrl = bm2022.getDriveConnector().getMasterProperty(systemMasterProperty.webApp_URL)+"?ustva="+getTestDatum().getMonth()+"&officeId="+bm.getRootFolderId();
     html +=`<a href="${doGetUrl}"><button type="button">Ausgaben und Einnahmen sind vollständig, bitte UStVA verschicken</button></a>`;
 
     const ImageBlob = null;
@@ -82,6 +82,6 @@ function ausgabenFuerMonat(html: string, bm: BusinessModel, monat: string): stri
 }
 
 export function getTestDatum(){
-  return new Date(2021,1,2);
+  return new Date(2021,2,2);
  // return new Date();
 }

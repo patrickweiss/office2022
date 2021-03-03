@@ -10,7 +10,8 @@ export const currentOOversion = ooVersions.oo56;
 
 
 export enum systemMasterProperty{
-    officeOne2022_TemplateFolderId="officeOne2022_TemplateFolderId"
+    officeOne2022_TemplateFolderId="officeOne2022_TemplateFolderId",
+    webApp_URL="webApp_URL"
 }
 
 export enum ooFolders{
@@ -56,5 +57,5 @@ export const months = {
     '09': '(09) September',
     '10': '(10) Oktober',
     '11': '(11) November',
-    '12': '(12) Dezember'
+    '12': '(12) Dezember',
 }
