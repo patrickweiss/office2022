@@ -70,7 +70,7 @@ export function ausgabenFolderScannen(rootFolderId: string, month: string) {
     return JSON.stringify(result);
 }
 
-function wennBelegNeuIstEintragen(beleg, datum, BM: BusinessModel) {
+function wennBelegNeuIstEintragen(beleg:GoogleAppsScript.Drive.File, datum, BM: BusinessModel) {
     //Ist Beleg schon in Ausgabetabelle eingetragen?
     var ausgabeDaten = BM.getAusgabenTableCache().getOrCreateHashTable("ID")[beleg.getId()];
     if (ausgabeDaten != null) {
@@ -86,54 +86,18 @@ function wennBelegNeuIstEintragen(beleg, datum, BM: BusinessModel) {
 
 
     //Versuch per Sprache umbenannten Beleg zu parsen (Bewirtungsbeleg oder Ausgabe)
-    let belegWoerter = beleg.getName().split(" ");
+    let belegName = beleg.getName().replace("✔_","");
+    let belegWoerter = belegName.split(" ");
     if (belegWoerter.length > 2) {
         if (belegWoerter[0] == "Bewirtungsbeleg" || belegWoerter[0] == "Geschäftsessen") {
             neuenBewirtungsbelegEintragen(beleg, belegWoerter, datum, BM);
             return;
         }
-
-        //neuen Ausgabebeleg eintragen
-        neueAusgabeEintragen(beleg, belegWoerter, datum, BM);
-        return;
+        //nur umbenannte Belege eintragen
+        if (belegName.indexOf("%") != -1)neueAusgabeEintragen(beleg, belegWoerter, datum, BM);
     }
-
-    //neuen, nicht umbenannten Beleg eintragen
-    //   var neueAusgabeRow = a.ausgabenCache.newRow();
-    let neueAusgabeRow = BM.createAusgabenRechnung();
-    neueAusgabeRow.setFileId(beleg.getId());
-    neueAusgabeRow.createLink(beleg.getId(), beleg.getName());
-    neueAusgabeRow.setDatum(datum);
-    neueAusgabeRow.setBezahltAm(datum);
-    neueAusgabeRow.setKonto("nicht zugeordnet");
-    neueAusgabeRow.setText(beleg.getName());
     return;
 }
-/*
-function updateNameFromDataAndTemplate(ausgabeRow: Buchung, template: string) {
-
-    var columnArray = template.split("_");
-    var dateiName = "✔_";
-    var variableText;
-
-    for (var index in columnArray) {
-        //var dataCell = ausgabeDaten.getValue(columnArray[index]);
-        var spaltenName = columnArray[index].split(".")[0]
-        variableText = ausgabeRow.getValueStringOrNumber(spaltenName);
-        dateiName += variableText + "_";
-    }
-    dateiName = dateiName.slice(0, -1);
-    var alterName = ausgabeRow.getLink().split("\"")[3];
-
-    if (alterName !== dateiName) {
-        var datei = DriveApp.getFileById(ausgabeRow.getValue("ID"));
-        datei.setName(dateiName);
-        ausgabeRow.createLink(ausgabeRow.getValue("ID"), dateiName);
-        var datum = new Date();
-        datei.setDescription(datei.getDescription() + " " + datum.getFullYear() + "." + (datum.getMonth() + 1) + "." + datum.getDay() + ":" + alterName);
-    }
-}
-*/
 
 export function checkParsedFile(buchungRow: Umbuchung) {
     const file = DriveApp.getFileById(buchungRow.getFileId());

@@ -486,55 +486,54 @@ export class UStVATableCache extends TableCache<UStVA> {
   }
   public getRowByIndex(rowIndex: string): UStVA { return new UStVA(this, rowIndex); }
   public UStVASummenAktualisieren(normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date, periode: string) {
-    this.deleteAll();
     //ZN spalte befüllen
 
     // alle Eintrage mit Status "aktuelle Daten" neu generieren
     //Stati: "aktuelle Daten", "verschickt","bestätigt", "berichtigt"  
 
-    let periodeUndStatusMonatlich = {
-      "1": "01 Januar",
-      "2": "02 Februar",
-      "3": "03 März",
-      "4": "04 April",
-      "5": "05 Mai",
-      "6": "06 Juni",
-      "7": "07 Juli",
-      "8": "08 August",
-      "9": "09 September",
-      "10": "10 Oktober",
-      "11": "11 November",
-      "12": "12 Dezember"
+    let belegNrMonatlich = {
+      "1": "01aktuell",
+      "2": "02aktuell",
+      "3": "03aktuell",
+      "4": "04aktuell",
+      "5": "05aktuell",
+      "6": "06aktuell",
+      "7": "07aktuell",
+      "8": "08aktuell",
+      "9": "09aktuell",
+      "10": "10aktuell",
+      "11": "11aktuell",
+      "12": "12aktuell"
     }
-    let periodeUndStatusProQuartal = {
-      "1": "1. Quartal",
-      "2": "1. Quartal",
-      "3": "1. Quartal",
-      "4": "2. Quartal",
-      "5": "2. Quartal",
-      "6": "2. Quartal",
-      "7": "3. Quartal",
-      "8": "3. Quartal",
-      "9": "3. Quartal",
-      "10": "4. Quartal",
-      "11": "4. Quartal",
-      "12": "4. Quartal"
+    let belegNrMonatlichProQuartal = {
+      "1": "41aktuell",
+      "2": "41aktuell",
+      "3": "41aktuell",
+      "4": "42aktuell",
+      "5": "42aktuell",
+      "6": "42aktuell",
+      "7": "43aktuell",
+      "8": "43aktuell",
+      "9": "43aktuell",
+      "10": "44aktuell",
+      "11": "44aktuell",
+      "12": "44aktuell"
     }
 
     //let periodenHash = periodeUndStatusProQuartal;
-    if (periode === "monatlich") this.aktualisieren(periodeUndStatusMonatlich, normalisierteBuchungen, beginnOfYear);
-    else this.aktualisieren(periodeUndStatusProQuartal, normalisierteBuchungen, beginnOfYear);
+    if (periode === "monatlich") this.aktualisieren(belegNrMonatlich, normalisierteBuchungen, beginnOfYear);
+    else this.aktualisieren(belegNrMonatlichProQuartal, normalisierteBuchungen, beginnOfYear);
   }
   private aktualisieren(periodenHash: Object, normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date) {
-    let summenHash = this.getOrCreateHashTable("Periode und Status");
+    let summenHash = this.getRowHashTable();
     //alle Perioden initialisieren------------------------------------------------------------------------------------------------------
     for (var index in periodenHash) {
       let periode = periodenHash[index];
       let ustvaRow = summenHash[periode] as UStVA;
       if (ustvaRow == undefined) {
-        ustvaRow = this.createNewRow();
-        ustvaRow.setValue("Periode und Status", periode);
-        summenHash = this.getOrCreateHashTable("Periode und Status");
+        ustvaRow = this.getOrCreateRowById(periode);
+        ustvaRow.setValue("Periode und Status", "aktuell");
+        summenHash = this.getRowHashTable();
         ustvaRow.setDatum(
           new Date(beginnOfYear.getFullYear(), parseInt(index) - 1)
         );
@@ -558,7 +557,7 @@ export class UStVATableCache extends TableCache<UStVA> {
             if (monat == "") break;//wenn nicht bezahlt wurde, muss bei Ist-Versteuerung keine Mehrwertsteuer bezahlt werden
             var periode = periodenHash[monat];
             if (periode == undefined) break;
-            var ustvaRow = summenHash[periode] as UStVA;
+            let ustvaRow = summenHash[periode] as UStVA;
             console.log(buchungRow.getDatum().getFullYear()+" "+parseInt(buchungRow.getValue("Monat").toString(),10));
             if (buchungRow.getDatum().getFullYear() === 2020 && parseInt(buchungRow.getValue("Monat").toString(),10) >= 7) {
               //CoronaMwST: 16% in 35 und 36
@@ -581,7 +580,7 @@ export class UStVATableCache extends TableCache<UStVA> {
             var monat = buchungRow.getValue("Monat").toString();
             var periode = periodenHash[monat];
             if (periode == undefined) break;
-            var ustvaRow = summenHash[periode];
+            ustvaRow = summenHash[periode] as UStVA;
             var aktuellerBetrag = -Number(buchungRow.getValue("Betrag"));
             var aktuelleSumme = ustvaRow.getValue("66");
             ustvaRow.setValue("66", aktuellerBetrag + aktuelleSumme);
@@ -594,7 +593,7 @@ export class UStVATableCache extends TableCache<UStVA> {
     //Feld 81 runden Feld 83 berechnen
     for (var index in periodenHash) {
       var periode = periodenHash[index];
-      ustvaRow = summenHash[periode] as UStVA;
+      let ustvaRow = summenHash[periode] as UStVA;
       ustvaRow.setValue("81", Math.floor(ustvaRow.getValue("81")));
       ustvaRow.setValue("83", ustvaRow.getValue("81") * 0.19 + ustvaRow.get36() - ustvaRow.getValue("66"));
     }
@@ -969,7 +968,6 @@ export class Produkt extends TableRow {
 
 }
 export class Gutschrift extends Rechnung {
-  public getText() { return this.getKonto() + " " + this.getNettoBetragMitVorzeichen() + " €" }
   public getKonto() { return "Leistung:" + this.getValue("Name"); }
   public getName() { return this.getValue("Name"); }
   public setName(value: string) { this.setValue("Name", value); }
@@ -979,6 +977,9 @@ export class Gutschrift extends Rechnung {
   public setNettoBetrag(value: any) { this.setValue("Summe netto", value); }
   public getBetrag() { return this.getValue("Gutschriftbetrag"); }
   public setBetrag(value: any) { this.setValue("Gutschriftbetrag", value); }
+  public getText() { return this.getDokumententyp(); }
+  public setText(text: string) { this.setDokumententyp(text); }
+
   public getDokumententyp() { return this.getValue("Dokumententyp"); }
   public setDokumententyp(value: any) { this.setValue("Dokumententyp", value); }
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {

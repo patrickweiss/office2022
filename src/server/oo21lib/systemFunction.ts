@@ -1,10 +1,10 @@
 import { alleAusgabenFolderScannen, ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { BusinessModel } from "./businessModel";
-import { sendStatusMail } from "./sendStatusMail";
+import { getTestDatum, sendStatusMail } from "./sendStatusMail";
 import { oolog } from "./spreadsheerLogger";
 import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
-import * as OO2021 from "../../officeone/BusinessModel" ;
+import * as OO2021 from "../../officeone/BusinessModel";
 
 
 export function installSystem(fileId: string, table: ooTables, version: ooVersions) {
@@ -20,11 +20,11 @@ export function installSystem(fileId: string, table: ooTables, version: ooVersio
         }
 
         const triggerMode = bm.getDriveConnector().getOfficeProperty(office.triggerMode)
-        if (triggerMode === triggerModes.test)  ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
-        if (triggerMode === triggerModes.production)   ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
+        if (triggerMode === triggerModes.test) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
+        if (triggerMode === triggerModes.production) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
 
-        bm.getDriveConnector().setOfficeProperty(office.officeRootID_FolderId,bm.getDriveConnector().officeFolder.getId());
-        oolog.logEnd("System installiert für:" +triggerMode+" "+ bm.getDriveConnector().getOfficeProperty(office.firma));
+        bm.getDriveConnector().setOfficeProperty(office.officeRootID_FolderId, bm.getDriveConnector().officeFolder.getId());
+        oolog.logEnd("System installiert für:" + triggerMode + " " + bm.getDriveConnector().getOfficeProperty(office.firma));
     }
     catch (e) {
         oolog.logEnd(e.toString())
@@ -32,25 +32,29 @@ export function installSystem(fileId: string, table: ooTables, version: ooVersio
 }
 export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersions): boolean {
     const lock = LockService.getScriptLock();
-    if (!lock.tryLock(1))return;
+    if (!lock.tryLock(1)) return;
     oolog.logBeginn("tryCodeUpdate")
     try {
-    
+
 
         const bm = new BusinessModel(fileId, table, version);
         if (bm.getDriveConnector().isDeprecated()) {
-            archiveHostfile(bm,table,version);
+            archiveHostfile(bm, table, version);
             oolog.logEnd("Datei wurde archiviert, Trigger gestoppt");
             return true;
         }
         const bm2021 = new OO2021.BusinessModel(bm.getDriveConnector().officeFolder.getId());
         alleAusgabenFolderScannen(bm2021);
-       alleGutschriftenFolderScannen(bm2021);
+        alleGutschriftenFolderScannen(bm2021);
+        bm2021.kontoSummenAktualisieren();
+        bm2021.save();
         //wenn neue Belege gefunden wurden, Mail schicken
-        if (bm2021.getAusgabenTableCache().loadRowCount < bm2021.getAusgabenTableCache().dataArray.length ||
-        bm2021.getGutschriftenTableCache().loadRowCount < bm2021.getGutschriftenTableCache().dataArray.length){
+        if (
+            bm2021.getAusgabenTableCache().loadRowCount < bm2021.getAusgabenTableCache().dataArray.length ||
+            bm2021.getGutschriftenTableCache().loadRowCount < bm2021.getGutschriftenTableCache().dataArray.length ||
+            getTestDatum().getDate() === 2) {
             //Mail schicken, mit aktuellem Status
-            sendStatusMail(bm2021,bm);
+            sendStatusMail(bm2021, bm);
             oolog.addMessage("Mail mit neuem Status versendet");
         }
         oolog.logEnd("System Jobs wurden durchgeführt");
@@ -65,8 +69,8 @@ export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersio
     }
 }
 
-function archiveHostfile(bm:BusinessModel, table: ooTables, version: ooVersions){
-    oolog.addMessage( "archiveHostfile");
+function archiveHostfile(bm: BusinessModel, table: ooTables, version: ooVersions) {
+    oolog.addMessage("archiveHostfile");
     bm.getDriveConnector().archiveHostFile();
     //we need a copy of the data, not only a reference ...
     const data = JSON.parse(JSON.stringify(bm.getDriveConnector().getTableData(table)));
@@ -84,5 +88,5 @@ function archiveHostfile(bm:BusinessModel, table: ooTables, version: ooVersions)
         oolog.addMessage("trigger for function deleted:" + triggers[i].getHandlerFunction());
         ScriptApp.deleteTrigger(triggers[i]);
     }
-    bm.getDriveConnector().setOfficeProperty(office.triggerMode,triggerModes.stop);
+    bm.getDriveConnector().setOfficeProperty(office.triggerMode, triggerModes.stop);
 }

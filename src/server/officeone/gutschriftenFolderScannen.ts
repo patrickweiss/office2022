@@ -79,35 +79,37 @@ function wennGutschriftNeuIstEintragen(beleg, datum, BM: BusinessModel) {
     }
 
     //Versuch per Sprache umbenannten Beleg zu parsen (Bewirtungsbeleg oder Ausgabe)
-    let belegWoerter = beleg.getName().split(" ");
-
+  
     //neuen Ausgabebeleg eintragen
-    neueGutschriftEintragen(beleg, belegWoerter, datum, BM);
+    neueGutschriftEintragen(beleg, datum, BM);
 
 
     return;
 }
 
-function neueGutschriftEintragen(beleg, belegWoerter, datum, BM: BusinessModel) {
-
+function neueGutschriftEintragen(beleg:GoogleAppsScript.Drive.File, datum, BM: BusinessModel) {
+    let belegName = beleg.getName().replace("✔_","");
+    //wenn der Beleg nicht umbenannt wurde, wird er ignoriert
+    if (belegName.indexOf("%")===-1)return;
     let neueGutschriftRow = BM.createGutschrift();
 
     neueGutschriftRow.setFileId(beleg.getId());
     neueGutschriftRow.createLink(beleg.getId(), beleg.getName());
     neueGutschriftRow.setDatum(datum);
+    neueGutschriftRow.setText(belegName);
 
+    let belegWoerter = belegName.split(" ");
 
     if (belegWoerter.length > 2) {
         //Wenn die Datei nicht umbenannt wurde, wird sie mit aktuellem Dateinamen und richtigem Monat abgelegt
         var index = 1;
         var konto = belegWoerter[0];
-        while (isNaN(belegWoerter[index].charAt(0)) && belegWoerter[index].charAt(0) != "-") {
+        while (isNaN(parseFloat(belegWoerter[index].charAt(0))) && belegWoerter[index].charAt(0) != "-") {
             konto += " " + belegWoerter[index];
             index++;
         }
         neueGutschriftRow.setBetrag(parseFloat(belegWoerter[index].replace(".", "").replace(",", ".")));
         var prozent = "0%";
-        var belegName = beleg.getName();
         if (belegName.indexOf("19%") != -1) prozent = "19%";
         if (belegName.indexOf("7%") != -1) prozent = "7%";
         if (belegName.indexOf("16%") != -1) prozent = "16%";
