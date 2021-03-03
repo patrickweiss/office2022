@@ -13,8 +13,7 @@ export function sendStatusMail(bm: BusinessModel,bm2022:OO2022.BusinessModel) {
     <tbody>`;
     html=outerAusgabenFuerMonat(html,bm,monat-1,vorjahrID);//html für vor vor monat
     html=outerAusgabenFuerMonat(html,bm,monat,vorjahrID);//html für monat vor aktuellem monat
-    html+= `</tbody>
-    </table>`;
+    html+= `</tbody>`;
 
     html+= `<thead><tr><th>Gutschriften</th><th></th><th></th><th></th><th></th></tr></thead>
     <tbody>`;
@@ -22,6 +21,9 @@ export function sendStatusMail(bm: BusinessModel,bm2022:OO2022.BusinessModel) {
     html = outerGutschriftenFuerMonat(html,bm,monat,vorjahrID);//html für monat vor aktuellem monat
     html+= `</tbody>
     </table></body>`;
+
+    const doGetUrl = ScriptApp.getService().getUrl()+"?ustva="+getTestDatum().getMonth();
+    html +=`<a href="${doGetUrl}"><button type="button">Ausgaben und Einnahmen sind vollständig, bitte UStVA verschicken</button></a>`;
 
     const ImageBlob = null;
     GmailApp.sendEmail(userEmail, "Neue Belege geparst", html, { htmlBody: html });
@@ -45,9 +47,9 @@ function gutschriftenFuerMonat(html: string, bm: BusinessModel, monat: string): 
     <tbody>`;
     for (let ausgabe of bm.getGutschriftenFuerMonat(monat.toString())) {
         html += `<tr><td>${ausgabe.getText()}</td>
-        <td>${formatMoney(ausgabe.getBetrag())}</td>
-        <td>${formatMoney(ausgabe.getNettoBetrag())}</td>
-        <td>${formatMoney(ausgabe.getMehrwertsteuer())}</td>
+        <td align="right">${formatMoney(ausgabe.getBetrag())}</td>
+        <td align="right">${formatMoney(ausgabe.getNettoBetrag())}</td>
+        <td align="right">${formatMoney(ausgabe.getMehrwertsteuer())}</td>
         <td>${ausgabe.getKonto()}</td></tr>`;
     }
     return html;
@@ -71,9 +73,9 @@ function ausgabenFuerMonat(html: string, bm: BusinessModel, monat: string): stri
     <tbody>`;
     for (let ausgabe of bm.getAusgabenFuerMonat(monat.toString())) {
         html += `<tr><td>${ausgabe.getText()}</td>
-        <td>${formatMoney(ausgabe.getBetrag())}</td>
-        <td>${formatMoney(ausgabe.getNettoBetrag())}</td>
-        <td>${formatMoney(ausgabe.getMehrwertsteuer())}</td>
+        <td align="right">${formatMoney(ausgabe.getBetrag())}</td>
+        <td align="right">${formatMoney(ausgabe.getNettoBetrag())}</td>
+        <td align="right">${formatMoney(ausgabe.getMehrwertsteuer())}</td>
         <td>${ausgabe.getKonto()}</td></tr>`;
     }
     return html;

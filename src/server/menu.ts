@@ -2,6 +2,7 @@ import { Installation, InstallationenTableCache } from "../officeone/BusinessDat
 import { doGetApplicant } from "../officetwo/application/doGetApplicant";
 import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
 import { DriveConnector, oooVersion } from "./officeone/driveconnector";
+import { doGetUStVA } from "./oo21lib/doGetUStVA";
 //import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
 
 export const onOpen = () => {
@@ -57,6 +58,7 @@ export const openAboutSidebar = () => {
 export const doGet = (e: GoogleAppsScript.Events.DoGet) => {
   if (e.parameters["email"])return doGetLastschriftmandat(e);
   if (e.parameters["applicant"])return doGetApplicant(e);
+  if (e.parameters["ustva"])return doGetUStVA(e);
   const html = HtmlService.createHtmlOutputFromFile('office-one-2021').setTitle("OfficeOne.2021");
   html.addMetaTag('viewport', 'width=device-width, initial-scale=1');
   return html;
