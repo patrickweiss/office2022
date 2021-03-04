@@ -35,7 +35,7 @@ export function UStVAbuchen(rootFolderId: string) {
 
     ustvaUmbuchung.setDatum(new Date(parseInt(jahr,10),parseInt(periode,10)-1));
     ustvaUmbuchung.setKonto("UStVA");
-    ustvaUmbuchung.setGegenkonto("Verbindlichkeiten Umsatzsteuer");
+    ustvaUmbuchung.setGegenkonto("Verbindlichkeiten UStVA");
     ustvaUmbuchung.setText(belegDaten);
     ustvaUmbuchung.setBetrag(parseKz83FromUStVA(belegDaten));
     umbuchungenTableCache.save();

@@ -32,9 +32,10 @@ interface agent {
   beispiel: string;
 }
 enum exportgruppe {
-  abschreibung = "OfficeOne.Export",
+  abschreibung = "OfficeOneAbschreibung.Export",
   Anlage = "OfficeOne.Export",
-  laufendeBuchungen = "OfficeOne.Export"
+  laufendeBuchungen = "OfficeOne.Export",
+  mwstAbschluss = "OfficeOneMwstAbschluss.Export"
 }
 
 export function SimbaExportErstellen(rootFolderId: string) {
@@ -481,6 +482,9 @@ function negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a: ag
 
 function negativenBetragTranformierenAusCSVExport(csvRow: CSVExport) {
   if (csvRow.getValue("Exportgruppe") === "") csvRow.setValue("Exportgruppe", exportgruppe.laufendeBuchungen);
+  if (csvRow.getValue("BelegNr")==="mwstUStVAAufVMwSt" ||
+  csvRow.getValue("BelegNr")==="mwstVorsteuerAufVMwSt" ||
+  csvRow.getValue("BelegNr")==="mwstUmsatzsteuerAufVMwSt" ) csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
   if (csvRow.getValue("Betrag") < 0) {
     var altSoll = csvRow.getValue("Konto (Soll)");
     var altHaben = csvRow.getValue("Konto (Haben)");
