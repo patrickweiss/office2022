@@ -484,7 +484,8 @@ function negativenBetragTranformierenAusCSVExport(csvRow: CSVExport) {
   if (csvRow.getValue("Exportgruppe") === "") csvRow.setValue("Exportgruppe", exportgruppe.laufendeBuchungen);
   if (csvRow.getValue("BelegNr")==="mwstUStVAAufVMwSt" ||
   csvRow.getValue("BelegNr")==="mwstVorsteuerAufVMwSt" ||
-  csvRow.getValue("BelegNr")==="mwstUmsatzsteuerAufVMwSt" ) csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
+  csvRow.getValue("BelegNr")==="mwstUmsatzsteuerAufVMwSt"||
+  csvRow.getValue("BelegNr")==="mwstFinanzamtOP" ) csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
   if (csvRow.getValue("Betrag") < 0) {
     var altSoll = csvRow.getValue("Konto (Soll)");
     var altHaben = csvRow.getValue("Konto (Haben)");

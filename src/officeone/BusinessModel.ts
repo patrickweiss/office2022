@@ -341,6 +341,16 @@ export class BusinessModel {
         mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
         mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1790");
 
+        //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
+        let mwstFinanzamtOP = this.getOrCreateUmbuchung("mwstFinanzamtOP");
+        mwstFinanzamtOP.setDatum(this.endOfYear());
+        mwstFinanzamtOP.setKonto("Umsatzsteuer Vorjahr");
+        mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer-vorsteuer-ustva);
+        mwstFinanzamtOP.setGegenkonto("Umsatzsteuer Vorjahr");
+        //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
+        mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
+
+
         //SimbaIstUmsatz
         /*
         let simbaIstUmsatz = fealligeUmsatzsteuer / 19 * 100;
