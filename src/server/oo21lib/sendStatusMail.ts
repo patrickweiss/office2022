@@ -82,6 +82,6 @@ function ausgabenFuerMonat(html: string, bm: BusinessModel, monat: string): stri
 }
 
 export function getTestDatum(){
-  return new Date(2021,2,2);
- // return new Date();
+  // return new Date(2021,2,2);
+  return new Date();
 }

@@ -50,7 +50,7 @@ export function tryCodeUpdate(fileId: string, table: ooTables, version: ooVersio
         if (
             bm2021.getAusgabenTableCache().loadRowCount < bm2021.getAusgabenTableCache().dataArray.length ||
             bm2021.getGutschriftenTableCache().loadRowCount < bm2021.getGutschriftenTableCache().dataArray.length ||
-            getTestDatum().getDate() === 2) {
+            getTestDatum().getDate() === 1) {
             //Mail schicken, mit aktuellem Status
             sendStatusMail(bm2021, bm);
             oolog.addMessage("Mail mit neuem Status versendet");
