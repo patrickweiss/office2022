@@ -1,6 +1,7 @@
+import { currentOOversion, ooFolders } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
-export const oooVersion = "0055";
+export const oooVersion = "0056";
 
 
 export class DriveConnector {
@@ -10,34 +11,73 @@ export class DriveConnector {
   static rangeValues = {};
 
   static oooVersionsFileNameIdMap = {
-    "0055":{
-      "(1) Installationen - Version:0055":"1aFzY4ui0pC3vu13dUnwkVycwX39mOdOPb602wXKlU4Y",
-      "(0) Testsysteme - Version:0055":"19e7vc0vIQK6odtvznGSzhybWkIBk9VFi4_H8OBSrH_E",
-      "7 Datenschlürfer - Version:0055":"1e4CmRpBgpVtO6PlWXN2DyZ8UP14MSigxkd7GMlsevJw",
-      "6 Posteingang - Version:0055":"1a8P5ufmV8CX5YImZBHMV7u4KXd_YOydn2w2OAvFLHF0",
-      "(2) ElsterTransfer - Version:0055":"1YSd7HBg23-Cf16tIryOBnwoziN6CTdGZ62oBHALLB7A",
-      "4 Bilanz, Gewinn und Steuererklärungen - Version:0055":"1y-EEqtrea6tM4PJf4inRNOqd-SLPCOj8eoQmVvI4X5g",
-      "5 SEPA - Lastschriftmandat - Version:0055":"1KMdpZN7uSA6Y4uKCLUNni4Qj_uuDpK6YZIe2u9gXZOU",
-      "3 Bankbuchungen zuordnen - Version:0055":"1IbGAv2J7HK5EQOBRtBXRy_tN8OVvsfq6OMsNeUj0XG8",
-      "2 Ausgaben erfassen - Version:0055":"181TmgsS7yNbsSAtLZ1Azbz0sK8L4yaEJKG_IGZeO5Zg",
-      "1 Rechnung schreiben - Version:0055":"1inJweTS-tp5ow27A5J3lSuQXovhfYFmHIIClpaNtJAs",
-      "0 E-Mail verschicken - Version:0055":"1-JFdtpdgbUFJwDLPFwfpxtMXbjlKoysa_X_spynQuSI"
+    "0056": {
+      "00 Office - Version:0056": "1FGKiIS766C6TKSotG1QXvLniWVMJsgUZYgNA6KL7cdY",
+      "7 Datenschlürfer - Version:0056": "1Q4byI_52f3M-mP2-HSa6XItN3pb3NAnI6DXptbhtsGE",
+      "3 Bankbuchungen zuordnen - Version:0056": "17AmF6ufE3KKh7YHKw5sOCv0jRsVHeltd2Iewgmq6f-U",
+      "2 Ausgaben erfassen - Version:0056": "1Ok2NIxKSSZzjTmUa-Q8vvixmS4N7Br52zNFelIb_rjo",
+      "1 Rechnung schreiben - Version:0056": "17otAE0kfwrMq7YZnPYdZh-AHqnUIvYqkGfPfLA_EnrQ",
+      "4 Bilanz, Gewinn und Steuererklärungen - Version:0056": "12JGWZsWRKkQK_q_jslYMQKVwMh6BLK_GkzzN2_y9T_Y"
     },
-    "0054":{
-      "(1) Installationen - Version:0054":"1NZFUya4uKiLkHT1NTjF752igsU7dyrDB9eoDAVlSulM",
-      "5 SEPA - Lastschriftmandat - Version:0054":"1UhZKf4WOiGYgwamy6PXNgPl0_hBN0ya2I3g-5qKA6c4",
-      "7 Datenschlürfer - Version:0054":"1pB0sggfUhlUUv9jMmnmrBUvvpWqe4qpurUD5_R7esQc",
-      "6 Posteingang - Version:0054":"1Drg_tWuuiUcE2Cfjo69xKHQ9onPBE1BwJXdOieZ0uIo",
-      "(2) ElsterTransfer - Version:0054":"1woi9QyDt1u3qTQf4gzC7D91QXq4T6chZwq2rGON4mZk",
-      "4 Bilanz, Gewinn und Steuererklärungen - Version:0054":"17xUX6aeaUFlfAFWMMZO_rCxu9Lh4kBPhNz-LHHPZnh8",
-      "3 Bankbuchungen zuordnen - Version:0054":"1FMzlG37z9Gfu6YNTkEftquwNB6Yudq0hUdoXT4XcUzY",
-      "2 Ausgaben erfassen - Version:0054":"1lu4_BoUmfU99NWfH--KXGTsAp5FBrWj1nkiEBz0JAcQ",
-      "1 Rechnung schreiben - Version:0054":"1CzIvL3QOGEKI8ZZV2HnUmpi8bjll94ppncJYoS1pr8o",
-      "0 E-Mail verschicken - Version:0054":"11a0l-8leXGwwVdki4wCvEWHx6bX4eoNkM58MnGBns9E",
-      "(0) Testsysteme - Version:0054":"1DiYUtI_5zT007oGNIZbv4eUovKjbSalV6W6kzf7r66o"
+    "0055": {
+      "(1) Installationen - Version:0055": "1aFzY4ui0pC3vu13dUnwkVycwX39mOdOPb602wXKlU4Y",
+      "(0) Testsysteme - Version:0055": "19e7vc0vIQK6odtvznGSzhybWkIBk9VFi4_H8OBSrH_E",
+      "7 Datenschlürfer - Version:0055": "1e4CmRpBgpVtO6PlWXN2DyZ8UP14MSigxkd7GMlsevJw",
+      "6 Posteingang - Version:0055": "1a8P5ufmV8CX5YImZBHMV7u4KXd_YOydn2w2OAvFLHF0",
+      "(2) ElsterTransfer - Version:0055": "1YSd7HBg23-Cf16tIryOBnwoziN6CTdGZ62oBHALLB7A",
+      "4 Bilanz, Gewinn und Steuererklärungen - Version:0055": "1y-EEqtrea6tM4PJf4inRNOqd-SLPCOj8eoQmVvI4X5g",
+      "5 SEPA - Lastschriftmandat - Version:0055": "1KMdpZN7uSA6Y4uKCLUNni4Qj_uuDpK6YZIe2u9gXZOU",
+      "3 Bankbuchungen zuordnen - Version:0055": "1IbGAv2J7HK5EQOBRtBXRy_tN8OVvsfq6OMsNeUj0XG8",
+      "2 Ausgaben erfassen - Version:0055": "181TmgsS7yNbsSAtLZ1Azbz0sK8L4yaEJKG_IGZeO5Zg",
+      "1 Rechnung schreiben - Version:0055": "1inJweTS-tp5ow27A5J3lSuQXovhfYFmHIIClpaNtJAs",
+      "0 E-Mail verschicken - Version:0055": "1-JFdtpdgbUFJwDLPFwfpxtMXbjlKoysa_X_spynQuSI"
+    },
+    "0054": {
+      "(1) Installationen - Version:0054": "1NZFUya4uKiLkHT1NTjF752igsU7dyrDB9eoDAVlSulM",
+      "5 SEPA - Lastschriftmandat - Version:0054": "1UhZKf4WOiGYgwamy6PXNgPl0_hBN0ya2I3g-5qKA6c4",
+      "7 Datenschlürfer - Version:0054": "1pB0sggfUhlUUv9jMmnmrBUvvpWqe4qpurUD5_R7esQc",
+      "6 Posteingang - Version:0054": "1Drg_tWuuiUcE2Cfjo69xKHQ9onPBE1BwJXdOieZ0uIo",
+      "(2) ElsterTransfer - Version:0054": "1woi9QyDt1u3qTQf4gzC7D91QXq4T6chZwq2rGON4mZk",
+      "4 Bilanz, Gewinn und Steuererklärungen - Version:0054": "17xUX6aeaUFlfAFWMMZO_rCxu9Lh4kBPhNz-LHHPZnh8",
+      "3 Bankbuchungen zuordnen - Version:0054": "1FMzlG37z9Gfu6YNTkEftquwNB6Yudq0hUdoXT4XcUzY",
+      "2 Ausgaben erfassen - Version:0054": "1lu4_BoUmfU99NWfH--KXGTsAp5FBrWj1nkiEBz0JAcQ",
+      "1 Rechnung schreiben - Version:0054": "1CzIvL3QOGEKI8ZZV2HnUmpi8bjll94ppncJYoS1pr8o",
+      "0 E-Mail verschicken - Version:0054": "11a0l-8leXGwwVdki4wCvEWHx6bX4eoNkM58MnGBns9E",
+      "(0) Testsysteme - Version:0054": "1DiYUtI_5zT007oGNIZbv4eUovKjbSalV6W6kzf7r66o"
     }
   }
   static oooVersionsRangeFileMap = {
+    "0056": {
+      EMailIdD: "0 E-Mail verschicken - Version:0056",
+      RechnungSchreibenD: "1 Rechnung schreiben - Version:0056",
+      GutschriftenD: "1 Rechnung schreiben - Version:0056",
+      EURechnungenD: "1 Rechnung schreiben - Version:0056",
+      KundenD: "1 Rechnung schreiben - Version:0056",
+      PositionenarchivD: "1 Rechnung schreiben - Version:0056",
+      ProdukteD: "1 Rechnung schreiben - Version:0056",
+      RechnungenD: "1 Rechnung schreiben - Version:0056",
+      AbschreibungenD: "2 Ausgaben erfassen - Version:0056",
+      AusgabenD: "2 Ausgaben erfassen - Version:0056",
+      BewirtungsbelegeD: "2 Ausgaben erfassen - Version:0056",
+      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen - Version:0056",
+      "VerträgeD": "2 Ausgaben erfassen - Version:0056",
+      BankbuchungenD: "3 Bankbuchungen zuordnen - Version:0056",
+      UmbuchungenD: "3 Bankbuchungen zuordnen - Version:0056",
+      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0056",
+      LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0056",
+      LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0056",
+      InstallationenD: "(1) Installationen - Version:0056",
+      ElsterTransferD: "(2) ElsterTransfer - Version:0056",
+      PosteingangD: "6 Posteingang - Version:0056",
+      GdpduD: "7 Datenschlürfer - Version:0056",
+      DataFileD: "7 Datenschlürfer - Version:0056",
+      TestsystemeD: "(0) Testsysteme - Version:0056"
+    },
     "0055": {
       EMailIdD: "0 E-Mail verschicken - Version:0055",
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
@@ -58,7 +98,7 @@ export class DriveConnector {
       EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      CSVExportD:"4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0055",
       LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0055",
       LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0055",
@@ -67,7 +107,7 @@ export class DriveConnector {
       PosteingangD: "6 Posteingang - Version:0055",
       GdpduD: "7 Datenschlürfer - Version:0055",
       DataFileD: "7 Datenschlürfer - Version:0055",
-      TestsystemeD:"(0) Testsysteme - Version:0055"
+      TestsystemeD: "(0) Testsysteme - Version:0055"
     },
     "0054": {
       EMailIdD: "0 E-Mail verschicken - Version:0054",
@@ -89,7 +129,7 @@ export class DriveConnector {
       EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
       KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
       UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      CSVExportD:"4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
       LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0054",
       LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0054",
       LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0054",
@@ -98,10 +138,13 @@ export class DriveConnector {
       PosteingangD: "6 Posteingang - Version:0054",
       GdpduD: "7 Datenschlürfer - Version:0054",
       DataFileD: "7 Datenschlürfer - Version:0054",
-      TestsystemeD:"(0) Testsysteme - Version:0054"
+      TestsystemeD: "(0) Testsysteme - Version:0054"
     }
   }
   static oooVersionValuesFileMap = {
+    "0056": {
+      Konfiguration: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+    },
     "0055": {
       Konfiguration: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
     },
@@ -110,6 +153,21 @@ export class DriveConnector {
     }
   }
   static oooVersionValueFileMap = {
+    "0056": {
+      GutschriftenDatei: "1 Rechnung schreiben - Version:0056",
+      HilfeRechnungFertigstellen: "1 Rechnung schreiben - Version:0056",
+      HilfeRechnungSchreiben: "1 Rechnung schreiben - Version:0056",
+      KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0056",
+      Rechnungsnummer: "1 Rechnung schreiben - Version:0056",
+      Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0056",
+      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0056",
+      KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0056",
+      EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
+      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056"
+    },
     "0055": {
       GutschriftenDatei: "1 Rechnung schreiben - Version:0055",
       HilfeRechnungFertigstellen: "1 Rechnung schreiben - Version:0055",
@@ -117,7 +175,7 @@ export class DriveConnector {
       KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0055",
       Rechnungsnummer: "1 Rechnung schreiben - Version:0055",
       Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0055",
-      KundenRechnungsvorlage:  "1 Rechnung schreiben - Version:0055",
+      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0055",
       KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0055",
       EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
@@ -132,7 +190,7 @@ export class DriveConnector {
       KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0054",
       Rechnungsnummer: "1 Rechnung schreiben - Version:0054",
       Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0054",
-      KundenRechnungsvorlage:  "1 Rechnung schreiben - Version:0054",
+      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0054",
       KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0054",
       EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
       EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
@@ -255,17 +313,17 @@ export class DriveConnector {
         var spreadsheetId = "";
         if (!spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).hasNext()) {
           spreadsheetId = this.copyAndInitializeSpreadsheet(rangeName, oooVersion, spreadsheetFolder);
-          console.log("new spreadsheet:"+spreadsheetId+" for range:"+rangeName+"for folder:"+rootFolderId);
+          console.log("new spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId);
         } else {
           spreadsheetId = spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).next().getId();
-          console.log("old spreadsheet:"+spreadsheetId+" for range:"+rangeName+"for folder:"+rootFolderId);
+          console.log("old spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId);
         }
         spreadsheet = SpreadsheetApp.openById(spreadsheetId);
         this.spreadsheets[rootFolderId + this.getRangeFileName(rangeName, version)] = spreadsheet;
       }
       return spreadsheet as GoogleAppsScript.Spreadsheet.Spreadsheet;
     } catch (e) {
-      console.log("exception get spreadsheet:"+spreadsheetId+" for range:"+rangeName+"for folder:"+rootFolderId+" for version:"+version);
+      console.log("exception get spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId + " for version:" + version);
       console.log(e.stack);
       return SpreadsheetApp.getActive();
     }
@@ -313,7 +371,7 @@ export function generateAndMailTableRow() {
 }
 
 export function generateAndMailoooVersionsFileNameIdMap() {
-  const newVersionFolder = getDevOpsFolder().getFoldersByName(oooVersion).next();
+  const newVersionFolder = getDevOpsFolder().getFoldersByName(oooVersion).next().getFoldersByName(ooFolders.office + " " + currentOOversion).next();
   const spreadheets = newVersionFolder.getFilesByType("application/vnd.google-apps.spreadsheet");
   let oooVersionsFileNameIdMap = {};
   while (spreadheets.hasNext()) {

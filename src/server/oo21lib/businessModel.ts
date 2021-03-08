@@ -9,7 +9,7 @@ export class BusinessModel {
     }
     private install() {
         if (this.dc.systemInstalled()) return;
-        this.dc.installSystem();
+        this.dc.installFromSpreadsheetCopy();
     }
     public getDriveConnector(): DriveConnector { return this.dc; }
     public scanDriveForNewDocuments(){

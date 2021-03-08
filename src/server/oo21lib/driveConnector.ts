@@ -1,4 +1,3 @@
-import { oolog } from "./spreadsheerLogger";
 import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
@@ -16,7 +15,6 @@ export class DriveConnector {
         this.hostFileId = hostFileId;
         this.hostTable = hostTable;
         this.version = version;
-        oolog.addMessage("new DC for "+this.hostFileId+" "+this.hostTable+" "+this.version)
     }
     public systemInstalled(): boolean {
         //if the host file is named like the master file, we assume the system is correctly installed
@@ -52,10 +50,19 @@ export class DriveConnector {
         //---------------------------------------------------------------------------------------------------
         return true;
     }
-    public installSystem() {
+    public installFromWebApp(){
+        this.officeFolder = copyFolder(
+            this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
+            DriveApp.getRootFolder().getId(),
+            currentOOversion,
+            currentOOversion
+        )
+    }
+    public installFromSpreadsheetCopy() {
         //load hostTable data in tableData Cache
         this.tableDataCache[this.hostTable] = SpreadsheetApp.getActive().getSheetByName(this.getSheetName(this.hostTable)).getDataRange().getValues();
         if (this.getOfficeProperty(office.importFrom2021_FolderId) === "") {
+            //copy System Master
             this.officeFolder = copyFolder(
                 this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
                 DriveApp.getRootFolder().getId(),
@@ -180,7 +187,6 @@ export class DriveConnector {
         versionFolder.addFile(installCallFile);
         this.officeFolder.removeFile(installCallFile);
 
-        oolog.addMessage("This file was archived, this should be the last log entry!!!")
     }
 }
 

@@ -1,5 +1,5 @@
 import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
-import { getOrCreateFolder } from "./directDriveConnector";
+import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
@@ -33,7 +33,7 @@ export function updateDriveMaster(rootFolderId: string) {
     }
   }
 }
-/*
+
 export function updateDrive(rootFolderId: string) {
 
   let oooPreviousVersion = getPreviousVersion();
@@ -141,7 +141,7 @@ export function updateDrive(rootFolderId: string) {
   return getOrCreateOfficeOneFolders();
  
 }
-*/
+
 
 
 function importToBiggerTable(dataOldVersion: any[][][], rootFolderId: string, rangeName: string) {

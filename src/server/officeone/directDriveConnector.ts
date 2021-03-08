@@ -1,45 +1,84 @@
+import { BusinessModel } from "../../client/office-one-2021/bm/BusinessModel";
+import { currentOOversion, ooFolders, ooTables, ooVersions } from "../oo21lib/systemEnums";
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { ServerFunction } from "./enums";
+
+//oo21lib stuff
+import * as oo22 from "../oo21lib/driveConnector";
 
 
 
 export function getOrCreateOfficeOneFolders() {
   var foldersHash = {};
-  let result = {};
+  let result = {
+    serverFunction: ServerFunction.getOrCreateOfficeOneFolders,
+    foldersArray: foldersHash
+  };
   //is funktion invoked from within an office one spreadheet?
 
-  //Look for folders in GDrive root if function is invoked by WebApp
+  try {
+    //Look for folders in GDrive root if function is invoked by WebApp
     const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
     const ooFolderId = location[0][0]
     const leaf = location[0][1];
     const folder = DriveApp.getFolderById(ooFolderId);
     const version = folder.getName().slice(-4);
     foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: leaf };
- 
-  result = {
-    serverFunction: ServerFunction.getOrCreateOfficeOneFolders,
-    foldersArray: foldersHash
+  } catch (e) {
+    console.log(e);
+    //Funktion wurde von WebApp aufgerufen
+    const ooSystemFolderIterator = DriveApp.getFoldersByName(ooFolders.system)
+    if (ooSystemFolderIterator.hasNext()) {
+      const ooSystemFolder = ooSystemFolderIterator.next();
+      const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
+      console.log(systemSpreadsheetName);
+      const ssIterator = ooSystemFolder.getFilesByName(systemSpreadsheetName);
+      if (ssIterator.hasNext()) {
+        //System ist schon installiert, Rootfolder Ids zurückgeben
+        const sheetValue = SpreadsheetApp.openById(ssIterator.next().getId()).getActiveSheet().getRange("B2").getValue().toString()
+        console.log(sheetValue);
+        const folderIds = JSON.parse(sheetValue)
+        console.log(folderIds)
+        for (let ooFolderId in folderIds) {
+          const folder = DriveApp.getFolderById(ooFolderId);
+          const version = folder.getName().slice(-4);
+          foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
+
+        }
+      } else {/*
+
+      console.log("System installieren")
+      const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office+" "+currentOOversion);
+      const oo22dv = new oo22.DriveConnector(ooRoot.getId(),ooTables.officeConfiguration,currentOOversion);
+      oo22dv.installSystem();
+      const ooFolderId = oo22dv.officeFolder.getId();
+      const folder = DriveApp.getFolderById(ooFolderId);
+      const version = folder.getName().slice(-4);
+      foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
+      */
+      }
+    }
+
   }
   console.log(JSON.stringify(result));
   return JSON.stringify(result);
 }
-export function getOrCreateRootFolder(ooRootFolderLabel, ooRootFolderVersion) {
-  Logger.log("getOrCreateRootFolder aufgerufen");
-  var ooRootFolderIterator = DriveApp.getRootFolder().getFoldersByName(ooRootFolderLabel);
-  var ooRootFolder: GoogleAppsScript.Drive.Folder | null = null;
-  if (ooRootFolderIterator.hasNext()) ooRootFolder = ooRootFolderIterator.next();
-  if (ooRootFolder === null) {
-    ooRootFolder = DriveApp.createFolder(ooRootFolderLabel);
-    ooRootFolder.setDescription("Version " + ooRootFolderVersion);
-  }
+
+export function getOrCreateRootFolder(ooRootFolderLabel:string, ooRootFolderVersion:string) {
+  console.log("System installieren")
+ // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
+  const oo22dv = new oo22.DriveConnector("", ooTables.officeConfiguration, currentOOversion);
+  oo22dv.installFromWebApp();
+  const ooFolderId = oo22dv.officeFolder.getId();
 
   var result = {
     serverFunction: ServerFunction.getOrCreateRootFolder,
-    id: ooRootFolder.getId(),
-    name: ooRootFolder.getName()
+    id: ooFolderId,
+    name: oo22dv.officeFolder.getName()
   }
   return JSON.stringify(result);
 }
+
 export function getOrCreateAusgabenFolder(rootFolderId) {
   var rootFolder = DriveApp.getFolderById(rootFolderId);
   var ausgabenFolder = getOrCreateFolder(rootFolder, "2 Ausgaben");

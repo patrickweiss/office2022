@@ -9,19 +9,20 @@ import './ui/WaitingForBMUpdate';
 
 import './framework/DriveLeaf';
 import { Leafs } from './framework/OfficeLeaf';
+import { currentOOversion } from '../../server/oo21lib/systemEnums';
 
 declare let window: IOfficeWindow;
 
 // initial state 
 export const initial = {
 	UI: {
-		status:'2021.0055.00',
+		status:'2021.'+currentOOversion+'.00',
 		leaf: Leafs.C2021OfficeOnePocket,
 		renderHelpOf: '',
 		counter: 1,
 		loggedIn: true,
 		waitingForResponse: false,
-		version:'0055',
+		version:currentOOversion,
 		UIversion:'00',
 		Ausgaben: {},
 		Gutschriften:{content:"PhotoMachen"},

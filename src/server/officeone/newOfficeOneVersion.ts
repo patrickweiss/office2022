@@ -1,7 +1,7 @@
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { months } from "./enums";
 
-export const getDevOpsFolder = () => {return DriveApp.getFolderById("1Q9J0q2ZIlHgxoqxrGA2ufTMUBiWLf6vd")};
+export const getDevOpsFolder = () => {return DriveApp.getFolderById("139Tyi3gOXE7ZkfUdhRXMMl8uZj0uxIb9")};
 
 export const newOfficeOneVersion = () => {
     const nextVersion = getNextVersion();

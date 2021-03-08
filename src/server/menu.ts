@@ -3,7 +3,7 @@ import { doGetApplicant } from "../officetwo/application/doGetApplicant";
 import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
 import { DriveConnector, oooVersion } from "./officeone/driveconnector";
 import { doGetUStVA } from "./oo21lib/doGetUStVA";
-//import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
+import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
 
 export const onOpen = () => {
   try {
@@ -63,7 +63,7 @@ export const doGet = (e: GoogleAppsScript.Events.DoGet) => {
   html.addMetaTag('viewport', 'width=device-width, initial-scale=1');
   return html;
 }
-/*
+
 export const updateOfficeOne = () => {
   const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
   const ooFolderId = location[0][0]
@@ -83,4 +83,3 @@ export const updateOfficeOne = () => {
 
 }
 
-*/

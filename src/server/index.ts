@@ -5,7 +5,7 @@ import * as newUiFunctions from './ui';
 //old system
 import * as publicUiFunctions from './menu';
 import { generateAndMailTableRow, generateAndMailoooVersionsFileNameIdMap } from './officeone/driveconnector';
-import { getNamedRangeData, getOrCreateOfficeOneFolders } from './officeone/directDriveConnector';
+import { getNamedRangeData, getOrCreateOfficeOneFolders, getOrCreateRootFolder } from './officeone/directDriveConnector';
 //import { updateDrive } from './officeone/updateDrive';
 import { UStVAberechnen } from './officeone/UStVAberechnen';
 import { UStVAverschicken } from './officeone/UStVAverschicken';
@@ -54,6 +54,7 @@ interface IOfficeGlobal {
     installTestsystemTest: () => void;
     installTest: () => void;
     installFromForm: (e: any) => void;
+    getOrCreateRootFolder: (ooRootFolderLabel:string, ooRootFolderVersion:string) => void;
     doGet: any;
     openAboutSidebar: any;
     generateAndMailTableRow: any;
@@ -97,7 +98,7 @@ global.getNamedRangeData = getNamedRangeData;
 global.UStVAberechnen = UStVAberechnen;
 global.UStVAverschicken = UStVAverschicken;
 global.UStVAbuchen = UStVAbuchen;
-//global.updateOfficeOne = publicUiFunctions.updateOfficeOne;
+global.updateOfficeOne = publicUiFunctions.updateOfficeOne;
 global.newOfficeOneVersion = newOfficeOneVersion;
 global.generateAndMailoooVersionsFileNameIdMap = generateAndMailoooVersionsFileNameIdMap;
 global.ausgabenFolderScannen = ausgabenFolderScannen;
@@ -124,5 +125,6 @@ global.mrechnungErstellen = mrechnungErstellen;
 //E Mail Form
 global.addEmailId = addEmailId;
 global.vertraegeFolderScannen = vertraegeFolderScannen;
+global.getOrCreateRootFolder = getOrCreateRootFolder;
 
 

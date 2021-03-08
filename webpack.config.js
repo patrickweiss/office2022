@@ -281,7 +281,7 @@ const serverConfig = {
     ],
   },
   optimization: {
-    minimize: true,
+    minimize: false,
     minimizer: [
       new TerserPlugin({
         sourceMap: true,
