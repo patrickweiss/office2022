@@ -7,6 +7,23 @@ import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from
 import * as OO2021 from "../../officeone/BusinessModel";
 
 
+export function daily(){
+    return true;
+}
+
+export function weekly(){
+    return true;
+}
+
+export function monthly(){
+    return true;
+}
+
+export function yearly(){
+    return true;
+}
+
+
 export function installSystem(fileId: string, table: ooTables, version: ooVersions) {
     oolog.logBeginn("installSystem")
     try {
