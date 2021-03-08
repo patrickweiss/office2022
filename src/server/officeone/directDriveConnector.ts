@@ -37,9 +37,10 @@ export function getOrCreateOfficeOneFolders() {
         //System ist schon installiert, Rootfolder Ids zurückgeben
         const sheetValue = SpreadsheetApp.openById(ssIterator.next().getId()).getActiveSheet().getRange("B2").getValue().toString()
         console.log(sheetValue);
-        const folderIds = JSON.parse(sheetValue)
+        const folderIds = JSON.parse(sheetValue) as Array<string>;
         console.log(folderIds)
-        for (let ooFolderId in folderIds) {
+        for (let ooFolderId of folderIds) {
+          console.log(ooFolderId);
           const folder = DriveApp.getFolderById(ooFolderId);
           const version = folder.getName().slice(-4);
           foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };

@@ -73,6 +73,21 @@ export function updateDrive(rootFolderId: string) {
   const archiv = getOrCreateFolder(archivRoot, "Version:" + oooPreviousVersion);
 
   try {
+
+    const eMailSpreadsheet = rootFolder.getFilesByName("0 E-Mail verschicken - Version:" + oooPreviousVersion).next();
+    archiv.addFile(eMailSpreadsheet);
+    rootFolder.removeFile(eMailSpreadsheet);
+  
+  
+    const lastschriftSpreadsheet = rootFolder.getFilesByName("5 SEPA - Lastschriftmandat - Version:" + oooPreviousVersion).next();
+    archiv.addFile(lastschriftSpreadsheet);
+    rootFolder.removeFile(lastschriftSpreadsheet);
+  
+    const posteingangSpreadsheet = rootFolder.getFilesByName("6 Posteingang - Version:" + oooPreviousVersion).next();
+    archiv.addFile(posteingangSpreadsheet);
+    rootFolder.removeFile(posteingangSpreadsheet);
+  
+
     const installationenSpreadsheet = rootFolder.getFilesByName("(1) Installationen - Version:" + oooPreviousVersion).next();
     archiv.addFile(installationenSpreadsheet);
     rootFolder.removeFile(installationenSpreadsheet);
@@ -85,9 +100,6 @@ export function updateDrive(rootFolderId: string) {
 
   }
 
-  const eMailSpreadsheet = rootFolder.getFilesByName("0 E-Mail verschicken - Version:" + oooPreviousVersion).next();
-  archiv.addFile(eMailSpreadsheet);
-  rootFolder.removeFile(eMailSpreadsheet);
 
   const einnahmenSpreadsheet = rootFolder.getFilesByName("1 Rechnung schreiben - Version:" + oooPreviousVersion).next();
   archiv.addFile(einnahmenSpreadsheet);
@@ -104,14 +116,6 @@ export function updateDrive(rootFolderId: string) {
   const bilanzSpreadsheet = rootFolder.getFilesByName("4 Bilanz, Gewinn und Steuererklärungen - Version:" + oooPreviousVersion).next();
   archiv.addFile(bilanzSpreadsheet);
   rootFolder.removeFile(bilanzSpreadsheet);
-
-  const lastschriftSpreadsheet = rootFolder.getFilesByName("5 SEPA - Lastschriftmandat - Version:" + oooPreviousVersion).next();
-  archiv.addFile(lastschriftSpreadsheet);
-  rootFolder.removeFile(lastschriftSpreadsheet);
-
-  const posteingangSpreadsheet = rootFolder.getFilesByName("6 Posteingang - Version:" + oooPreviousVersion).next();
-  archiv.addFile(posteingangSpreadsheet);
-  rootFolder.removeFile(posteingangSpreadsheet);
 
   const datenschluerferSpreadsheet = rootFolder.getFilesByName("7 Datenschlürfer - Version:" + oooPreviousVersion).next();
   archiv.addFile(datenschluerferSpreadsheet);

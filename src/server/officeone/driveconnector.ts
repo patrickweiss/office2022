@@ -48,7 +48,6 @@ export class DriveConnector {
   }
   static oooVersionsRangeFileMap = {
     "0056": {
-      EMailIdD: "0 E-Mail verschicken - Version:0056",
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0056",
       GutschriftenD: "1 Rechnung schreiben - Version:0056",
       EURechnungenD: "1 Rechnung schreiben - Version:0056",
@@ -68,18 +67,10 @@ export class DriveConnector {
       KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
       UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0056",
-      LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0056",
-      LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0056",
-      InstallationenD: "(1) Installationen - Version:0056",
-      ElsterTransferD: "(2) ElsterTransfer - Version:0056",
-      PosteingangD: "6 Posteingang - Version:0056",
       GdpduD: "7 Datenschlürfer - Version:0056",
       DataFileD: "7 Datenschlürfer - Version:0056",
-      TestsystemeD: "(0) Testsysteme - Version:0056"
     },
     "0055": {
-      EMailIdD: "0 E-Mail verschicken - Version:0055",
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
       GutschriftenD: "1 Rechnung schreiben - Version:0055",
       EURechnungenD: "1 Rechnung schreiben - Version:0055",
@@ -99,15 +90,8 @@ export class DriveConnector {
       KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0055",
-      LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0055",
-      LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0055",
-      InstallationenD: "(1) Installationen - Version:0055",
-      ElsterTransferD: "(2) ElsterTransfer - Version:0055",
-      PosteingangD: "6 Posteingang - Version:0055",
       GdpduD: "7 Datenschlürfer - Version:0055",
       DataFileD: "7 Datenschlürfer - Version:0055",
-      TestsystemeD: "(0) Testsysteme - Version:0055"
     },
     "0054": {
       EMailIdD: "0 E-Mail verschicken - Version:0054",

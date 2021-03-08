@@ -1,4 +1,4 @@
-import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
+import { clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
 
@@ -19,7 +19,7 @@ export class DriveConnector {
     public systemInstalled(): boolean {
         //if the host file is named like the master file, we assume the system is correctly installed
         const hostSpreadsheetName = this.getFileName(this.hostTable);
-        if (hostSpreadsheetName !== DriveApp.getFileById(this.hostFileId).getName()){ 
+        if (hostSpreadsheetName !== DriveApp.getFileById(this.hostFileId).getName()) {
             return false;
         }
         //intialize office folder
@@ -50,13 +50,14 @@ export class DriveConnector {
         //---------------------------------------------------------------------------------------------------
         return true;
     }
-    public installFromWebApp(){
+    public installFromWebApp() {
         this.officeFolder = copyFolder(
             this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
             DriveApp.getRootFolder().getId(),
             currentOOversion,
             currentOOversion
         )
+        this.setupSystemFolder()
     }
     public installFromSpreadsheetCopy() {
         //load hostTable data in tableData Cache
@@ -91,6 +92,25 @@ export class DriveConnector {
         DriveApp.getRootFolder().removeFile(installCallFile);
         //correct the name of the hostFile
         DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
+        this.setupSystemFolder()
+    }
+    private setupSystemFolder() {
+        const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
+        const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
+        console.log(systemSpreadsheetName);
+        const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
+        if (ssIterator.hasNext()) {
+            //add office folder id to array
+            const systemSpreadsheet = SpreadsheetApp.openById(ssIterator.next().getId());
+            const rootfolders = JSON.parse(systemSpreadsheet.getActiveSheet().getRange("B2").getValue().toString()) as Array<string>;
+            rootfolders.push(this.officeFolder.getId());
+            systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify(rootfolders));
+        } else {
+            //create new spreadsheet and add office folder to array
+            const newSystemId = DriveApp.getFileById(clientSystemMasterId).makeCopy(ooFolders.system + " - " + ooFolders.version + currentOOversion, systemFolder).getId();
+            const systemSpreadsheet = SpreadsheetApp.openById(newSystemId)
+            systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify([this.officeFolder.getId()]));
+        }
     }
     public getSheetName(table: ooTables): string { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
     public setOfficeObject(systemObject: systemObject, object: Object): void {
@@ -263,5 +283,5 @@ export function getOrCreateFolder(rootFolder: GoogleAppsScript.Drive.Folder, fol
     var folderIterator = rootFolder.getFoldersByName(folderName);
     if (folderIterator.hasNext()) return folderIterator.next();
     else return rootFolder.createFolder(folderName);
-  }
-  
+}
+
