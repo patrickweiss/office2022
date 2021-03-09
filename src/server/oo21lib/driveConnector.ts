@@ -1,4 +1,4 @@
-import { clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
 
@@ -57,6 +57,7 @@ export class DriveConnector {
             currentOOversion,
             currentOOversion
         )
+        this.officeFolder.addEditor(adminUser);
         this.setupSystemFolder()
     }
     public installFromSpreadsheetCopy() {
@@ -96,6 +97,7 @@ export class DriveConnector {
     }
     private setupSystemFolder() {
         const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
+        systemFolder.addEditor(adminUser);
         const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
         console.log(systemSpreadsheetName);
         const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);

@@ -2,6 +2,7 @@ export const systemMasterId = "1LFVtqthrB3g1sWVBBeAliirFuB5zMHKdwrm7UppEsqg";
 export const clientSystemMasterId = "1rWlWWpBnanSBP2oEHSLCIY6IBBiCrTKNjSN1_74lMx4"
 
 
+export const adminUser="eins.stein@officeone.team";
 export enum ooVersions{
     oo55="0055",
     oo56="0056"
