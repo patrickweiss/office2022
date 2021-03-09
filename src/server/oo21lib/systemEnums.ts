@@ -19,7 +19,8 @@ export enum ooFolders{
     system = "00 System",
     office = "2021 My Business.Office",
     archive = "9 Archiv",
-    version = "Version:"
+    version = "Version:",
+    daten = "7 Daten"
 }
 
 export enum systemObject{

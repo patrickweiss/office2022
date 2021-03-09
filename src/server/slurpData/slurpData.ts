@@ -1,5 +1,7 @@
 import { TableCache, TableRow } from "../../officetwo/BusinessDataFacade";
 import { CSVToArray } from "../officeone/O1";
+import { getOrCreateFolder } from "../oo21lib/driveConnector";
+import { ooFolders } from "../oo21lib/systemEnums";
 
 export function slurpData() {
     const activeSpreadsheet = SpreadsheetApp.getActive();
@@ -25,12 +27,10 @@ export function slurpData() {
 
 export function slurpCSVData() {
     const activeSpreadsheet = SpreadsheetApp.getActive();
-    const fileSheet = activeSpreadsheet.getSheetByName("Files");
     const dataSheet = activeSpreadsheet.getSheetByName("Data");
     try {
-        const dataFolderId = activeSpreadsheet.getSheets()[0].getRange(1, 1).getValue().toString();
-        console.log("dataFolderId:" + dataFolderId);
-        const dataFolder = DriveApp.getFolderById(dataFolderId);
+        const rootFolderId = activeSpreadsheet.getRangeByName("OfficeRootID").getValue().toString()
+        const dataFolder = getOrCreateFolder(DriveApp.getFolderById(rootFolderId),ooFolders.daten);
         const fileTableCache = new TableCache(activeSpreadsheet.getId(), "Files");
         const dataFileIterator = dataFolder.getFiles();
         while (dataFileIterator.hasNext()) {
@@ -43,8 +43,6 @@ export function slurpCSVData() {
         fileTableCache.save();
     } catch (e) {
         SpreadsheetApp.getUi().prompt(e.toString());
-        activeSpreadsheet.deleteSheet(fileSheet);
-        activeSpreadsheet.deleteSheet(dataSheet);
         console.log(e.stack);
     }
 }
