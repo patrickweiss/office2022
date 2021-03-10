@@ -180,8 +180,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         let erstesDatum;
         for (index in transactionArray) {
             let transaction: CSVTransaction = transactionArray[index];
-            if (transaction.isValid) {
-
+            if (transaction.isValid || (transaction.isPlanned && datenFormat!==csvTypes.KSK) ) {
                 var datumNeu = transaction.WertstellungsDatum;
                 erstesDatum = datumNeu;
                 let betrag = transaction.Betrag;
