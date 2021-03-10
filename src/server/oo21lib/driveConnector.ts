@@ -212,10 +212,6 @@ export class DriveConnector {
     }
 }
 
-export function deleteSystem0055() {
-    DriveApp.getRootFolder().getFoldersByName(ooFolders.system + " " + ooVersions.oo55).next().setTrashed(true);
-    DriveApp.getRootFolder().getFoldersByName(ooFolders.office + " " + ooVersions.oo55).next().setTrashed(true);
-}
 
 function getOrCreateFolderIn(inFolder: GoogleAppsScript.Drive.Folder, returnFolderName: ooFolders | string) {
     const folderIterator = inFolder.getFoldersByName(returnFolderName);

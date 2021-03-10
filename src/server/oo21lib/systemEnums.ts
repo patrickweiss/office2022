@@ -19,9 +19,11 @@ export enum systemMasterProperty{
 export enum ooFolders{
     system = "00 System",
     office = "2021 My Business.Office",
+    vorlagen = "0 Vorlagen",
+    daten = "7 Daten",
     archive = "9 Archiv",
     version = "Version:",
-    daten = "7 Daten"
+    rechnung = "Rechnungsvorlage leer"
 }
 
 export enum systemObject{
@@ -30,7 +32,20 @@ export enum systemObject{
 
 export enum office{
     geschaeftsjahr = "zeitraumJahr",
+    taxNumberOffice = "taxNumberOffice",
+    taxNumberDistrict = "taxNumberDistrict",
+    taxNumberDistinctionNumber = "taxNumberDistinctionNumber",
     firma = "bezeichnung",
+    name ="name",
+    vorname = "vorname",
+    strasse ="strasse",
+    hausnummer = "hausnummer",
+    plz ="plz",
+    ort = "ort",
+    telefon = "telefon",
+    email = "email",
+    bank = "bank",
+    iban = "iban",
     subversion = "subversion",
     importFrom2021_FolderId = "importFrom2021_FolderId",
     triggerMode="triggerMode",

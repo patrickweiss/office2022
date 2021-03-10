@@ -1,5 +1,4 @@
 //new system
-import { deleteSystem0055 } from './oo21lib/driveConnector';
 import * as newUiFunctions from './ui';
 
 //old system
@@ -29,14 +28,13 @@ import { mrechnungErstellen, mneuePosition } from './officeone/rechnungSchreiben
 import onEdit from './officeone/onEditRechnung';
 import { installTestsystemTest, testFromForm } from './officeone/testFromForm';
 import { addEmailId } from '../officetwo/application/addEMailId';
-import { doGet } from '../officetwo/sepa/doGet';
 import { vertraegeFolderScannen } from './officeone/vertraegeFolderScannen';
+import { rechnungsVorlageErstellen } from './oo21lib/rechnungsVorlageErstellen';
 
 
 global.onOpen = publicUiFunctions.onOpen;
 global.installOO22 = newUiFunctions.installOO22;
 global.updateOO22 = newUiFunctions.updateOO22
-global.deleteSystem = deleteSystem0055;
 global.tryUpdateWithoutParameters = newUiFunctions.tryUpdateWithoutParameters
 
 
@@ -55,6 +53,7 @@ interface IOfficeGlobal {
     installTest: () => void;
     installFromForm: (e: any) => void;
     getOrCreateRootFolder: (ooRootFolderLabel:string, ooRootFolderVersion:string) => void;
+    rechnungsVorlageErstellen :  () => void;
     doGet: any;
     openAboutSidebar: any;
     generateAndMailTableRow: any;
@@ -126,5 +125,5 @@ global.mrechnungErstellen = mrechnungErstellen;
 global.addEmailId = addEmailId;
 global.vertraegeFolderScannen = vertraegeFolderScannen;
 global.getOrCreateRootFolder = getOrCreateRootFolder;
-
+global.rechnungsVorlageErstellen = rechnungsVorlageErstellen ;
 

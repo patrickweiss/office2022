@@ -37,7 +37,7 @@ export const onOpen = () => {
       .createMenu('Office One 2022') // edit me!
       .addItem('System installieren', 'installOO22')
       .addItem('System aktualisieren', 'updateOO22')
-      .addItem('System löschen', 'deleteSystem')
+      .addItem('Rechnungsvorlage erstellen', 'rechnungsVorlageErstellen')
       .addItem("OfficeOne.2021", "openOfficeOne2021")
     menu.addToUi();
     }
