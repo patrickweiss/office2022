@@ -1,4 +1,4 @@
-import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, ranges, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
 
 
@@ -58,7 +58,7 @@ export class DriveConnector {
             currentOOversion
         )
         this.officeFolder.addEditor(adminUser);
-        this.setupSystemFolder()
+        this.setupSystemFolderAndRootIds()
     }
     public installFromSpreadsheetCopy() {
         //load hostTable data in tableData Cache
@@ -93,13 +93,24 @@ export class DriveConnector {
         DriveApp.getRootFolder().removeFile(installCallFile);
         //correct the name of the hostFile
         DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
-        this.setupSystemFolder()
+        this.setupSystemFolderAndRootIds()
     }
-    private setupSystemFolder() {
+
+    
+    private setupSystemFolderAndRootIds() {
+        //rootID in "1 Rechnung"
+        const rechnungenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.rechnungen)).next().getId());
+        rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
+        const ausgabenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.ausgaben)).next().getId());
+        ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
+        const datenSchluerfer =  SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.gdpdu)).next().getId());
+        datenSchluerfer.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
+        //rootID in 00 Office
+        this.setOfficeProperty(office.officeRootID_FolderId,this.officeFolder.getId());
+        //00 System update
         const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
         systemFolder.addEditor(adminUser);
         const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
-        console.log(systemSpreadsheetName);
         const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
         if (ssIterator.hasNext()) {
             //add office folder id to array

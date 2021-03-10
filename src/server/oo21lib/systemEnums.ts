@@ -52,6 +52,10 @@ export enum office{
     officeRootID_FolderId="officeRootID_FolderId",
     vorjahrOfficeRootID_FolderId="vorjahrOfficeRootID_FolderId"
 }
+
+export enum ranges{
+    OfficeRootID="OfficeRootID"
+}
 export enum triggerModes{
     production = "Produktion",
     test = "Test",
@@ -60,7 +64,10 @@ export enum triggerModes{
 export enum ooTables{
     systemMasterConfiguration = "systemMasterConfiguration", //
     officeConfiguration = "officeConfiguration",
-    email="email"
+    email="email",
+    rechnungen = "rechnungen",
+    ausgaben = "ausgaben",
+    gdpdu = "gdpdu"
 }
 
 export const months = {
