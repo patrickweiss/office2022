@@ -95,18 +95,14 @@ export class DriveConnector {
         DriveApp.getFileById(this.hostFileId).setName(this.getFileName(this.hostTable));
         this.setupSystemFolderAndRootIds()
     }
-
-    
     private setupSystemFolderAndRootIds() {
         //rootID in "1 Rechnung"
         const rechnungenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.rechnungen)).next().getId());
-        rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
+        rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         const ausgabenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.ausgaben)).next().getId());
-        ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
+        ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         const datenSchluerfer =  SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.gdpdu)).next().getId());
-        datenSchluerfer.getRangeByName(ranges.OfficeRootID).setValue(this.officeFolder.getId());
-        //rootID in 00 Office
-        this.setOfficeProperty(office.officeRootID_FolderId,this.officeFolder.getId());
+        datenSchluerfer.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         //00 System update
         const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
         systemFolder.addEditor(adminUser);

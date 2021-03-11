@@ -1,5 +1,5 @@
 import { BusinessModel } from "../../client/office-one-2021/bm/BusinessModel";
-import { currentOOversion, ooFolders, ooTables, ooVersions } from "../oo21lib/systemEnums";
+import { currentOOversion, office, ooFolders, ooTables, ooVersions } from "../oo21lib/systemEnums";
 import { DriveConnector, oooVersion } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
@@ -71,6 +71,10 @@ export function getOrCreateRootFolder(ooRootFolderLabel:string, ooRootFolderVers
   const oo22dv = new oo22.DriveConnector("", ooTables.officeConfiguration, currentOOversion);
   oo22dv.installFromWebApp();
   const ooFolderId = oo22dv.officeFolder.getId();
+  const newOOsystemId = DriveApp.getFolderById(ooFolderId).getFilesByName(oo22dv.getFileName(ooTables.officeConfiguration)).next().getId();
+  const oo22dvFromOwnOOInstance = new oo22.DriveConnector(newOOsystemId,ooTables.officeConfiguration,currentOOversion);
+  oo22dvFromOwnOOInstance.systemInstalled()
+  oo22dvFromOwnOOInstance.setOfficeProperty(office.officeRootID_FolderId,ooFolderId);
 
   var result = {
     serverFunction: ServerFunction.getOrCreateRootFolder,
