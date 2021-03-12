@@ -2,7 +2,7 @@ import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, o
 
 
 
-export class DriveConnector {
+  class DriveConnector {
     private hostFileId: string;
     public hostTable: ooTables;
     private version: ooVersions;

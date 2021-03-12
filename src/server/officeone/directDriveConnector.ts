@@ -1,10 +1,9 @@
-import { BusinessModel } from "../../client/office-one-2021/bm/BusinessModel";
-import { currentOOversion, office, ooFolders, ooTables, ooVersions } from "../oo21lib/systemEnums";
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { currentOOversion, office, ooFolders, ooTables } from "../oo21lib/systemEnums";
+import { DriveConnector } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
 //oo21lib stuff
-import * as oo22 from "../oo21lib/driveConnector";
+//import * as oo22 from "../oo21lib/driveConnector";
 
 
 
@@ -68,18 +67,15 @@ export function getOrCreateOfficeOneFolders() {
 export function getOrCreateRootFolder(ooRootFolderLabel:string, ooRootFolderVersion:string) {
   console.log("System installieren")
  // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
-  const oo22dv = new oo22.DriveConnector("", ooTables.officeConfiguration, currentOOversion);
-  oo22dv.installFromWebApp();
-  const ooFolderId = oo22dv.officeFolder.getId();
-  const newOOsystemId = DriveApp.getFolderById(ooFolderId).getFilesByName(oo22dv.getFileName(ooTables.officeConfiguration)).next().getId();
-  const oo22dvFromOwnOOInstance = new oo22.DriveConnector(newOOsystemId,ooTables.officeConfiguration,currentOOversion);
-  oo22dvFromOwnOOInstance.systemInstalled()
-  oo22dvFromOwnOOInstance.setOfficeProperty(office.officeRootID_FolderId,ooFolderId);
+  DriveConnector.installFromWebApp();
+  const ooFolderId = DriveConnector.officeFolder.getId();
+  const newOOsystemId = DriveApp.getFolderById(ooFolderId).getFilesByName(DriveConnector.getFileName(ooTables.officeConfiguration,currentOOversion)).next().getId();
+  DriveConnector.setOfficeProperty(office.officeRootID_FolderId,ooFolderId);
 
   var result = {
     serverFunction: ServerFunction.getOrCreateRootFolder,
     id: ooFolderId,
-    name: oo22dv.officeFolder.getName()
+    name: DriveConnector.officeFolder.getName()
   }
   return JSON.stringify(result);
 }

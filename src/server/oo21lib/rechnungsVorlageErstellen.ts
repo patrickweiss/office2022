@@ -1,13 +1,13 @@
 import { DriveConnector } from "../officeone/driveconnector";
 import { linkFormula } from "../officeone/SimbaExportErstellen";
-import { BusinessModel } from "./businessModel";
+//import { BusinessModel } from "./businessModel";
 import { currentOOversion, office, ooFolders, ooTables } from "./systemEnums";
 
 export function rechnungsVorlageErstellen() {
-    const bm = new BusinessModel(SpreadsheetApp.getActive().getId(), ooTables.officeConfiguration, currentOOversion);
-    const rootFolderId = bm.getDriveConnector().officeFolder.getId();
-    const vorlageLeer = bm.getDriveConnector().officeFolder.getFoldersByName(ooFolders.vorlagen).next().getFilesByName(ooFolders.rechnung).next()
-    const neueVorlage = vorlageLeer.makeCopy("Rechnungsvorlage " + bm.getDriveConnector().getOfficeProperty(office.firma))
+    //const bm = new BusinessModel(SpreadsheetApp.getActive().getId(), ooTables.officeConfiguration, currentOOversion);
+    const rootFolderId = DriveConnector.getRootId();
+    const vorlageLeer = DriveConnector.officeFolder.getFoldersByName(ooFolders.vorlagen).next().getFilesByName(ooFolders.rechnung).next()
+    const neueVorlage = vorlageLeer.makeCopy("Rechnungsvorlage " + DriveConnector.getOfficeProperty(office.firma))
 
     const properties = [office.taxNumberOffice,
     office.taxNumberDistrict,
@@ -15,7 +15,7 @@ export function rechnungsVorlageErstellen() {
     office.plz, office.ort, office.telefon, office.email, office.bank, office.iban]
     const stammdaten = {}
     for (let property of properties) {
-        stammdaten[property] = bm.getDriveConnector().getOfficeProperty(property)
+        stammdaten[property] = DriveConnector.getOfficeProperty(property)
     }
     replaceDocumentVariablesByObjectData(DocumentApp.openById(neueVorlage.getId()), stammdaten);
     DriveConnector.saveFormulaByName(rootFolderId,"Rechnungsvorlagelink",currentOOversion,linkFormula(neueVorlage.getId()))

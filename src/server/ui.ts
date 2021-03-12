@@ -1,6 +1,6 @@
 import { currentOOversion, ooTables } from "./oo21lib/systemEnums";
-import { installSystem, tryCodeUpdate } from "./oo21lib/systemFunction";
-
+import { installSystem } from "./oo21lib/systemFunction";
+/*
 export const onOpen = () => {
   const menu = SpreadsheetApp.getUi()
     .createMenu('Office One 2022') // edit me!
@@ -33,4 +33,4 @@ export function tryUpdateWithoutParameters():boolean{
   const fileId = SpreadsheetApp.getActive().getId();
   return tryCodeUpdate(fileId,ooTables.officeConfiguration,currentOOversion)
 }
-
+*/

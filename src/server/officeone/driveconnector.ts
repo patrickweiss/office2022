@@ -1,4 +1,5 @@
-import { currentOOversion, ooFolders } from "../oo21lib/systemEnums";
+import { copyFolder, getOrCreateFolder } from "../oo21lib/driveConnector";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, ranges, systemMasterId, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
 export const oooVersion = "0056";
@@ -9,6 +10,13 @@ export class DriveConnector {
   static driveFolders = {};
   static spreadsheets = {};
   static rangeValues = {};
+
+  //neuer Mist .... alles nicht für statische Klasse geeignet ....
+  static officeFolder: GoogleAppsScript.Drive.Folder;
+  private static ooConfigurationCache: Object = {};
+  private static tableDataCache: Object = {};
+  private static spreadsheetCache: Object = {};
+
 
   static oooVersionsFileNameIdMap = {
     "0056": {
@@ -183,9 +191,112 @@ export class DriveConnector {
       LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054"
     }
   }
+
+  // neuer Mist ....
   static getRootId(): string {
-    return SpreadsheetApp.getActiveSpreadsheet().getRangeByName("OfficeRootID").getValue().toString();
+    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName("OfficeRootID").getValue().toString();
+    this.officeFolder = DriveApp.getFolderById(rootId);
+    return rootId
   }
+  public static installFromWebApp() {
+    this.officeFolder = copyFolder(
+      this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
+      DriveApp.getRootFolder().getId(),
+      currentOOversion,
+      currentOOversion
+    )
+    this.officeFolder.addEditor(adminUser);
+    this.setupSystemFolderAndRootIds()
+  }
+  private static setupSystemFolderAndRootIds() {
+    //rootID in "1 Rechnung"
+    const rechnungenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.rechnungen, currentOOversion)).next().getId());
+    rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
+    const ausgabenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.ausgaben, currentOOversion)).next().getId());
+    ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
+    const datenSchluerfer = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.gdpdu, currentOOversion)).next().getId());
+    datenSchluerfer.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
+    //00 System update
+    const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
+    systemFolder.addEditor(adminUser);
+    const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
+    const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
+    if (ssIterator.hasNext()) {
+      //add office folder id to array
+      const systemSpreadsheet = SpreadsheetApp.openById(ssIterator.next().getId());
+      const rootfolders = JSON.parse(systemSpreadsheet.getActiveSheet().getRange("B2").getValue().toString()) as Array<string>;
+      rootfolders.push(this.officeFolder.getId());
+      systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify(rootfolders));
+    } else {
+      //create new spreadsheet and add office folder to array
+      const newSystemId = DriveApp.getFileById(clientSystemMasterId).makeCopy(ooFolders.system + " - " + ooFolders.version + currentOOversion, systemFolder).getId();
+      const systemSpreadsheet = SpreadsheetApp.openById(newSystemId)
+      systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify([this.officeFolder.getId()]));
+    }
+  }
+  public static getFileName(table: ooTables, version: ooVersions): string {
+    const tableFile = this.getMasterProperty(table + "_TableFile");
+    const table_FileName = this.getMasterProperty(tableFile + "Name") + " - Version:" + version;
+    return table_FileName;
+  }
+  public static getOfficeProperty(name: office) { return this.getPropertyFromTable(ooTables.officeConfiguration, name); }
+
+  public static setOfficeProperty(officeProperty: office, value: string): void {
+    const officeDataTable = this.getTableData(ooTables.officeConfiguration);
+    const propertyRow = officeDataTable.filter(row => row[0] === officeProperty)[0]
+    propertyRow[1] = value;
+    this.getSpreadsheet22(ooTables.officeConfiguration)
+      .getSheetByName(this.getSheetName(ooTables.officeConfiguration))
+      .getDataRange()
+      .setValues(officeDataTable);
+    SpreadsheetApp.flush()
+  }
+  private static getSpreadsheet22(table: ooTables): GoogleAppsScript.Spreadsheet.Spreadsheet {
+    let spreadsheet = this.spreadsheetCache[this.getFileName(table, currentOOversion)] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet;
+    if (!spreadsheet) {
+      const spreadsheetName = this.getFileName(table, currentOOversion)
+      console.log(this.officeFolder.getId()+" "+spreadsheetName+" table:"+table);
+      const spreadsheetFileIterator = this.officeFolder.getFilesByName(spreadsheetName);
+      spreadsheet = SpreadsheetApp.openById(spreadsheetFileIterator.next().getId())
+      this.spreadsheetCache[spreadsheetName] =spreadsheet;
+     }
+    return spreadsheet;
+  }
+  public static getMasterProperty(name: systemMasterProperty | string) { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, name); }
+  private static getPropertyFromTable(table: ooTables, propertyName: string): string {
+    const property = this.getValuesCache(table).getValueByName(propertyName);
+    if (!property) {
+      throw new Error("Variable missing in Configuration:" + table + " " + propertyName);
+    }
+    return property;
+  }
+  private static getValuesCache(table: ooTables) {
+    let valuesCache = this.ooConfigurationCache[table];
+    if (!valuesCache) {
+      const data = this.getTableData(table);
+      valuesCache = new ValuesCache(data);
+      this.ooConfigurationCache[table] = valuesCache;
+    }
+    return valuesCache;
+  }
+  public static getTableData(table: ooTables): any[][] {
+    let tableData = this.tableDataCache[table] as unknown as any[][];
+    if (!tableData && table === ooTables.systemMasterConfiguration) {
+      tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
+      this.tableDataCache[table] = tableData;
+      return tableData
+    }
+    if (!tableData) {
+      //load data from host file
+      tableData = this.getSpreadsheet22(table).getSheetByName(this.getSheetName(table)).getDataRange().getValues()
+      this.tableDataCache[table] = tableData
+    }
+    return tableData;
+  }
+  public static getSheetName(table: ooTables): string { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
+
+
+  //alte Funktionen, alle mit rootFolderId und Version
   static getNamedRangeData(rootFolderId: string, rangeName: string, version: string): [Object[][], string[][], string[][]] {
     console.log(`getNamedRangeData(${rootFolderId},${rangeName},${version}`)
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
@@ -202,19 +313,6 @@ export class DriveConnector {
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1(),
     spreadsheet.getRangeByName(rangeName).getNumberFormats()];
-  }
-
-  static getRangeFileName(rangeName: string, version: string) {
-    let fileName = DriveConnector.oooVersionsRangeFileMap[version][rangeName];
-    if (fileName === undefined) fileName = DriveConnector.oooVersionValueFileMap[version][rangeName];
-    if (fileName === undefined) fileName = DriveConnector.oooVersionValuesFileMap[version][rangeName];
-    if (fileName === undefined) throw new Error("Range:" + rangeName + " is not defined in DriveConnector");
-    return fileName;
-  }
-  static getMasterFileID(rangeName: string, version: string) {
-    let masterSpreadsheetId = DriveConnector.oooVersionsFileNameIdMap[version][this.getRangeFileName(rangeName, version)]
-    if (masterSpreadsheetId === undefined) throw new Error("File for:" + rangeName + " is not defined in DriveConnector");
-    return masterSpreadsheetId;
   }
   static getValueByName(rootFolderId: string, rangeName: string, version: string) {
     let value = this.rangeValues[rootFolderId + rangeName];
@@ -246,7 +344,6 @@ export class DriveConnector {
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setValues(value);
     SpreadsheetApp.flush()
   }
-
   static saveNamedRangeData(rootFolderId: string, rangeName: string, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
     console.log("DriveConnector.saveNamedRangeData:" + rootFolderId + " " + rangeName);
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
@@ -337,6 +434,20 @@ export class DriveConnector {
     }
     return spreadsheetId;
   }
+
+  //alte Konfiguration
+  static getRangeFileName(rangeName: string, version: string) {
+    let fileName = DriveConnector.oooVersionsRangeFileMap[version][rangeName];
+    if (fileName === undefined) fileName = DriveConnector.oooVersionValueFileMap[version][rangeName];
+    if (fileName === undefined) fileName = DriveConnector.oooVersionValuesFileMap[version][rangeName];
+    if (fileName === undefined) throw new Error("Range:" + rangeName + " is not defined in DriveConnector");
+    return fileName;
+  }
+  static getMasterFileID(rangeName: string, version: string) {
+    let masterSpreadsheetId = DriveConnector.oooVersionsFileNameIdMap[version][this.getRangeFileName(rangeName, version)]
+    if (masterSpreadsheetId === undefined) throw new Error("File for:" + rangeName + " is not defined in DriveConnector");
+    return masterSpreadsheetId;
+  }
 }
 
 
@@ -364,4 +475,19 @@ export function generateAndMailoooVersionsFileNameIdMap() {
   }
   GmailApp.sendEmail("patrick.sbrzesny@saw-office.net", "oooVersionsFileNameIdMap", JSON.stringify(oooVersionsFileNameIdMap));
 
+}
+
+class ValuesCache {
+  dataArray: any[][];
+  dataHash = {};
+  constructor(data: any[][]) {
+    if (!data) throw new Error("no data for Values Cache");
+    this.dataArray = data;
+    for (let row of this.dataArray) {
+      this.dataHash[row[0]] = row[1];
+    }
+  }
+  public getValueByName(name: string) {
+    return this.dataHash[name];
+  }
 }

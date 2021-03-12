@@ -1,5 +1,5 @@
 //new system
-import * as newUiFunctions from './ui';
+//import * as newUiFunctions from './ui';
 
 //old system
 import * as publicUiFunctions from './menu';
@@ -33,17 +33,12 @@ import { rechnungsVorlageErstellen } from './oo21lib/rechnungsVorlageErstellen';
 
 
 global.onOpen = publicUiFunctions.onOpen;
-global.installOO22 = newUiFunctions.installOO22;
-global.updateOO22 = newUiFunctions.updateOO22
-global.tryUpdateWithoutParameters = newUiFunctions.tryUpdateWithoutParameters
 
 
 
 
 interface IOfficeGlobal {
     onOpen: () => void;
-    installOO22: () => void;
-    updateOO22:() => void;
     deleteSystem:()=>void;
     tryUpdateWithoutParameters:()=>boolean;
     vertraegeFolderScannen: (rootFolderId: string) => string;
