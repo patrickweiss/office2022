@@ -2,7 +2,7 @@ import { alleAusgabenFolderScannen, ausgabenFolderScannen } from "../officeone/a
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
 import { oolog } from "./spreadsheerLogger";
-import { office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
+import { currentOOversion, office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
 import * as OO2021 from "../../officeone/BusinessModel";
 import { DriveConnector } from "../officeone/driveconnector";
 
@@ -33,12 +33,11 @@ export function installSystem(rootId:string) {
             ScriptApp.deleteTrigger(triggers[i]);
         }
 
-        const triggerMode = DriveConnector.getOfficeProperty(office.triggerMode)
+        const triggerMode = DriveConnector.getOfficeProperty(rootId, office.triggerMode, currentOOversion)
         if (triggerMode === triggerModes.test) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
         if (triggerMode === triggerModes.production) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
 
-        DriveConnector.setOfficeProperty(office.officeRootID_FolderId, DriveConnector.officeFolder.getId());
-        oolog.logEnd("System installiert für:" + triggerMode + " " + DriveConnector.getOfficeProperty(office.firma));
+        oolog.logEnd("System installiert für:" + triggerMode + " " + DriveConnector.getOfficeProperty(rootId,office.firma,currentOOversion));
     }
     catch (e) {
         oolog.logEnd(e.toString())

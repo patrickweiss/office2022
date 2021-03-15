@@ -1,8 +1,8 @@
-import { DriveConnector } from "../../server/officeone/driveconnector";
+import { ranges } from "../../server/oo21lib/systemEnums";
 import { processEmailIdForm } from "./processEmailIdForm";
 
 export const addEmailId = (event: GoogleAppsScript.Events.SheetsOnFormSubmit) => {
-    const rootId = DriveConnector.getRootId()
+    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
     console.log("addEmailId called");
     if (event===undefined){
        const debugEvent = {

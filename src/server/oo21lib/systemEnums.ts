@@ -12,8 +12,8 @@ export const currentOOversion = ooVersions.oo56;
 
 
 export enum systemMasterProperty{
-    officeOne2022_TemplateFolderId="officeOne2022_TemplateFolderId",
-    webApp_URL="webApp_URL"
+    officeOne2022_TemplateFolderId="1b_Yxbqe6SRlL37fQZgHfBWYvwrZ5YKCV",
+    webApp_URL="https://script.google.com/macros/s/AKfycbwJNEXkA8U-wZlJ93DTxe3xN8ihP_qiYM10RP1gjdGltOe3U0WI/exec"
 }
 
 export enum ooFolders{

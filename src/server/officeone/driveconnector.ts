@@ -6,77 +6,34 @@ export const oooVersion = "0056";
 
 
 export class DriveConnector {
-
   static driveFolders = {};
   static spreadsheets = {};
   static rangeValues = {};
-
-  //neuer Mist .... alles nicht für statische Klasse geeignet ....
-  static officeFolder: GoogleAppsScript.Drive.Folder;
-  private static ooConfigurationCache: Object = {};
-  private static tableDataCache: Object = {};
-  private static spreadsheetCache: Object = {};
-
-
-  static oooVersionsFileNameIdMap = {
-    "0056": {
-      "00 Office - Version:0056": "1FGKiIS766C6TKSotG1QXvLniWVMJsgUZYgNA6KL7cdY",
-      "7 Datenschlürfer - Version:0056": "1Q4byI_52f3M-mP2-HSa6XItN3pb3NAnI6DXptbhtsGE",
-      "3 Bankbuchungen zuordnen - Version:0056": "17AmF6ufE3KKh7YHKw5sOCv0jRsVHeltd2Iewgmq6f-U",
-      "2 Ausgaben erfassen - Version:0056": "1Ok2NIxKSSZzjTmUa-Q8vvixmS4N7Br52zNFelIb_rjo",
-      "1 Rechnung schreiben - Version:0056": "17otAE0kfwrMq7YZnPYdZh-AHqnUIvYqkGfPfLA_EnrQ",
-      "4 Bilanz, Gewinn und Steuererklärungen - Version:0056": "12JGWZsWRKkQK_q_jslYMQKVwMh6BLK_GkzzN2_y9T_Y"
-    },
-    "0055": {
-      "(1) Installationen - Version:0055": "1aFzY4ui0pC3vu13dUnwkVycwX39mOdOPb602wXKlU4Y",
-      "(0) Testsysteme - Version:0055": "19e7vc0vIQK6odtvznGSzhybWkIBk9VFi4_H8OBSrH_E",
-      "7 Datenschlürfer - Version:0055": "1e4CmRpBgpVtO6PlWXN2DyZ8UP14MSigxkd7GMlsevJw",
-      "6 Posteingang - Version:0055": "1a8P5ufmV8CX5YImZBHMV7u4KXd_YOydn2w2OAvFLHF0",
-      "(2) ElsterTransfer - Version:0055": "1YSd7HBg23-Cf16tIryOBnwoziN6CTdGZ62oBHALLB7A",
-      "4 Bilanz, Gewinn und Steuererklärungen - Version:0055": "1y-EEqtrea6tM4PJf4inRNOqd-SLPCOj8eoQmVvI4X5g",
-      "5 SEPA - Lastschriftmandat - Version:0055": "1KMdpZN7uSA6Y4uKCLUNni4Qj_uuDpK6YZIe2u9gXZOU",
-      "3 Bankbuchungen zuordnen - Version:0055": "1IbGAv2J7HK5EQOBRtBXRy_tN8OVvsfq6OMsNeUj0XG8",
-      "2 Ausgaben erfassen - Version:0055": "181TmgsS7yNbsSAtLZ1Azbz0sK8L4yaEJKG_IGZeO5Zg",
-      "1 Rechnung schreiben - Version:0055": "1inJweTS-tp5ow27A5J3lSuQXovhfYFmHIIClpaNtJAs",
-      "0 E-Mail verschicken - Version:0055": "1-JFdtpdgbUFJwDLPFwfpxtMXbjlKoysa_X_spynQuSI"
-    },
-    "0054": {
-      "(1) Installationen - Version:0054": "1NZFUya4uKiLkHT1NTjF752igsU7dyrDB9eoDAVlSulM",
-      "5 SEPA - Lastschriftmandat - Version:0054": "1UhZKf4WOiGYgwamy6PXNgPl0_hBN0ya2I3g-5qKA6c4",
-      "7 Datenschlürfer - Version:0054": "1pB0sggfUhlUUv9jMmnmrBUvvpWqe4qpurUD5_R7esQc",
-      "6 Posteingang - Version:0054": "1Drg_tWuuiUcE2Cfjo69xKHQ9onPBE1BwJXdOieZ0uIo",
-      "(2) ElsterTransfer - Version:0054": "1woi9QyDt1u3qTQf4gzC7D91QXq4T6chZwq2rGON4mZk",
-      "4 Bilanz, Gewinn und Steuererklärungen - Version:0054": "17xUX6aeaUFlfAFWMMZO_rCxu9Lh4kBPhNz-LHHPZnh8",
-      "3 Bankbuchungen zuordnen - Version:0054": "1FMzlG37z9Gfu6YNTkEftquwNB6Yudq0hUdoXT4XcUzY",
-      "2 Ausgaben erfassen - Version:0054": "1lu4_BoUmfU99NWfH--KXGTsAp5FBrWj1nkiEBz0JAcQ",
-      "1 Rechnung schreiben - Version:0054": "1CzIvL3QOGEKI8ZZV2HnUmpi8bjll94ppncJYoS1pr8o",
-      "0 E-Mail verschicken - Version:0054": "11a0l-8leXGwwVdki4wCvEWHx6bX4eoNkM58MnGBns9E",
-      "(0) Testsysteme - Version:0054": "1DiYUtI_5zT007oGNIZbv4eUovKjbSalV6W6kzf7r66o"
-    }
-  }
+  static konfiguration: Object;
   static oooVersionsRangeFileMap = {
     "0056": {
-      RechnungSchreibenD: "1 Rechnung schreiben - Version:0056",
-      GutschriftenD: "1 Rechnung schreiben - Version:0056",
-      EURechnungenD: "1 Rechnung schreiben - Version:0056",
-      KundenD: "1 Rechnung schreiben - Version:0056",
-      PositionenarchivD: "1 Rechnung schreiben - Version:0056",
-      ProdukteD: "1 Rechnung schreiben - Version:0056",
-      RechnungenD: "1 Rechnung schreiben - Version:0056",
-      AbschreibungenD: "2 Ausgaben erfassen - Version:0056",
-      AusgabenD: "2 Ausgaben erfassen - Version:0056",
-      BewirtungsbelegeD: "2 Ausgaben erfassen - Version:0056",
-      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen - Version:0056",
-      "VerträgeD": "2 Ausgaben erfassen - Version:0056",
-      BankbuchungenD: "3 Bankbuchungen zuordnen - Version:0056",
-      UmbuchungenD: "3 Bankbuchungen zuordnen - Version:0056",
-      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      GdpduD: "7 Datenschlürfer - Version:0056",
-      DataFileD: "7 Datenschlürfer - Version:0056",
+      RechnungSchreibenD: "1 Rechnung schreiben",
+      GutschriftenD: "1 Rechnung schreiben",
+      EURechnungenD: "1 Rechnung schreiben",
+      KundenD: "1 Rechnung schreiben",
+      PositionenarchivD: "1 Rechnung schreiben",
+      ProdukteD: "1 Rechnung schreiben",
+      RechnungenD: "1 Rechnung schreiben",
+      AbschreibungenD: "2 Ausgaben erfassen",
+      AusgabenD: "2 Ausgaben erfassen",
+      BewirtungsbelegeD: "2 Ausgaben erfassen",
+      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen",
+      "VerträgeD": "2 Ausgaben erfassen",
+      BankbuchungenD: "3 Bankbuchungen zuordnen",
+      UmbuchungenD: "3 Bankbuchungen zuordnen",
+      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen",
+      KontenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
+      GdpduD: "7 Datenschlürfer",
+      DataFileD: "7 Datenschlürfer",
+      Konfiguration: "00 Office"
     },
     "0055": {
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
@@ -100,65 +57,23 @@ export class DriveConnector {
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       GdpduD: "7 Datenschlürfer - Version:0055",
       DataFileD: "7 Datenschlürfer - Version:0055",
-    },
-    "0054": {
-      EMailIdD: "0 E-Mail verschicken - Version:0054",
-      RechnungSchreibenD: "1 Rechnung schreiben - Version:0054",
-      GutschriftenD: "1 Rechnung schreiben - Version:0054",
-      EURechnungenD: "1 Rechnung schreiben - Version:0054",
-      KundenD: "1 Rechnung schreiben - Version:0054",
-      PositionenarchivD: "1 Rechnung schreiben - Version:0054",
-      ProdukteD: "1 Rechnung schreiben - Version:0054",
-      RechnungenD: "1 Rechnung schreiben - Version:0054",
-      AbschreibungenD: "2 Ausgaben erfassen - Version:0054",
-      AusgabenD: "2 Ausgaben erfassen - Version:0054",
-      BewirtungsbelegeD: "2 Ausgaben erfassen - Version:0054",
-      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen - Version:0054",
-      "VerträgeD": "2 Ausgaben erfassen - Version:0054",
-      BankbuchungenD: "3 Bankbuchungen zuordnen - Version:0054",
-      UmbuchungenD: "3 Bankbuchungen zuordnen - Version:0054",
-      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      LastschriftmandatD: "5 SEPA - Lastschriftmandat - Version:0054",
-      LastschriftproduktD: "5 SEPA - Lastschriftmandat - Version:0054",
-      LastschriftenD: "5 SEPA - Lastschriftmandat - Version:0054",
-      InstallationenD: "(1) Installationen - Version:0054",
-      ElsterTransferD: "(2) ElsterTransfer - Version:0054",
-      PosteingangD: "6 Posteingang - Version:0054",
-      GdpduD: "7 Datenschlürfer - Version:0054",
-      DataFileD: "7 Datenschlürfer - Version:0054",
-      TestsystemeD: "(0) Testsysteme - Version:0054"
-    }
-  }
-  static oooVersionValuesFileMap = {
-    "0056": {
-      Konfiguration: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-    },
-    "0055": {
-      Konfiguration: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-    },
-    "0054": {
-      Konfiguration: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
     }
   }
   static oooVersionValueFileMap = {
     "0056": {
-      GutschriftenDatei: "1 Rechnung schreiben - Version:0056",
-      HilfeRechnungFertigstellen: "1 Rechnung schreiben - Version:0056",
-      HilfeRechnungSchreiben: "1 Rechnung schreiben - Version:0056",
-      KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0056",
-      Rechnungsnummer: "1 Rechnung schreiben - Version:0056",
-      Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0056",
-      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0056",
-      KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0056",
-      EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056",
-      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0056"
+      GutschriftenDatei: "1 Rechnung schreiben",
+      HilfeRechnungFertigstellen: "1 Rechnung schreiben",
+      HilfeRechnungSchreiben: "1 Rechnung schreiben",
+      KundenEMailVorlageDoc: "1 Rechnung schreiben",
+      Rechnungsnummer: "1 Rechnung schreiben",
+      Rechnungsvorlagelink: "1 Rechnung schreiben",
+      KundenRechnungsvorlage: "1 Rechnung schreiben",
+      KundenStornorechnungsvorlage: "1 Rechnung schreiben",
+      EMailID: "4 Bilanz, Gewinn und Steuererklärungen",
+      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen",
+      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen",
+      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen",
+      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen"
     },
     "0055": {
       GutschriftenDatei: "1 Rechnung schreiben - Version:0055",
@@ -174,126 +89,24 @@ export class DriveConnector {
       AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
       LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055"
-    },
-    "0054": {
-      GutschriftenDatei: "1 Rechnung schreiben - Version:0054",
-      HilfeRechnungFertigstellen: "1 Rechnung schreiben - Version:0054",
-      HilfeRechnungSchreiben: "1 Rechnung schreiben - Version:0054",
-      KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0054",
-      Rechnungsnummer: "1 Rechnung schreiben - Version:0054",
-      Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0054",
-      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0054",
-      KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0054",
-      EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054",
-      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0054"
     }
   }
+  public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: string, version: string) {
+    //rootID in spreadsheet
+    const spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
+    spreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(rootFolderId);
 
-  // neuer Mist ....
-  static getRootId(): string {
-    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName("OfficeRootID").getValue().toString();
-    this.officeFolder = DriveApp.getFolderById(rootId);
-    return rootId
   }
-  public static installFromWebApp() {
-    this.officeFolder = copyFolder(
-      this.getMasterProperty(systemMasterProperty.officeOne2022_TemplateFolderId),
-      DriveApp.getRootFolder().getId(),
-      currentOOversion,
-      currentOOversion
-    )
-    this.officeFolder.addEditor(adminUser);
-    this.setupSystemFolderAndRootIds()
-  }
-  private static setupSystemFolderAndRootIds() {
-    //rootID in "1 Rechnung"
-    const rechnungenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.rechnungen, currentOOversion)).next().getId());
-    rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
-    const ausgabenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.ausgaben, currentOOversion)).next().getId());
-    ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
-    const datenSchluerfer = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.gdpdu, currentOOversion)).next().getId());
-    datenSchluerfer.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(this.officeFolder.getId());
-    //00 System update
-    const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
-    systemFolder.addEditor(adminUser);
-    const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
-    const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
-    if (ssIterator.hasNext()) {
-      //add office folder id to array
-      const systemSpreadsheet = SpreadsheetApp.openById(ssIterator.next().getId());
-      const rootfolders = JSON.parse(systemSpreadsheet.getActiveSheet().getRange("B2").getValue().toString()) as Array<string>;
-      rootfolders.push(this.officeFolder.getId());
-      systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify(rootfolders));
-    } else {
-      //create new spreadsheet and add office folder to array
-      const newSystemId = DriveApp.getFileById(clientSystemMasterId).makeCopy(ooFolders.system + " - " + ooFolders.version + currentOOversion, systemFolder).getId();
-      const systemSpreadsheet = SpreadsheetApp.openById(newSystemId)
-      systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify([this.officeFolder.getId()]));
+  public static getOfficeProperty(rootFolderId: string, name: office, version: string) {
+    if (!this.konfiguration) {
+      this.konfiguration = {};
+      const konfigurationRangeData: Object[][] = DriveConnector.getNamedRangeData(rootFolderId, "Konfiguration", oooVersion)[0];
+      for (let zeile of konfigurationRangeData) {
+        this.konfiguration[zeile[0].toString()] = zeile[1];
+      }
     }
+    return this.konfiguration[name];
   }
-  public static getFileName(table: ooTables, version: ooVersions): string {
-    const tableFile = this.getMasterProperty(table + "_TableFile");
-    const table_FileName = this.getMasterProperty(tableFile + "Name") + " - Version:" + version;
-    return table_FileName;
-  }
-  public static getOfficeProperty(name: office) { return this.getPropertyFromTable(ooTables.officeConfiguration, name); }
-
-  public static setOfficeProperty(officeProperty: office, value: string): void {
-    const officeDataTable = this.getTableData(ooTables.officeConfiguration);
-    const propertyRow = officeDataTable.filter(row => row[0] === officeProperty)[0]
-    propertyRow[1] = value;
-    this.getSpreadsheet22(ooTables.officeConfiguration)
-      .getSheetByName(this.getSheetName(ooTables.officeConfiguration))
-      .getDataRange()
-      .setValues(officeDataTable);
-    SpreadsheetApp.flush()
-  }
-  private static getSpreadsheet22(table: ooTables): GoogleAppsScript.Spreadsheet.Spreadsheet {
-    let spreadsheet = this.spreadsheetCache[this.getFileName(table, currentOOversion)] as unknown as GoogleAppsScript.Spreadsheet.Spreadsheet;
-    if (!spreadsheet) {
-      const spreadsheetName = this.getFileName(table, currentOOversion)
-      console.log(this.officeFolder.getId()+" "+spreadsheetName+" table:"+table);
-      const spreadsheetFileIterator = this.officeFolder.getFilesByName(spreadsheetName);
-      spreadsheet = SpreadsheetApp.openById(spreadsheetFileIterator.next().getId())
-      this.spreadsheetCache[spreadsheetName] =spreadsheet;
-     }
-    return spreadsheet;
-  }
-  public static getMasterProperty(name: systemMasterProperty | string) { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, name); }
-  private static getPropertyFromTable(table: ooTables, propertyName: string): string {
-    const property = this.getValuesCache(table).getValueByName(propertyName);
-    if (!property) {
-      throw new Error("Variable missing in Configuration:" + table + " " + propertyName);
-    }
-    return property;
-  }
-  private static getValuesCache(table: ooTables) {
-    let valuesCache = this.ooConfigurationCache[table];
-    if (!valuesCache) {
-      const data = this.getTableData(table);
-      valuesCache = new ValuesCache(data);
-      this.ooConfigurationCache[table] = valuesCache;
-    }
-    return valuesCache;
-  }
-  public static getTableData(table: ooTables): any[][] {
-    let tableData = this.tableDataCache[table] as unknown as any[][];
-    if (!tableData && table === ooTables.systemMasterConfiguration) {
-      tableData = SpreadsheetApp.openById(systemMasterId).getSheetByName("Configuration").getDataRange().getValues();
-      this.tableDataCache[table] = tableData;
-      return tableData
-    }
-    if (!tableData) {
-      //load data from host file
-      tableData = this.getSpreadsheet22(table).getSheetByName(this.getSheetName(table)).getDataRange().getValues()
-      this.tableDataCache[table] = tableData
-    }
-    return tableData;
-  }
-  public static getSheetName(table: ooTables): string { return this.getPropertyFromTable(ooTables.systemMasterConfiguration, table + "_TableSheet"); }
 
 
   //alte Funktionen, alle mit rootFolderId und Version
@@ -315,7 +128,7 @@ export class DriveConnector {
     spreadsheet.getRangeByName(rangeName).getNumberFormats()];
   }
   static getValueByName(rootFolderId: string, rangeName: string, version: string) {
-    let value = this.rangeValues[rootFolderId + rangeName];
+    let value = this.rangeValues[rootFolderId + rangeName + version];
     if (value === undefined) {
       value = this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).getFormula();
       if (value === "") value = this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).getValue();
@@ -323,25 +136,13 @@ export class DriveConnector {
     }
     return value;
   }
-  static getValuesByName(rootFolderId: string, rangeName: string, version: string) {
-    let values = this.rangeValues[rootFolderId + rangeName];
-    if (values === undefined) {
-      console.log("driveconnector.getValuesByName:" + rootFolderId + " " + rangeName + " " + version);
-      values = this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).getValues();
-      this.rangeValues[rootFolderId + rangeName] = values;
-    }
-    return values;
-  }
   static saveValueByName(rootFolderId: string, rangeName: string, version: string, value: any) {
+    this.rangeValues[rootFolderId + rangeName + version] = value
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setValue(value);
     SpreadsheetApp.flush()
   }
   static saveFormulaByName(rootFolderId: string, rangeName: string, version: string, value: any) {
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setFormula(value);
-    SpreadsheetApp.flush()
-  }
-  static saveValuesByName(rootFolderId: string, rangeName: string, version: string, value: any) {
-    this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setValues(value);
     SpreadsheetApp.flush()
   }
   static saveNamedRangeData(rootFolderId: string, rangeName: string, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
@@ -439,13 +240,14 @@ export class DriveConnector {
   static getRangeFileName(rangeName: string, version: string) {
     let fileName = DriveConnector.oooVersionsRangeFileMap[version][rangeName];
     if (fileName === undefined) fileName = DriveConnector.oooVersionValueFileMap[version][rangeName];
-    if (fileName === undefined) fileName = DriveConnector.oooVersionValuesFileMap[version][rangeName];
     if (fileName === undefined) throw new Error("Range:" + rangeName + " is not defined in DriveConnector");
-    return fileName;
+    return fileName + " - Version:" + version;
   }
   static getMasterFileID(rangeName: string, version: string) {
-    let masterSpreadsheetId = DriveConnector.oooVersionsFileNameIdMap[version][this.getRangeFileName(rangeName, version)]
-    if (masterSpreadsheetId === undefined) throw new Error("File for:" + rangeName + " is not defined in DriveConnector");
+    const masterFolder = DriveApp.getFolderById(systemMasterProperty.officeOne2022_TemplateFolderId);
+    const fileName = this.getRangeFileName(rangeName, version)
+    masterFolder.getFilesByName(fileName).next().getId()
+    let masterSpreadsheetId = masterFolder.getFilesByName(fileName).next().getId()
     return masterSpreadsheetId;
   }
 }

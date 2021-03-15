@@ -1,8 +1,8 @@
 import { LastschriftmandatTableCache, Lastschriftmandat, LastschriftproduktTableCache, LastschriftenTableCache, Lastschriftprodukt } from "../../officeone/BusinessDataFacade";
-import { DriveConnector } from "../../server/officeone/driveconnector";
+import { ranges } from "../../server/oo21lib/systemEnums";
 
 export default function createLastschriften(){
-    const rootId = DriveConnector.getRootId();
+    const rootId =  SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
     let lm = new LastschriftmandatTableCache(rootId);
     let lmArray = lm.getRowArray();
     let lp = new LastschriftproduktTableCache(rootId);

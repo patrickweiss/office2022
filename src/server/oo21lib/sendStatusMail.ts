@@ -1,12 +1,12 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { DriveConnector } from "../officeone/driveconnector";
 import { formatMoney } from "../officeone/rechnungSchreiben";
-import { months, office, systemMasterProperty } from "./systemEnums";
+import { currentOOversion, months, office, systemMasterProperty } from "./systemEnums";
 
 export function sendStatusMail(bm: BusinessModel) {
     const monat = getTestDatum().getMonth();
     const userEmail = Session.getActiveUser().getEmail()
-    const vorjahrID = DriveConnector.getOfficeProperty(office.vorjahrOfficeRootID_FolderId);
+    const vorjahrID = DriveConnector.getOfficeProperty(bm.getRootFolderId(),office.vorjahrOfficeRootID_FolderId,currentOOversion);
 
     let html = "<body><table>";
     html+= `<thead><tr><th>Ausgaben</th><th></th><th></th><th></th><th></th></tr></thead>
@@ -22,7 +22,7 @@ export function sendStatusMail(bm: BusinessModel) {
     html+= `</tbody>
     </table></body>`;
 
-    const doGetUrl = DriveConnector.getMasterProperty(systemMasterProperty.webApp_URL)+"?ustva="+getTestDatum().getMonth()+"&officeId="+bm.getRootFolderId();
+    const doGetUrl = systemMasterProperty.webApp_URL+"?ustva="+getTestDatum().getMonth()+"&officeId="+bm.getRootFolderId();
     html +=`<a href="${doGetUrl}"><button type="button">Ausgaben und Einnahmen sind vollständig, bitte UStVA verschicken</button></a>`;
 
     const ImageBlob = null;

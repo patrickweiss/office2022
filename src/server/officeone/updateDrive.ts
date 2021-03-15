@@ -62,10 +62,6 @@ export function updateDrive(rootFolderId: string) {
       DriveConnector.saveValueByName(rootFolderId, valueName, oooVersion, dataOldVersion)
     }
   }
-  for (let valuesName of Object.keys(DriveConnector.oooVersionValuesFileMap[oooPreviousVersion])) {
-    const dataOldVersion = DriveConnector.getValuesByName(rootFolderId, valuesName, oooPreviousVersion);
-    DriveConnector.saveValuesByName(rootFolderId, valuesName, oooVersion, dataOldVersion)
-  }
 
   //alte Tabellen in Archivordner verschieben
   const rootFolder = DriveApp.getFolderById(rootFolderId);

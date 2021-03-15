@@ -1,4 +1,5 @@
-import { currentOOversion, office, ooFolders, ooTables } from "../oo21lib/systemEnums";
+import { copyFolder } from "../oo21lib/driveConnector";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
 import { DriveConnector } from "./driveconnector";
 import { ServerFunction } from "./enums";
 
@@ -64,18 +65,45 @@ export function getOrCreateOfficeOneFolders() {
   return JSON.stringify(result);
 }
 
-export function getOrCreateRootFolder(ooRootFolderLabel:string, ooRootFolderVersion:string) {
+export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVersion: string) {
   console.log("System installieren")
- // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
-  DriveConnector.installFromWebApp();
-  const ooFolderId = DriveConnector.officeFolder.getId();
-  const newOOsystemId = DriveApp.getFolderById(ooFolderId).getFilesByName(DriveConnector.getFileName(ooTables.officeConfiguration,currentOOversion)).next().getId();
-  DriveConnector.setOfficeProperty(office.officeRootID_FolderId,ooFolderId);
+  // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
+
+  const officeFolder = copyFolder(
+    systemMasterProperty.officeOne2022_TemplateFolderId,
+    DriveApp.getRootFolder().getId(),
+    currentOOversion,
+    currentOOversion
+  )
+  officeFolder.addEditor(adminUser);
+  const officeRootId = officeFolder.getId()
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "RechnungenD", currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "AusgabenD", currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "DataFileD", currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "Konfiguration", currentOOversion);
+
+  //00 System update
+  const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
+  systemFolder.addEditor(adminUser);
+  const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
+  const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
+  if (ssIterator.hasNext()) {
+    //add office folder id to array
+    const systemSpreadsheet = SpreadsheetApp.openById(ssIterator.next().getId());
+    const rootfolders = JSON.parse(systemSpreadsheet.getActiveSheet().getRange("B2").getValue().toString()) as Array<string>;
+    rootfolders.push(officeRootId);
+    systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify(rootfolders));
+  } else {
+    //create new spreadsheet and add office folder to array
+    const newSystemId = DriveApp.getFileById(clientSystemMasterId).makeCopy(ooFolders.system + " - " + ooFolders.version + currentOOversion, systemFolder).getId();
+    const systemSpreadsheet = SpreadsheetApp.openById(newSystemId)
+    systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify([officeRootId]));
+  }
 
   var result = {
     serverFunction: ServerFunction.getOrCreateRootFolder,
-    id: ooFolderId,
-    name: DriveConnector.officeFolder.getName()
+    id: officeRootId,
+    name: DriveApp.getFolderById(officeRootId).getName()
   }
   return JSON.stringify(result);
 }
