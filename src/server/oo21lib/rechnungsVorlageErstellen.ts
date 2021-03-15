@@ -19,7 +19,6 @@ export function rechnungsVorlageErstellen() {
     }
     replaceDocumentVariablesByObjectData(DocumentApp.openById(neueVorlage.getId()), stammdaten);
     DriveConnector.saveFormulaByName(rootFolderId,"Rechnungsvorlagelink",currentOOversion,linkFormula(neueVorlage.getId()))
-    DriveConnector.saveFormulaByName(rootFolderId,"KundenRechnungsvorlage",currentOOversion,linkFormula(neueVorlage.getId()))   
 }
 
 function replaceDocumentVariablesByObjectData(dokument: GoogleAppsScript.Document.Document, datenObject) {
