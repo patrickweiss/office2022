@@ -1,5 +1,6 @@
 import { AusgabenRechnung, Bewirtungsbeleg, EinnahmenRechnung, Konto,EURechnung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { office } from "../oo21lib/systemEnums";
 import { ServerFunction } from "./enums";
 
 export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, rootFolderNameVorjahr: string) {
@@ -7,7 +8,7 @@ export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, r
 
   var BMnow = new BusinessModel(rootFolderId);
 
-  var rootFolderIdLastYear = DriveApp.getFoldersByName(rootFolderNameVorjahr).next().getId();
+  var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
 
   var BMlastYear = new BusinessModel(rootFolderIdLastYear);
   KontenStammdatenAusVorjahrAktualisieren(BMlastYear, BMnow);
@@ -131,7 +132,7 @@ function OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear: BusinessMod
 
 function AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
   BMlastYear.getBilanzkontenArray().forEach(bestandsKonto => {
-    if (!bestandsKonto.isDatenschluerferKonto()&& !bestandsKonto.isBankkonto()) {
+    if (!bestandsKonto.isDatenschluerferKonto()&& !bestandsKonto.isBankkonto() && bestandsKonto.getSumme()!=0) {
       var anfangsbestandsbuchung = BMnow.getOrCreateUmbuchung("UmEB" + bestandsKonto.getId().toString().replace(/ /g, "-"));
       anfangsbestandsbuchung.setDatum(BMlastYear.endOfYear());
       anfangsbestandsbuchung.setKonto("Geld Vorjahre");
