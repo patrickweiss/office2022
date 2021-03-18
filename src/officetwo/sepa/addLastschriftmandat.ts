@@ -1,8 +1,8 @@
-import { ranges } from '../../server/oo21lib/systemEnums';
+import { ooTables } from '../../server/oo21lib/systemEnums';
 import { processLastschriftmandatForm } from './processLastschriftmandatForm';
 
 export const addLastschriftmandat = (event: GoogleAppsScript.Events.SheetsOnFormSubmit) => {
-   const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
+   const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
    console.log("addLastschriftmandat called");
    if (event===undefined){
       const debugEvent = {

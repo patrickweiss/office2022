@@ -1,5 +1,4 @@
-import { copyFolder, getOrCreateFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, ranges, systemMasterId, systemMasterProperty } from "../oo21lib/systemEnums";
+import {  currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
 export const oooVersion = "0056";
@@ -33,7 +32,8 @@ export class DriveConnector {
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
-      Konfiguration: "00 Office"
+      Konfiguration: "00 Office",
+      log: "00 Office"
     },
     "0055": {
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
@@ -91,16 +91,16 @@ export class DriveConnector {
       LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055"
     }
   }
-  public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: string, version: string) {
+  public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: ooTables, version: string) {
     //rootID in spreadsheet
     const spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
-    spreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1, 1).setValue(rootFolderId);
+    spreadsheet.getRangeByName(ooTables.OfficeRootID).getCell(1, 1).setValue(rootFolderId);
 
   }
   public static getOfficeProperty(rootFolderId: string, name: office, version: string) {
     if (!this.konfiguration) {
       this.konfiguration = {};
-      const konfigurationRangeData: Object[][] = DriveConnector.getNamedRangeData(rootFolderId, "Konfiguration", oooVersion)[0];
+      const konfigurationRangeData: Object[][] = DriveConnector.getNamedRangeData(rootFolderId, ooTables.Konfiguration, oooVersion)[0];
       for (let zeile of konfigurationRangeData) {
         this.konfiguration[zeile[0].toString()] = zeile[1];
       }
@@ -110,7 +110,7 @@ export class DriveConnector {
 
 
   //alte Funktionen, alle mit rootFolderId und Version
-  static getNamedRangeData(rootFolderId: string, rangeName: string, version: string): [Object[][], string[][], string[][]] {
+  static getNamedRangeData(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][]] {
     console.log(`getNamedRangeData(${rootFolderId},${rangeName},${version}`)
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     console.log(spreadsheet.getName());
@@ -118,7 +118,7 @@ export class DriveConnector {
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1()];
   }
-  static getNamedRangeDataAndFormat(rootFolderId: string, rangeName: string, version: string): [Object[][], string[][], string[][], string[][]] {
+  static getNamedRangeDataAndFormat(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][], string[][]] {
     Logger.log(`getNamedRangeData(${rootFolderId},${rangeName},${version}`)
 
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
@@ -127,7 +127,7 @@ export class DriveConnector {
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1(),
     spreadsheet.getRangeByName(rangeName).getNumberFormats()];
   }
-  static getValueByName(rootFolderId: string, rangeName: string, version: string) {
+  static getValueByName(rootFolderId: string, rangeName: ooTables, version: string) {
     let value = this.rangeValues[rootFolderId + rangeName + version];
     if (value === undefined) {
       value = this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).getFormula();
@@ -136,16 +136,16 @@ export class DriveConnector {
     }
     return value;
   }
-  static saveValueByName(rootFolderId: string, rangeName: string, version: string, value: any) {
+  static saveValueByName(rootFolderId: string, rangeName: ooTables, version: string, value: any) {
     this.rangeValues[rootFolderId + rangeName + version] = value
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setValue(value);
     SpreadsheetApp.flush()
   }
-  static saveFormulaByName(rootFolderId: string, rangeName: string, version: string, value: any) {
+  static saveFormulaByName(rootFolderId: string, rangeName: ooTables, version: string, value: any) {
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setFormula(value);
     SpreadsheetApp.flush()
   }
-  static saveNamedRangeData(rootFolderId: string, rangeName: string, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
+  static saveNamedRangeData(rootFolderId: string, rangeName: ooTables, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
     console.log("DriveConnector.saveNamedRangeData:" + rootFolderId + " " + rangeName);
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     let dataRange = spreadsheet.getRangeByName(rangeName);
@@ -183,7 +183,7 @@ export class DriveConnector {
     dataRange.setBackgrounds(backgroundArray).setBorder(true, true, true, true, true, true, "#b7b7b7", SpreadsheetApp.BorderStyle.SOLID);
     SpreadsheetApp.flush();
   }
-  public static getSpreadsheet(rootFolderId: string, rangeName: string, version: string) {
+  public static getSpreadsheet(rootFolderId: string, rangeName: ooTables, version: string) {
     try {
       let spreadsheetFolder: GoogleAppsScript.Drive.Folder = this.driveFolders[rootFolderId];
       if (spreadsheetFolder === undefined) {
@@ -220,19 +220,6 @@ export class DriveConnector {
     let spreadsheet = SpreadsheetApp.openById(spreadsheetId);
     location[0][0] = spreadsheetFolder.getId();
     spreadsheet.getRangeByName("OfficeRootID").setValues(location);
-    if (this.getRangeFileName(rangeName, version) === "4 Bilanz, Gewinn und Steuererklärungen - Version:" + oooVersion) {
-      spreadsheet.getRangeByName("EMailID").setValue("");
-      spreadsheet.getRangeByName("EinnahmenID").setValue("");
-      spreadsheet.getRangeByName("AusgabenID").setValue("");
-      spreadsheet.getRangeByName("BankkontenID").setValue("");
-      spreadsheet.getRangeByName("LastschriftenID").setValue("");
-    } else {
-      if (this.getRangeFileName(rangeName, version) === "0 E-Mail verschicken - Version:" + oooVersion) DriveConnector.saveValueByName(spreadsheetFolder.getId(), "EMailID", oooVersion, spreadsheetId);
-      if (this.getRangeFileName(rangeName, version) === "1 Rechnung schreiben - Version:" + oooVersion) DriveConnector.saveValueByName(spreadsheetFolder.getId(), "EinnahmenID", oooVersion, spreadsheetId);
-      if (this.getRangeFileName(rangeName, version) === "2 Ausgaben erfassen - Version:" + oooVersion) DriveConnector.saveValueByName(spreadsheetFolder.getId(), "AusgabenID", oooVersion, spreadsheetId);
-      if (this.getRangeFileName(rangeName, version) === "3 Bankbuchungen zuordnen - Version:" + oooVersion) DriveConnector.saveValueByName(spreadsheetFolder.getId(), "BankkontenID", oooVersion, spreadsheetId);
-      if (this.getRangeFileName(rangeName, version) === "5 SEPA - Lastschriftmandat - Version:" + oooVersion) DriveConnector.saveValueByName(spreadsheetFolder.getId(), "LastschriftenID", oooVersion, spreadsheetId);
-    }
     return spreadsheetId;
   }
 
@@ -255,7 +242,7 @@ export class DriveConnector {
 
 
 export function generateAndMailTableRow() {
-  let namedRange = "EMailIdD";
+  let namedRange = ooTables.Konfiguration;
   let columnArray = DriveConnector.getNamedRangeData("1-b7eO9tjq4lZcpHDnhfcd4cUdBnRbXGt", namedRange, oooVersion)[0][0];
   let getterAndSetter = "";
   columnArray.forEach(column => {

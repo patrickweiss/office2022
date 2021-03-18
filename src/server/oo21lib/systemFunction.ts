@@ -1,7 +1,6 @@
 import { alleAusgabenFolderScannen, ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
-import { oolog } from "./spreadsheerLogger";
 import { currentOOversion, office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
 import * as OO2021 from "../../officeone/BusinessModel";
 import { DriveConnector } from "../officeone/driveconnector";
@@ -22,14 +21,12 @@ export function yearly(){
 
 
 export function installSystem(rootId:string) {
-    oolog.logBeginn("installSystem")
     try {
       //  const bm = new BusinessModel(fileId, table, version);
 
         // Deletes all triggers in the current project.
         let triggers = ScriptApp.getProjectTriggers();
         for (let i = 0; i < triggers.length; i++) {
-            oolog.addMessage("trigger for function deleted:" + triggers[i].getHandlerFunction());
             ScriptApp.deleteTrigger(triggers[i]);
         }
 
@@ -37,18 +34,15 @@ export function installSystem(rootId:string) {
         if (triggerMode === triggerModes.test) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().everyMinutes(1).create()
         if (triggerMode === triggerModes.production) ScriptApp.newTrigger("tryUpdateWithoutParameters").timeBased().atHour(0).everyDays(1).create()
 
-        oolog.logEnd("System installiert für:" + triggerMode + " " + DriveConnector.getOfficeProperty(rootId,office.firma,currentOOversion));
     }
     catch (e) {
-        oolog.logEnd(e.toString())
     }
 }
 export function daily(rootId:string): boolean {
     const lock = LockService.getScriptLock();
     if (!lock.tryLock(1)) return;
-    oolog.logBeginn("tryCodeUpdate")
     try {
-        const bm2021 = new OO2021.BusinessModel(rootId);
+        const bm2021 = new OO2021.BusinessModel(rootId,"");
         alleAusgabenFolderScannen(bm2021);
         alleGutschriftenFolderScannen(bm2021);
         bm2021.kontoSummenAktualisieren();
@@ -60,15 +54,12 @@ export function daily(rootId:string): boolean {
             getTestDatum().getDate() === 1) {
             //Mail schicken, mit aktuellem Status
             sendStatusMail(bm2021);
-            oolog.addMessage("Mail mit neuem Status versendet");
         }
-        oolog.logEnd("System Jobs wurden durchgeführt");
         SpreadsheetApp.flush();
         lock.releaseLock();
         return false;
     }
     catch (e) {
-        oolog.logEnd(e.toString())
         SpreadsheetApp.flush();
         lock.releaseLock();
     }

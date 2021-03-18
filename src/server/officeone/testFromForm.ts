@@ -5,6 +5,7 @@ import { dataRangeByKeyFromColumn } from "./onEditRechnung";
 import { cell } from "./rechnungSchreiben";
 import { linkFormula } from "./SimbaExportErstellen";
 import numeral from "numeral";
+import { ooTables } from "../oo21lib/systemEnums";
 
 interface agent {
     order: string;
@@ -97,7 +98,7 @@ function eMailMitLink(kundenEmail, kundenName, e) {
         var neueVersionString = oooVersion;
         let clientFolder = DriveApp.getFolderById("0Bww6H6AlfkCfT0Vnc281SU1YR28")
             .createFolder("XXXX " + kundenEmail + ".Office " + oooVersion);
-        let bm = new BusinessModel(clientFolder.getId());
+        let bm = new BusinessModel(clientFolder.getId(),"eMailMitLink");
         clientFolder.setName(bm.endOfYear().getFullYear() + " " + kundenEmail + ".Office " + oooVersion);
 
 
@@ -148,7 +149,7 @@ function installationStarten(installationDataRange: GoogleAppsScript.Spreadsheet
     //read from all Tables from new version to make sure all new Spreadsheets get copied
     for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
         if (rangeName !== "ElsterTransferD" && rangeName !== "InstallationenD" && rangeName !== "TestsystemeD") {
-            DriveConnector.getNamedRangeData(clientFolder.getId(), rangeName, oooVersion);
+            DriveConnector.getNamedRangeData(clientFolder.getId(), rangeName as ooTables, oooVersion);
         }
     }
     createNewOfficOneFolders(clientFolder.getId());
@@ -169,9 +170,7 @@ function installationStarten(installationDataRange: GoogleAppsScript.Spreadsheet
    
    
    //Link für Rechnungs- und Stornorechnungsvorlage eintragen, Link auf E-Mailvorlage löschen (muss Benutzer nach Installation selbst erstellen und einfügen)
-   DriveConnector.saveFormulaByName(clientFolder.getId(),"Rechnungsvorlagelink",oooVersion,linkFormula(neueRechnungsVorlageMagicInvoice.getId()))
-   DriveConnector.saveFormulaByName(clientFolder.getId(),"KundenRechnungsvorlage",oooVersion,linkFormula(neueRechnungsVorlageMagicInvoice.getId()))   
-   DriveConnector.saveFormulaByName(clientFolder.getId(),"KundenStornorechnungsvorlage",oooVersion,linkFormula(neueStornorechnungsVorlageMagicInvoice.getId()))
+   DriveConnector.saveFormulaByName(clientFolder.getId(),ooTables.Rechnungsvorlagelink,oooVersion,linkFormula(neueRechnungsVorlageMagicInvoice.getId()))
   // DriveConnector.saveFormulaByName(clientFolder.getId(),"KundenEMailVorlageDoc",oooVersion,linkFormula(neueeMailVorlageDoc.getId()))
   // copyTemplates(getDevOpsFolder().getFoldersByName(oooVersion).next().getId(), clientFolder.getId());
 }

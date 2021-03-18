@@ -1,6 +1,6 @@
-import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, ranges, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterId, systemMasterProperty, systemObject } from "./systemEnums";
 
-
+/*
 
   class DriveConnector {
     private hostFileId: string;
@@ -98,11 +98,11 @@ import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, o
     private setupSystemFolderAndRootIds() {
         //rootID in "1 Rechnung"
         const rechnungenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.rechnungen)).next().getId());
-        rechnungenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
+        rechnungenSpreadsheet.getRangeByName(ooTables.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         const ausgabenSpreadsheet = SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.ausgaben)).next().getId());
-        ausgabenSpreadsheet.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
+        ausgabenSpreadsheet.getRangeByName(ooTables.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         const datenSchluerfer =  SpreadsheetApp.openById(this.officeFolder.getFilesByName(this.getFileName(ooTables.gdpdu)).next().getId());
-        datenSchluerfer.getRangeByName(ranges.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
+        datenSchluerfer.getRangeByName(ooTables.OfficeRootID).getCell(1,1).setValue(this.officeFolder.getId());
         //00 System update
         const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
         systemFolder.addEditor(adminUser);
@@ -240,7 +240,7 @@ class ValuesCache {
         return this.dataHash[name];
     }
 }
-
+*/
 
 export function getNextVersion(): ooVersions {
     let oooNextVersion = (parseInt(currentOOversion, 10) + 1).toString();

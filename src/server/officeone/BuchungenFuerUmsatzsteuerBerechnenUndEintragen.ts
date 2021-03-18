@@ -1,9 +1,10 @@
 import { Buchung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { ServerFunction } from "./enums";
+import { ServerFunction } from "../oo21lib/systemEnums";
 
 export function BuchungenFuerUmsatzsteuerBerechnenUndEintragen(rootFolderId: string){
-    let BM = new BusinessModel(rootFolderId);
+    let BM = new BusinessModel(rootFolderId,"BuchungenFuerUmsatzsteuerBerechnenUndEintragen");
+    try {
     BM.umsatzsteuerJahresabrechnung();
     BM.save();
     var result = {
@@ -12,6 +13,11 @@ export function BuchungenFuerUmsatzsteuerBerechnenUndEintragen(rootFolderId: str
         gutsch:createUmsatzsteuerArray( BM.getImGeschaeftsjahrBezahlteGutschriften()),
       }
       return JSON.stringify(result);
+    }
+    catch (e) {
+      BM.saveError(e)
+      throw e;
+    } 
 }
 
 

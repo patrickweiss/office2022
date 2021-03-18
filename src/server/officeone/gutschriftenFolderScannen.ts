@@ -1,7 +1,7 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { months, ServerFunction } from "../oo21lib/systemEnums";
 import { checkParsedFile, netto, vorsteuer } from "./ausgabenFolderScannen";
 import { getOrCreateFolder } from "./directDriveConnector";
-import { months, ServerFunction } from "./enums";
 
 
 export function alleGutschriftenFolderScannen(BM:BusinessModel):void {
@@ -36,7 +36,8 @@ export function alleGutschriftenFolderScannen(BM:BusinessModel):void {
 }
 
 export function gutschriftenFolderScannen(rootFolderId: string, month: string) {
-    let BM = new BusinessModel(rootFolderId);
+    let BM = new BusinessModel(rootFolderId,"gutschriftenFolderScannen");
+    try{
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     var datumZuOrdner = {
         "01": new Date(geschaeftsjahr, 0, 1),
@@ -67,7 +68,13 @@ export function gutschriftenFolderScannen(rootFolderId: string, month: string) {
         serverFunction: ServerFunction.gutschriftenFolderScannen,
         GutschriftenD: BM.getGutschriftenTableCache().getData()
     }
+    BM.saveLog("gutschriftenFolderScannen");
     return JSON.stringify(result);
+  }
+  catch (e) {
+    BM.saveError(e)
+    throw e;
+  }
 
 }
 

@@ -1,5 +1,5 @@
+import { months, ooTables } from "../oo21lib/systemEnums";
 import { DriveConnector, oooVersion } from "./driveconnector";
-import { months } from "./enums";
 
 export const getDevOpsFolder = () => {return DriveApp.getFolderById("139Tyi3gOXE7ZkfUdhRXMMl8uZj0uxIb9")};
 
@@ -10,7 +10,7 @@ export const newOfficeOneVersion = () => {
     // make a copy of all Spreadsheets
     //read from all Tables from new version to make sure all new Spreadsheets get copied
     for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
-        DriveConnector.getNamedRangeData(nextVersionFolder.getId(), rangeName, oooVersion);
+        DriveConnector.getNamedRangeData(nextVersionFolder.getId(), rangeName as ooTables, oooVersion);
     }
     //rename all Spreadsheets, so they have the new version number
     const nextVersionSpreadsheetIterator = nextVersionFolder.getFiles();

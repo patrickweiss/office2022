@@ -1,4 +1,5 @@
-import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
+import { DriveConnector } from "../server/officeone/driveconnector";
+import { currentOOversion, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -39,6 +40,8 @@ interface IBelegZuBankbuchungZuordnen extends IAction {
     datum: Date;
 }
 export class BusinessModel {
+    private logMessage:string;
+    private beginBM:Date;
     private rootFolderId: string;
     private einnahmenRechnungTableCache: EinnahmenRechnungTableCache;
     private kundenTableCache: KundenTableCache;
@@ -56,12 +59,44 @@ export class BusinessModel {
     private eurTableCache: EURTableCache;
     private normalisierteBuchungenTableCache: NormalisierteBuchungenTableCache;
     private gdpduTableCache: GdpduTableCache;
-    public configurationCache: ValuesCache;
+    private configurationCache: ValuesCache;
 
     //Server specific code
-    constructor(rootfolderId: string) { this.rootFolderId = rootfolderId; }
+    constructor(rootfolderId: string,functionName:string) { 
+        this.rootFolderId = rootfolderId; 
+        this.logMessage=functionName;
+        this.beginBM=new Date();
+    }
 
-    private endOfYearCache: Date;
+    public addLogMessage(message:string){
+        this.logMessage+="\n"+message;    
+    }
+    public saveError(error:Error){
+        this.addLogMessage(error.message)
+        const errorMail = this.getConfigurationCache().getValueByName(office.fehlerEmail);
+        if (errorMail!=""){
+            GmailApp.sendEmail(errorMail,"Fehler bei "+this.logMessage.split("\n")[0],this.logMessage+"\n"+error.stack);
+        }
+        this.saveLog(error.stack);
+
+        const result = {
+            serverFunction: ServerFunction.unbehandelterFehler,
+            error: this.logMessage,
+        }
+        return  JSON.stringify(result);
+    }
+    public saveLog(message:string){
+        this.addLogMessage(message);
+        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId,ooTables.log,currentOOversion);
+        let sheet = logSpreadsheet.getSheetByName("log")
+        if (!sheet){
+            sheet =logSpreadsheet.insertSheet()
+            sheet.setName("log")
+        }
+        let now = new Date();
+        sheet.appendRow([this.beginBM,now,now.valueOf()-this.beginBM.valueOf(),this.logMessage]);
+    }
+
     public getRootFolderId() { return this.rootFolderId; }
 
     // Generic code for client and server identical 
@@ -451,7 +486,7 @@ export class BusinessModel {
         return this.gdpduTableCache;
     }
     public getConfigurationCache(): ValuesCache {
-        if (this.configurationCache === undefined) this.configurationCache = new ValuesCache("Konfiguration", this.getRootFolderId());
+        if (this.configurationCache === undefined) this.configurationCache = new ValuesCache(ooTables.Konfiguration, this.getRootFolderId());
         return this.configurationCache;
     }
     public netto(brutto: number, prozent: string) {

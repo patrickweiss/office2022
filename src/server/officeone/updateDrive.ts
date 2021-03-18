@@ -1,7 +1,8 @@
 import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
+import { ooTables } from "../oo21lib/systemEnums";
 import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector, oooVersion } from "./driveconnector";
-import { ServerFunction } from "./enums";
+import { ServerFunction } from "../oo21lib/systemEnums";
 
 export function getPreviousVersion() {
   let oooPreviousVersion = (parseInt(oooVersion, 10) - 1).toString();
@@ -17,8 +18,8 @@ export function updateDriveMaster(rootFolderId: string) {
   let oooPreviousVersion = getPreviousVersion();
 
   //copy DataTable Data
-  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
-    if (rangeName === "ElsterTransferD" || rangeName === "InstallationenD") {
+  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion]) ) {
+    if (rangeName === ooTables.ElsterTransferD || rangeName === ooTables.InstallationenD) {
       const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooPreviousVersion);
       const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooVersion);
       //Wenn die neue Tabelle mehr Spalten hat, dann werden die Daten spaltenweise kopiert
@@ -28,7 +29,7 @@ export function updateDriveMaster(rootFolderId: string) {
   }
   //read from all Tables from new version to make sure all new Spreadsheets get copied
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
-    if (rangeName === "ElsterTransferD" || rangeName === "InstallationenD") {
+    if (rangeName === ooTables.ElsterTransferD || rangeName === ooTables.InstallationenD) {
       DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooVersion);
     }
   }
@@ -40,27 +41,25 @@ export function updateDrive(rootFolderId: string) {
 
   //copy DataTable Data
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
-    if (rangeName !== "ElsterTransferD" && rangeName !== "InstallationenD") {
-      const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooPreviousVersion);
-      const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooVersion);
+    if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD) {
+      const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, oooPreviousVersion);
+      const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, oooVersion);
       //Wenn die neue Tabelle mehr Spalten hat, dann werden die Daten spaltenweise kopiert
-      if (dataOldVersion[0][0].length === dataNewVersion[0][0].length) DriveConnector.saveNamedRangeData(rootFolderId, rangeName, dataNewVersion[0].length, dataOldVersion[0], dataOldVersion[1], dataOldVersion[2], oooVersion);
-      else importToBiggerTable(dataOldVersion, rootFolderId, rangeName);
+      if (dataOldVersion[0][0].length === dataNewVersion[0][0].length) DriveConnector.saveNamedRangeData(rootFolderId, rangeName as ooTables, dataNewVersion[0].length, dataOldVersion[0], dataOldVersion[1], dataOldVersion[2], oooVersion);
+      else importToBiggerTable(dataOldVersion, rootFolderId, rangeName as ooTables);
     }
   }
   //read from all Tables from new version to make sure all new Spreadsheets get copied
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
-    if (rangeName !== "ElsterTransferD" && rangeName !== "InstallationenD" && rangeName !== "TestsystemeD") {
-      DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooVersion);
+    if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD ) {
+      DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, oooVersion);
     }
   }
 
   //copy value Data, except IDs of new spreadsheets!!!: 
   for (let valueName of Object.keys(DriveConnector.oooVersionValueFileMap[oooPreviousVersion])) {
-    if (valueName !== "EMailID" && valueName !== "EinnahmenID" && valueName !== "AusgabenID" && valueName !== "BankkontenID" && valueName !== "LastschriftenID") {
-      const dataOldVersion = DriveConnector.getValueByName(rootFolderId, valueName, oooPreviousVersion);
-      DriveConnector.saveValueByName(rootFolderId, valueName, oooVersion, dataOldVersion)
-    }
+      const dataOldVersion = DriveConnector.getValueByName(rootFolderId, valueName as ooTables, oooPreviousVersion);
+      DriveConnector.saveValueByName(rootFolderId, valueName as ooTables, oooVersion, dataOldVersion)
   }
 
   //alte Tabellen in Archivordner verschieben
@@ -144,7 +143,7 @@ export function updateDrive(rootFolderId: string) {
 
 
 
-function importToBiggerTable(dataOldVersion: any[][][], rootFolderId: string, rangeName: string) {
+function importToBiggerTable(dataOldVersion: any[][][], rootFolderId: string, rangeName: ooTables) {
   const data: any[][] = dataOldVersion[0];
   const background: any[][] = dataOldVersion[1];
   const fomulas: any[][] = dataOldVersion[2];

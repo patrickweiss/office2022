@@ -1,11 +1,11 @@
 import { DriveConnector } from "../officeone/driveconnector";
 import { linkFormula } from "../officeone/SimbaExportErstellen";
 //import { BusinessModel } from "./businessModel";
-import { currentOOversion, office, ooFolders, ooTables, ranges } from "./systemEnums";
+import { currentOOversion, office, ooFolders, ooTables} from "./systemEnums";
 
 export function rechnungsVorlageErstellen() {
     //const bm = new BusinessModel(SpreadsheetApp.getActive().getId(), ooTables.officeConfiguration, currentOOversion);
-    const rootFolderId =  SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
+    const rootFolderId =  SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
     const vorlageLeer = DriveApp.getFolderById(rootFolderId).getFoldersByName(ooFolders.vorlagen).next().getFilesByName(ooFolders.rechnung).next()
     const neueVorlage = vorlageLeer.makeCopy("Rechnungsvorlage " + DriveConnector.getOfficeProperty(rootFolderId,office.firma,currentOOversion))
 
@@ -18,7 +18,7 @@ export function rechnungsVorlageErstellen() {
         stammdaten[property] = DriveConnector.getOfficeProperty(rootFolderId,property,currentOOversion)
     }
     replaceDocumentVariablesByObjectData(DocumentApp.openById(neueVorlage.getId()), stammdaten);
-    DriveConnector.saveFormulaByName(rootFolderId,"Rechnungsvorlagelink",currentOOversion,linkFormula(neueVorlage.getId()))
+    DriveConnector.saveFormulaByName(rootFolderId,ooTables.Rechnungsvorlagelink,currentOOversion,linkFormula(neueVorlage.getId()))
 }
 
 function replaceDocumentVariablesByObjectData(dokument: GoogleAppsScript.Document.Document, datenObject) {

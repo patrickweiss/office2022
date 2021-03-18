@@ -1,5 +1,5 @@
 import { UmbuchungenTableCache } from "../../officeone/BusinessDataFacade";
-import { ServerFunction } from "./enums";
+import { ServerFunction } from "../oo21lib/systemEnums";
 
 export function UStVAbuchen(rootFolderId: string) {
 

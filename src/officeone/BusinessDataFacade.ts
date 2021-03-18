@@ -1,4 +1,5 @@
 import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
+import { ooTables } from "../server/oo21lib/systemEnums";
 
 
 export class TableCache<RowType extends TableRow> {
@@ -9,13 +10,13 @@ export class TableCache<RowType extends TableRow> {
   columnIndex: {};
   public loadRowCount: number;
   private rootId: string;
-  private tableName: string;
+  private tableName: ooTables;
   private rowHashTable;
   private columnHashTable = {};
   private rowArray: RowType[];
-  constructor(rootId: string, tableName: string) {
+  constructor(rootId: string, tableName: ooTables) {
     let data = {}
-    if (tableName === "RechnungSchreibenD" || tableName === "RechnungenD") {
+    if (tableName === ooTables.RechnungSchreibenD || tableName === ooTables.RechnungenD) {
       data = DriveConnector.getNamedRangeDataAndFormat(rootId, tableName, oooVersion)
       this.formatsArray = data[3];
     }
@@ -201,94 +202,94 @@ export class TableRow {
 }
 //Caches der Tabellen Daten
 export class EMailIdTableCache extends TableCache<EMailId> {
-  constructor(rootId: string) { super(rootId, "EMailIdD"); }
+  constructor(rootId: string) { super(rootId, ooTables.EMailIdD); }
   public getRowByIndex(rowIndex: string): EMailId { return new EMailId(this, rowIndex); }
 
 }
 export class AusgabenTableCache extends TableCache<AusgabenRechnung> {
-  constructor(rootId: string) { super(rootId, "AusgabenD"); }
+  constructor(rootId: string) { super(rootId, ooTables.AusgabenD); }
   public getRowByIndex(rowIndex: string): AusgabenRechnung { return new AusgabenRechnung(this, rowIndex); }
 
 }
 export class VertraegeTableCache extends TableCache<Vertrag> {
   constructor(rootId: string) {
-    super(rootId, "VerträgeD");
+    super(rootId, ooTables.VerträgeD);
   }
   public getRowByIndex(rowIndex: string): Vertrag { return new Vertrag(this, rowIndex); }
 
 }
 export class BewirtungsbelegeTableCache extends TableCache<Bewirtungsbeleg> {
   constructor(rootId: string) {
-    super(rootId, "BewirtungsbelegeD");
+    super(rootId, ooTables.BewirtungsbelegeD);
   }
   public getRowByIndex(rowIndex: string): Bewirtungsbeleg { return new Bewirtungsbeleg(this, rowIndex); }
 
 }
 export class AbschreibungenTableCache extends TableCache<Abschreibung> {
   constructor(rootId: string) {
-    super(rootId, "AbschreibungenD");
+    super(rootId, ooTables.AbschreibungenD);
   }
   public getRowByIndex(rowIndex: string): Abschreibung { return new Abschreibung(this, rowIndex); }
 
 }
 export class VerpflegungsmehraufwendungenTableCache extends TableCache<Verpflegungsmehraufwendung> {
   constructor(rootId: string) {
-    super(rootId, "VerpflegungsmehraufwendungenD");
+    super(rootId, ooTables.VerpflegungsmehraufwendungenD);
   }
   public getRowByIndex(rowIndex: string): Verpflegungsmehraufwendung { return new Verpflegungsmehraufwendung(this, rowIndex); }
 
 }
 export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
   constructor(rootId: string) {
-    super(rootId, "RechnungenD");
+    super(rootId, ooTables.RechnungenD);
   }
   public getRowByIndex(rowIndex: string): EinnahmenRechnung { return new EinnahmenRechnung(this, rowIndex); }
 
 }
 export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
   constructor(rootId: string) {
-    super(rootId, "RechnungSchreibenD");
+    super(rootId, ooTables.RechnungSchreibenD);
   }
   public getRowByIndex(rowIndex: string): RechnungSchreiben { return new RechnungSchreiben(this, rowIndex); }
 }
 export class KundenTableCache extends TableCache<Kunde> {
-  constructor(rootId: string) { super(rootId, "KundenD"); }
+  constructor(rootId: string) { super(rootId, ooTables.KundenD); }
   public getRowByIndex(rowIndex: string): Kunde { return new Kunde(this, rowIndex); }
 }
 export class ProdukteTableCache extends TableCache<Produkt>{
-  constructor(rootId: string) { super(rootId, "ProdukteD"); }
+  constructor(rootId: string) { super(rootId, ooTables.ProdukteD); }
   public getRowByIndex(rowIndex: string): Produkt { return new Produkt(this, rowIndex); }
 }
 export class EURechnungTableCache extends TableCache<EURechnung> {
   constructor(rootId: string) {
-    super(rootId, "EURechnungenD");
+    super(rootId, ooTables.EURechnungenD);
   }
   public getRowByIndex(rowIndex: string): EURechnung { return new EURechnung(this, rowIndex); }
 
 }
 export class GutschriftenTableCache extends TableCache<Gutschrift> {
   constructor(rootId: string) {
-    super(rootId, "GutschriftenD");
+    super(rootId, ooTables.GutschriftenD);
   }
   public getRowByIndex(rowIndex: string): Gutschrift { return new Gutschrift(this, rowIndex); }
 }
 export class PositionenarchivTableCache extends TableCache<PositionenArchiv>{
   constructor(rootId: string) {
-    super(rootId, "PositionenarchivD");
+    super(rootId, ooTables.PositionenarchivD);
   }
   public getRowByIndex(rowIndex: string): PositionenArchiv { return new PositionenArchiv(this, rowIndex); }
 
 }
 export class BankbuchungenTableCache extends TableCache<Bankbuchung> {
   constructor(rootId: string) {
-    super(rootId, "BankbuchungenD");
+    super(rootId, ooTables.BankbuchungenD);
   }
   public getRowByIndex(rowIndex: string): Bankbuchung { return new Bankbuchung(this, rowIndex); }
 
 }
 export class UmbuchungenTableCache extends TableCache<Umbuchung> {
   constructor(rootId: string) {
-    super(rootId, "UmbuchungenD");
+    super(rootId, ooTables.UmbuchungenD);
   }
   public getRowByIndex(rowIndex: string): Umbuchung { return new Umbuchung(this, rowIndex); }
 
@@ -297,7 +298,7 @@ export class KontenTableCache extends TableCache<Konto> {
 
   private kontenSpalten: Object;
   constructor(rootId: string) {
-    super(rootId, "KontenD");
+    super(rootId, ooTables.KontenD);
   }
   public getRowByIndex(rowIndex: string): Konto {
     return new Konto(this, rowIndex) as Konto;
@@ -482,7 +483,7 @@ function toHex(n) {
 }
 export class UStVATableCache extends TableCache<UStVA> {
   constructor(rootId: string) {
-    super(rootId, "UStVAD");
+    super(rootId, ooTables.UStVAD);
   }
   public getRowByIndex(rowIndex: string): UStVA { return new UStVA(this, rowIndex); }
   public UStVASummenAktualisieren(normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date, periode: string) {
@@ -602,7 +603,7 @@ export class UStVATableCache extends TableCache<UStVA> {
 export class EURTableCache extends TableCache<EUR> {
   private kontenSpalten: Object;
   constructor(rootId: string) {
-    super(rootId, "EÜRD");
+    super(rootId, ooTables.EÜRD);
   }
   public getRowByIndex(rowIndex: string): EUR { return new EUR(this, rowIndex); }
 
@@ -655,7 +656,7 @@ export class EURTableCache extends TableCache<EUR> {
 }
 export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBuchung> {
   constructor(rootId: string) {
-    super(rootId, "BuchungenD");
+    super(rootId, ooTables.BuchungenD);
   }
   public getRowByIndex(rowIndex: string): NormalisierteBuchung { return new NormalisierteBuchung(this, rowIndex); }
   public kontenStammdatenAktualisieren(kontenTableCache: KontenTableCache) {
@@ -697,35 +698,35 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
   }
 }
 export class ElsterTransferTableCache extends TableCache<ElsterTransfer> {
-  constructor(rootId: string) { super(rootId, "ElsterTransferD"); }
+  constructor(rootId: string) { super(rootId, ooTables.ElsterTransferD); }
   public getRowByIndex(rowIndex: string): ElsterTransfer { return new ElsterTransfer(this, rowIndex); }
 }
 export class LastschriftmandatTableCache extends TableCache<Lastschriftmandat>{
-  constructor(rootId: string) { super(rootId, "LastschriftmandatD"); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftmandatD); }
   public getRowByIndex(rowIndex: string): Lastschriftmandat { return new Lastschriftmandat(this, rowIndex); }
 }
 export class LastschriftenTableCache extends TableCache<Lastschrift>{
-  constructor(rootId: string) { super(rootId, "LastschriftenD"); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftenD); }
   public getRowByIndex(rowIndex: string): Lastschrift { return new Lastschrift(this, rowIndex); }
 }
 export class LastschriftproduktTableCache extends TableCache<Lastschriftprodukt>{
-  constructor(rootId: string) { super(rootId, "LastschriftproduktD"); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftproduktD); }
   public getRowByIndex(rowIndex: string): Lastschriftprodukt { return new Lastschriftprodukt(this, rowIndex); }
 }
 export class InstallationenTableCache extends TableCache<Installation>{
-  constructor(rootId: string) { super(rootId, "InstallationenD"); }
+  constructor(rootId: string) { super(rootId, ooTables.InstallationenD); }
   public getRowByIndex(rowIndex: string): Installation { return new Installation(this, rowIndex); }
 }
 export class CSVTableCache extends TableCache<CSVExport>{
-  constructor(rootId: string) { super(rootId, "CSVExportD"); }
+  constructor(rootId: string) { super(rootId, ooTables.CSVExportD); }
   public getRowByIndex(rowIndex: string): CSVExport { return new CSVExport(this, rowIndex); }
 }
 export class GdpduTableCache extends TableCache<Gdpdu>{
-  constructor(rootId: string) { super(rootId, "GdpduD"); }
+  constructor(rootId: string) { super(rootId, ooTables.GdpduD); }
   public getRowByIndex(rowIndex: string): Gdpdu { return new Gdpdu(this, rowIndex); }
 }
 export class DataFileTableCache extends TableCache<DataFile>{
-  constructor(rootId: string) { super(rootId, "DataFileD"); }
+  constructor(rootId: string) { super(rootId, ooTables.DataFileD); }
   public getRowByIndex(rowIndex: string): DataFile { return new DataFile(this, rowIndex); }
 }
 

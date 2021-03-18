@@ -1,11 +1,11 @@
 import { Umbuchung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { months, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
-import { months, ServerFunction } from "./enums";
 
- 
 
-export function alleAusgabenFolderScannen(BM:BusinessModel):void {
+
+export function alleAusgabenFolderScannen(BM: BusinessModel): void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     var datumZuOrdner = {
         "01": new Date(geschaeftsjahr, 0, 1),
@@ -31,46 +31,53 @@ export function alleAusgabenFolderScannen(BM:BusinessModel):void {
             wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
         }
     }
-  
+
 
 }
 
 export function ausgabenFolderScannen(rootFolderId: string, month: string) {
-    let BM = new BusinessModel(rootFolderId);
-    let geschaeftsjahr = BM.endOfYear().getFullYear();
-    var datumZuOrdner = {
-        "01": new Date(geschaeftsjahr, 0, 1),
-        "02": new Date(geschaeftsjahr, 1, 1),
-        "03": new Date(geschaeftsjahr, 2, 1),
-        "04": new Date(geschaeftsjahr, 3, 1),
-        "05": new Date(geschaeftsjahr, 4, 1),
-        "06": new Date(geschaeftsjahr, 5, 1),
-        "07": new Date(geschaeftsjahr, 6, 1),
-        "08": new Date(geschaeftsjahr, 7, 1),
-        "09": new Date(geschaeftsjahr, 8, 1),
-        "10": new Date(geschaeftsjahr, 9, 1),
-        "11": new Date(geschaeftsjahr, 10, 1),
-        "12": new Date(geschaeftsjahr, 11, 1),
-    }
-    var rootFolder = DriveApp.getFolderById(rootFolderId);
-    var ausgabenFolder = getOrCreateFolder(rootFolder, "2 Ausgaben");
-    var monatsOrdner = getOrCreateFolder(ausgabenFolder, months[month]);
-    var belegIterator = monatsOrdner.getFiles();
-    while (belegIterator.hasNext()) {
-        var beleg = belegIterator.next();
-        wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
-    }
+    let BM = new BusinessModel(rootFolderId, "ausgabenFolderScannen");
+    try {
+        let geschaeftsjahr = BM.endOfYear().getFullYear();
+        var datumZuOrdner = {
+            "01": new Date(geschaeftsjahr, 0, 1),
+            "02": new Date(geschaeftsjahr, 1, 1),
+            "03": new Date(geschaeftsjahr, 2, 1),
+            "04": new Date(geschaeftsjahr, 3, 1),
+            "05": new Date(geschaeftsjahr, 4, 1),
+            "06": new Date(geschaeftsjahr, 5, 1),
+            "07": new Date(geschaeftsjahr, 6, 1),
+            "08": new Date(geschaeftsjahr, 7, 1),
+            "09": new Date(geschaeftsjahr, 8, 1),
+            "10": new Date(geschaeftsjahr, 9, 1),
+            "11": new Date(geschaeftsjahr, 10, 1),
+            "12": new Date(geschaeftsjahr, 11, 1),
+        }
+        var rootFolder = DriveApp.getFolderById(rootFolderId);
+        var ausgabenFolder = getOrCreateFolder(rootFolder, "2 Ausgaben");
+        var monatsOrdner = getOrCreateFolder(ausgabenFolder, months[month]);
+        var belegIterator = monatsOrdner.getFiles();
+        while (belegIterator.hasNext()) {
+            var beleg = belegIterator.next();
+            wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
+        }
 
-    BM.save();
-    var result = {
-        serverFunction: ServerFunction.ausgabenFolderScannen,
-        AusgabenD: BM.getAusgabenTableCache().getData(),
-        BewirtungsbelegeD: BM.getBewirtungsbelegeTableCache().getData()
+        BM.save();
+        var result = {
+            serverFunction: ServerFunction.ausgabenFolderScannen,
+            AusgabenD: BM.getAusgabenTableCache().getData(),
+            BewirtungsbelegeD: BM.getBewirtungsbelegeTableCache().getData()
+        }
+        BM.saveLog("ausgabenFolderScannen");
+        return JSON.stringify(result);
     }
-    return JSON.stringify(result);
+    catch (e) {
+        BM.saveError(e)
+        throw e;
+    }
 }
 
-function wennBelegNeuIstEintragen(beleg:GoogleAppsScript.Drive.File, datum, BM: BusinessModel) {
+function wennBelegNeuIstEintragen(beleg: GoogleAppsScript.Drive.File, datum, BM: BusinessModel) {
     //Ist Beleg schon in Ausgabetabelle eingetragen?
     var ausgabeDaten = BM.getAusgabenTableCache().getOrCreateHashTable("ID")[beleg.getId()];
     if (ausgabeDaten != null) {
@@ -86,7 +93,7 @@ function wennBelegNeuIstEintragen(beleg:GoogleAppsScript.Drive.File, datum, BM: 
 
 
     //Versuch per Sprache umbenannten Beleg zu parsen (Bewirtungsbeleg oder Ausgabe)
-    let belegName = beleg.getName().replace("✔_","");
+    let belegName = beleg.getName().replace("✔_", "");
     let belegWoerter = belegName.split(" ");
     if (belegWoerter.length > 2) {
         if (belegWoerter[0] == "Bewirtungsbeleg" || belegWoerter[0] == "Geschäftsessen") {
@@ -94,7 +101,7 @@ function wennBelegNeuIstEintragen(beleg:GoogleAppsScript.Drive.File, datum, BM: 
             return;
         }
         //nur umbenannte Belege eintragen
-        if (belegName.indexOf("%") != -1)neueAusgabeEintragen(beleg, belegWoerter, datum, BM);
+        if (belegName.indexOf("%") != -1) neueAusgabeEintragen(beleg, belegWoerter, datum, BM);
     }
     return;
 }

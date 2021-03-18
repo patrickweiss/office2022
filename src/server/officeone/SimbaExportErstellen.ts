@@ -2,8 +2,8 @@ import { string } from "prop-types";
 import { Konto } from "../../client/office-one-2021/bm/BusinessDataFacade";
 import { AbschreibungenTableCache, AusgabenTableCache, BankbuchungenTableCache, BewirtungsbelegeTableCache, CSVExport, CSVTableCache, EinnahmenRechnungTableCache, EURechnungTableCache, GutschriftenTableCache, KontenTableCache, UmbuchungenTableCache, VerpflegungsmehraufwendungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { ooTables, ServerFunction } from "../oo21lib/systemEnums";
 import { DriveConnector, oooVersion } from "./driveconnector";
-import { ServerFunction } from "./enums";
 
 interface agent {
   rootFolderId: string;
@@ -39,95 +39,102 @@ enum exportgruppe {
 }
 
 export function SimbaExportErstellen(rootFolderId: string) {
-  var thisSpreadsheet = DriveConnector.getSpreadsheet(rootFolderId, "KontenD", oooVersion);
-  const ausgabenID = DriveConnector.getSpreadsheet(rootFolderId, "AusgabenD", oooVersion).getId();
-  const einnahmenID = DriveConnector.getSpreadsheet(rootFolderId, "RechnungenD", oooVersion).getId();
-  const bankkontenID = DriveConnector.getSpreadsheet(rootFolderId, "BankbuchungenD", oooVersion).getId();
-  let kontenCache = new KontenTableCache(rootFolderId);
+  const bm = new BusinessModel(rootFolderId, "SimbaExportErstellen");
+  try {
+    var thisSpreadsheet = DriveConnector.getSpreadsheet(rootFolderId, ooTables.KontenD, oooVersion);
+    const ausgabenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.AusgabenD, oooVersion).getId();
+    const einnahmenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.RechnungenD, oooVersion).getId();
+    const bankkontenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.BankbuchungenD, oooVersion).getId();
+    let kontenCache = new KontenTableCache(rootFolderId);
 
-  let a: agent = {
-    rootFolderId: rootFolderId,
-    geschaeftsjahrString: "",
-    geschaeftsjahr: new Date(),
-    csvCache: new CSVTableCache(rootFolderId),
-    kontenCache: kontenCache,
-    kontenHashTableRows: kontenCache.getOrCreateHashTable("Konto"),
-    ausgabenID: ausgabenID,
-    einnahmenID: einnahmenID,
-    bankkontenID: bankkontenID,
-    beispiel: "durch CSV Export ergänzt"
-  };
-  //  var agent = OfficeOne.createAgent(SpreadsheetApp.getActive());
-  //var logrange = saw.logbeginn("Auswertungen aktualisieren");
-  const bm = new BusinessModel(rootFolderId);
-  a.geschaeftsjahrString = bm.endOfYear().getFullYear().toString();
-  a.geschaeftsjahr = new Date(parseInt(a.geschaeftsjahrString, 10), 0, 1);
+    let a: agent = {
+      rootFolderId: rootFolderId,
+      geschaeftsjahrString: "",
+      geschaeftsjahr: new Date(),
+      csvCache: new CSVTableCache(rootFolderId),
+      kontenCache: kontenCache,
+      kontenHashTableRows: kontenCache.getOrCreateHashTable("Konto"),
+      ausgabenID: ausgabenID,
+      einnahmenID: einnahmenID,
+      bankkontenID: bankkontenID,
+      beispiel: "durch CSV Export ergänzt"
+    };
+    //  var agent = OfficeOne.createAgent(SpreadsheetApp.getActive());
+    //var logrange = saw.logbeginn("Auswertungen aktualisieren");
+    a.geschaeftsjahrString = bm.endOfYear().getFullYear().toString();
+    a.geschaeftsjahr = new Date(parseInt(a.geschaeftsjahrString, 10), 0, 1);
 
-  //kontenSpaltenSetzen(a);
-  //Alle Buchungen werden gelöscht
-  a.csvCache.reset();
-  // Daten aus Tabellen mit Geschäftsvorfällen eintragen 
-  console.log("simba Export ausgaben");
-  ausgabenCSV(a);
-  console.log("simba Export bewirtung");
-  bewirtungsbelegeCSV(a);
-  console.log("simba Export verpflegung");
-  verpflegungsmehraufwendungenCSV(a);
-  console.log("simba Export rechnungen");
-  rechnungenCSV(a);
-  console.log("simba Export gutschriften");
-  gutschriftenCSV(a);
-  console.log("simba Export eurechnungen");
-  euRechnungenCSV(a);
-  console.log("simba Export umbuchungen");
-  umbuchungenCSV(a);
-  console.log("simba Export bank");
-  bankbuchungenCSV(a);
-  console.log("simba Export abschreibungen");
-  abschreibungenCSV(a);
-  console.log("simba Export negativ konto umdrehen");
-  negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a);
-  console.log("simba Export kontenstammdaten");
-  //EB Buchungen fuer Simba anpassen
-  kontenStammdatenErgaenzenExportgruppeAnlagenCSV(a);
-  //Buchungen in CSV-Dateien Exportieren
-  a.csvCache.save();
-  console.log("export dateien erstellen");
-  var buchungenCSV = {};
-  for (var index in a.csvCache.dataArray) {
-    if (index !== "0") {
-      var csvRow = a.csvCache.getRowByIndex(index);
-      if (csvRow.getValue("Exportgruppe") != "") {
-        if (buchungenCSV[csvRow.getValue("Exportgruppe")] === undefined) buchungenCSV[csvRow.getValue("Exportgruppe")] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
-        var datum = isoDate(csvRow.getValue("Datum"));
-        buchungenCSV[csvRow.getValue("Exportgruppe")] +=
-          datum + ";" +
-          formatBetrag(csvRow.getValue("Betrag")) + ";" +
-          csvRow.getValue("SKR03 (Soll)") + ";" +
-          csvRow.getValue("SKR03 (Haben)") + ";" +
-          csvRow.getValue("Buchungstext") + ";" +
-          belegNrInSimbaFormat(csvRow.getValue("BelegNr")) + ";" +
-          csvRow.getId() + ";" +
-          csvRow.getValue("USt-IDNr") + ";1\n";
+    //kontenSpaltenSetzen(a);
+    //Alle Buchungen werden gelöscht
+    a.csvCache.reset();
+    // Daten aus Tabellen mit Geschäftsvorfällen eintragen 
+    console.log("simba Export ausgaben");
+    ausgabenCSV(a);
+    console.log("simba Export bewirtung");
+    bewirtungsbelegeCSV(a);
+    console.log("simba Export verpflegung");
+    verpflegungsmehraufwendungenCSV(a);
+    console.log("simba Export rechnungen");
+    rechnungenCSV(a);
+    console.log("simba Export gutschriften");
+    gutschriftenCSV(a);
+    console.log("simba Export eurechnungen");
+    euRechnungenCSV(a);
+    console.log("simba Export umbuchungen");
+    umbuchungenCSV(a);
+    console.log("simba Export bank");
+    bankbuchungenCSV(a);
+    console.log("simba Export abschreibungen");
+    abschreibungenCSV(a);
+    console.log("simba Export negativ konto umdrehen");
+    negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a);
+    console.log("simba Export kontenstammdaten");
+    //EB Buchungen fuer Simba anpassen
+    kontenStammdatenErgaenzenExportgruppeAnlagenCSV(a);
+    //Buchungen in CSV-Dateien Exportieren
+    a.csvCache.save();
+    console.log("export dateien erstellen");
+    var buchungenCSV = {};
+    for (var index in a.csvCache.dataArray) {
+      if (index !== "0") {
+        var csvRow = a.csvCache.getRowByIndex(index);
+        if (csvRow.getValue("Exportgruppe") != "") {
+          if (buchungenCSV[csvRow.getValue("Exportgruppe")] === undefined) buchungenCSV[csvRow.getValue("Exportgruppe")] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
+          var datum = isoDate(csvRow.getValue("Datum"));
+          buchungenCSV[csvRow.getValue("Exportgruppe")] +=
+            datum + ";" +
+            formatBetrag(csvRow.getValue("Betrag")) + ";" +
+            csvRow.getValue("SKR03 (Soll)") + ";" +
+            csvRow.getValue("SKR03 (Haben)") + ";" +
+            csvRow.getValue("Buchungstext") + ";" +
+            belegNrInSimbaFormat(csvRow.getValue("BelegNr")) + ";" +
+            csvRow.getId() + ";" +
+            csvRow.getValue("USt-IDNr") + ";1\n";
+        }
       }
     }
-  }
-  const timestampCSV = new Date().toISOString();
-  for (var exportGruppe in buchungenCSV) {
-    if (buchungenCSV.hasOwnProperty(exportGruppe)) {
-      var exportCSV = buchungenCSV[exportGruppe];
-      DriveApp.getFolderById(a.rootFolderId).createFile(`${exportGruppe}:${timestampCSV}.csv`, exportCSV, "text/csv");
+    const timestampCSV = new Date().toISOString();
+    for (var exportGruppe in buchungenCSV) {
+      if (buchungenCSV.hasOwnProperty(exportGruppe)) {
+        var exportCSV = buchungenCSV[exportGruppe];
+        DriveApp.getFolderById(a.rootFolderId).createFile(`${exportGruppe}:${timestampCSV}.csv`, exportCSV, "text/csv");
+      }
     }
-  }
-  var result = {
-    serverFunction: ServerFunction.SimbaExportErstellen
+    var result = {
+      serverFunction: ServerFunction.SimbaExportErstellen
 
+    }
+    bm.saveLog("SimbaExportErstellen");
+    return JSON.stringify(result);
   }
-  return JSON.stringify(result);
+  catch (e) {
+    bm.saveError(e)
+    throw e;
+  }
 }
 
-function belegNrInSimbaFormat(belegNr:string):string{
-  return belegNr.toUpperCase().replace("Ü","UE").replace("Ä","AE").replace("Ö","OE").replace("ß","SS").replace("-","").replace(".","");
+function belegNrInSimbaFormat(belegNr: string): string {
+  return belegNr.toUpperCase().replace("Ü", "UE").replace("Ä", "AE").replace("Ö", "OE").replace("ß", "SS").replace("-", "").replace(".", "");
 }
 
 function formatBetrag(betrag) {
@@ -145,14 +152,14 @@ function isoDate(date) {
 
   return [day, month, year].join('.');
 }
-function ebBuchungAnpassen(a:agent, csvRow:CSVExport, soll:Konto,haben:Konto) {
-//  csvRow.setValue("Exportgruppe", "EB " + csvRow.getValue("Exportgruppe"));
+function ebBuchungAnpassen(a: agent, csvRow: CSVExport, soll: Konto, haben: Konto) {
+  //  csvRow.setValue("Exportgruppe", "EB " + csvRow.getValue("Exportgruppe"));
   csvRow.setValue("Datum", a.geschaeftsjahr);
-  if (soll.getKontentyp()==="GuV")csvRow.setValue("SKR03 (Soll)","9000");
-  if (haben.getKontentyp()==="GuV")csvRow.setValue("SKR03 (Haben)","9000");
+  if (soll.getKontentyp() === "GuV") csvRow.setValue("SKR03 (Soll)", "9000");
+  if (haben.getKontentyp() === "GuV") csvRow.setValue("SKR03 (Haben)", "9000");
 }
 function ausgabenCSV(a: agent) {
-  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, "AusgabenD", oooVersion).getId();
+  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.AusgabenD, oooVersion).getId();
 
 
   a.ausgabenLinkFormula = linkFormula(ausgabenID);
@@ -198,7 +205,7 @@ function ausgabenCSV(a: agent) {
 
 }
 function bewirtungsbelegeCSV(a: agent) {
-  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, "AusgabenD", oooVersion).getId();
+  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.BewirtungsbelegeD, oooVersion).getId();
   //  a.ausgabenLinkFormula = saw.linkFormula(ausgabenID);
   a.bewirtungsbelegeCache = new BewirtungsbelegeTableCache(a.rootFolderId);
   if (a.bewirtungsbelegeCache.getRowByIndex("1").getValue("Datum") == "") return;
@@ -482,10 +489,10 @@ function negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a: ag
 
 function negativenBetragTranformierenAusCSVExport(csvRow: CSVExport) {
   if (csvRow.getValue("Exportgruppe") === "") csvRow.setValue("Exportgruppe", exportgruppe.laufendeBuchungen);
-  if (csvRow.getValue("BelegNr")==="mwstUStVAAufVMwSt" ||
-  csvRow.getValue("BelegNr")==="mwstVorsteuerAufVMwSt" ||
-  csvRow.getValue("BelegNr")==="mwstUmsatzsteuerAufVMwSt"||
-  csvRow.getValue("BelegNr")==="mwstFinanzamtOP" ) csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
+  if (csvRow.getValue("BelegNr") === "mwstUStVAAufVMwSt" ||
+    csvRow.getValue("BelegNr") === "mwstVorsteuerAufVMwSt" ||
+    csvRow.getValue("BelegNr") === "mwstUmsatzsteuerAufVMwSt" ||
+    csvRow.getValue("BelegNr") === "mwstFinanzamtOP") csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
   if (csvRow.getValue("Betrag") < 0) {
     var altSoll = csvRow.getValue("Konto (Soll)");
     var altHaben = csvRow.getValue("Konto (Haben)");
@@ -522,7 +529,7 @@ function getOrCreateKontoLeistungRow(a: agent, kontoName) {
 
   //Wenn es das Konto noch nicht gibt, dann anlegen.
   if (kontoRow === undefined) {
-    throw new Error("Konto fehlt:"+kontoName);
+    throw new Error("Konto fehlt:" + kontoName);
   }
 
   return a.kontenHashTableRows[kontoName];
@@ -534,7 +541,7 @@ function getOrCreateKontoRow(a: agent, kontoName): Konto {
 
   //Wenn es das Konto noch nicht gibt, dann anlegen.
   if (kontoRow === undefined) {
-    throw new Error("Konto fehlt:"+kontoName);
+    throw new Error("Konto fehlt:" + kontoName);
   }
 
   return a.kontenHashTableRows[kontoName];

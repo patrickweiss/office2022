@@ -1,23 +1,23 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { ServerFunction } from "./enums";
+import { ServerFunction } from "../oo21lib/systemEnums";
 
-export function UStVAberechnen(rootFolderId: string){
-    let BM = new BusinessModel(rootFolderId);
+export function UStVAberechnen(rootFolderId: string) {
+  let BM = new BusinessModel(rootFolderId, "UStVAberechnen");
+  try {
     BM.kontoSummenAktualisieren();
     BM.save();
 
     var result = {
-        serverFunction: ServerFunction.getNamedRangeData,
-        rangeName: "UStVAD",
-        namedRangeData: BM.getUStVATableCache().getData()
-      }
-      return JSON.stringify(result);
-   /* 
-    var result = {
-        serverFunction: ServerFunction.UStVAberechnen,
-        UStVAD: BM.getUStVATableCache().getData(),
+      serverFunction: ServerFunction.getNamedRangeData,
+      rangeName: "UStVAD",
+      namedRangeData: BM.getUStVATableCache().getData()
     }
-      return JSON.stringify(result);
-      */
+    BM.saveLog("Bankbuchungen korrekt importiert");
+    return JSON.stringify(result);
+  }
+  catch (e) {
+    BM.saveError(e)
+    throw e;
+  }
 }
 

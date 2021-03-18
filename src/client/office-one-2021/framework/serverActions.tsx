@@ -4,8 +4,9 @@ const { serverFunctions } = server;
 
 import * as Action from './Action';
 import { IOfficeWindow } from './OfficeWindow';
-import { reducerFunctions, ServerFunction } from './ServerProxy';
+import { reducerFunctions } from './ServerProxy';
 import { Leafs } from './OfficeLeaf';
+import { ServerFunction } from '../../../server/oo21lib/systemEnums';
 
 
 declare let window: IOfficeWindow;

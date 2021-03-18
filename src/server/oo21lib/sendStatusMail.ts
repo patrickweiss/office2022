@@ -33,7 +33,7 @@ function outerGutschriftenFuerMonat(html: string, bm: BusinessModel, monat: numb
     if (monat>0)html = gutschriftenFuerMonat(html,bm,monat.toString());
     else {
         if (vorjahrID!==""){
-            const vorjahrBM=new BusinessModel(vorjahrID);
+            const vorjahrBM=new BusinessModel(vorjahrID,"");
             html=gutschriftenFuerMonat(html,vorjahrBM,(monat+12).toString())
         }
     }
@@ -59,7 +59,7 @@ function outerAusgabenFuerMonat (html: string, bm: BusinessModel, monat: number,
     if (monat>0)html = ausgabenFuerMonat(html,bm,monat.toString());
     else {
         if (vorjahrID!==""){
-            const vorjahrBM=new BusinessModel(vorjahrID);
+            const vorjahrBM=new BusinessModel(vorjahrID,"");
             html=ausgabenFuerMonat(html,vorjahrBM,(monat+12).toString())
         }
     }

@@ -1,8 +1,8 @@
 import { DataFileTableCache, GdpduTableCache } from "../../officeone/BusinessDataFacade";
-import { ranges } from "../oo21lib/systemEnums";
+import { ooTables } from "../oo21lib/systemEnums";
 
 export function deleteData(){
-    const rootId =  SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
+    const rootId =  SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
     const dataTableCache = new GdpduTableCache(rootId);
     dataTableCache.reset();
     dataTableCache.save();

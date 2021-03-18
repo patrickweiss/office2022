@@ -1,7 +1,6 @@
 import { copyFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ServerFunction, systemMasterProperty } from "../oo21lib/systemEnums";
 import { DriveConnector } from "./driveconnector";
-import { ServerFunction } from "./enums";
 
 //oo21lib stuff
 //import * as oo22 from "../oo21lib/driveConnector";
@@ -77,10 +76,10 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
   )
   officeFolder.addEditor(adminUser);
   const officeRootId = officeFolder.getId()
-  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "RechnungenD", currentOOversion);
-  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "AusgabenD", currentOOversion);
-  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "DataFileD", currentOOversion);
-  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, "Konfiguration", currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.RechnungenD, currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.AusgabenD, currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.DataFileD, currentOOversion);
+  DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.Konfiguration, currentOOversion);
 
   //00 System update
   const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);

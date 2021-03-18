@@ -1,8 +1,8 @@
-import { ranges } from "../../server/oo21lib/systemEnums";
+import { ooTables } from "../../server/oo21lib/systemEnums";
 import { processEmailIdForm } from "./processEmailIdForm";
 
 export const addEmailId = (event: GoogleAppsScript.Events.SheetsOnFormSubmit) => {
-    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
+    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
     console.log("addEmailId called");
     if (event===undefined){
        const debugEvent = {

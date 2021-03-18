@@ -1,7 +1,6 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { oolog } from "../oo21lib/spreadsheerLogger";
+import { months, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
-import { months, ServerFunction } from "./enums";
 import { CSVToArray } from "./O1";
 import { formatDate } from "./rechnungSchreiben";
 
@@ -13,10 +12,9 @@ enum csvTypes {
 }
 
 export function bankbuchungenFolderScannen(rootFolderId: string, month: string) {
-    oolog.logBeginn("bankbuchungenFolderScannen,rootFolderID:" + rootFolderId + " monat:" + month)
+    const bm = new BusinessModel(rootFolderId,"bankbuchungenFolderScannen");
     try {
 
-        let BM = new BusinessModel(rootFolderId);
 
         var rootFolder = DriveApp.getFolderById(rootFolderId);
         var bankkontenFolder = getOrCreateFolder(rootFolder, "3 Bankkonten");
@@ -31,25 +29,23 @@ export function bankbuchungenFolderScannen(rootFolderId: string, month: string) 
             let belegDaten = beleg.getName().split(" ");
             if (belegDaten[0].substr(0, 1) !== "✔") {
                 let konto = belegDaten[0];
-                if (BM.isBankkonto(konto)) {
-                    bankbuchungenImportieren(beleg, BM, monthFolder);
-                } else if (konto === "Gehalt") gehaltsbuchungenImportieren(beleg, BM);
+                if (bm.isBankkonto(konto)) {
+                    bankbuchungenImportieren(beleg, bm, monthFolder);
+                } else if (konto === "Gehalt") gehaltsbuchungenImportieren(beleg, bm);
             }
         }
 
-        BM.save();
+        bm.save();
         var result = {
             serverFunction: ServerFunction.bankbuchungenFolderScannen,
-            BankbuchungenD: BM.getBankbuchungenTableCache().getData(),
+            BankbuchungenD: bm.getBankbuchungenTableCache().getData(),
         }
-        oolog.logEnd("Bankbuchungen korrekt importiert");
+        bm.saveLog("Bankbuchungen korrekt importiert");
         return JSON.stringify(result);
     }
     catch (e) {
-        oolog.logEnd(e.toString() + " " + e.stack)
-
+        return bm.saveError(e)
     }
-
 }
 
 
@@ -82,20 +78,20 @@ function gehaltsbuchungenImportieren(beleg, BM: BusinessModel): void {
 
 function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: BusinessModel, monthFolder: GoogleAppsScript.Drive.Folder): void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
-    console.log("Geschäftsjahr:" + geschaeftsjahr);
+    BM.addLogMessage("Geschäftsjahr:" + geschaeftsjahr);
 
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
     let konto = belegDaten[0];
     const datenFormat = (BM.getConfigurationCache().getValueByName(konto + "Is") as csvTypes)
-    oolog.addMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
+    BM.addLogMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
     let datenString;
     if (datenFormat === csvTypes.Commerzbank || datenFormat === csvTypes.KSK) datenString = beleg.getBlob().getDataAsString("utf-8");
     else datenString = beleg.getBlob().getDataAsString("ISO-8859-1");
     let neuerBankbestand = parseFloat(beleg.getName().split(" ")[1].replace(".", "").replace(",", "."));
     let alterBankbestand = BM.getBankbestand(konto);
     let aktuellerBankbestand = alterBankbestand;
-    oolog.addMessage("alter Bankbestand:" + alterBankbestand);
+    BM.addLogMessage("alter Bankbestand:" + alterBankbestand);
 
     if (datenFormat === csvTypes.Voba) {
         //die ersten 12 Zeilen wegwerfen
@@ -132,7 +128,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     //durch das Array iterieren:
     let index: string = "";
     if (letzteBuchung !== undefined) {
-        oolog.addMessage("letzte Buchung Id:" + letzteBuchung.getId());
+        BM.addLogMessage("letzte Buchung Id:" + letzteBuchung.getId());
         let foundFlag = false;
         for (index in transactionArray) {
             let transaction: CSVTransaction = transactionArray[index];

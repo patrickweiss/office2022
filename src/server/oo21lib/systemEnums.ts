@@ -31,6 +31,7 @@ export enum systemObject{
 }
 
 export enum office{
+    fehlerEmail = "fehlerEmail",
     geschaeftsjahr = "zeitraumJahr",
     taxNumberOffice = "taxNumberOffice",
     taxNumberDistrict = "taxNumberDistrict",
@@ -53,21 +54,50 @@ export enum office{
     vorjahrOfficeRootID_FolderId="vorjahrOfficeRootID_FolderId"
 }
 
-export enum ranges{
-    OfficeRootID="OfficeRootID"
-}
 export enum triggerModes{
     production = "Produktion",
     test = "Test",
     stop = "Stop"
 }
-export enum ooTables{
-    systemMasterConfiguration = "systemMasterConfiguration", //
-    officeConfiguration = "officeConfiguration",
-    email="email",
-    rechnungen = "rechnungen",
-    ausgaben = "ausgaben",
-    gdpdu = "gdpdu"
+export enum ooTables {
+  systemMasterConfiguration = "systemMasterConfiguration",
+  officeConfiguration = "officeConfiguration",
+  email = "email",
+  rechnungen = "rechnungen",
+  ausgaben = "ausgaben",
+  gdpdu = "gdpdu",
+  OfficeRootID = "OfficeRootID",
+  log = "log",
+  Konfiguration = "Konfiguration",
+  RechnungSchreibenD = "RechnungSchreibenD",
+  RechnungenD = "RechnungenD",
+  EMailIdD = "EMailIdD",
+  AusgabenD = "AusgabenD",
+  VerträgeD = "VerträgeD",
+  BewirtungsbelegeD = "BewirtungsbelegeD",
+  AbschreibungenD = "AbschreibungenD",
+  VerpflegungsmehraufwendungenD = "VerpflegungsmehraufwendungenD",
+  KundenD = "KundenD",
+  ProdukteD = "ProdukteD",
+  EURechnungenD = "EURechnungenD",
+  GutschriftenD = "GutschriftenD",
+  PositionenarchivD = "PositionenarchivD",
+  BankbuchungenD = "BankbuchungenD",
+  UmbuchungenD = "UmbuchungenD",
+  KontenD = "KontenD",
+  UStVAD = "UStVAD",
+  EÜRD = "EÜRD",
+  BuchungenD = "BuchungenD",
+  ElsterTransferD = "ElsterTransferD",
+  LastschriftmandatD = "LastschriftmandatD",
+  LastschriftenD = "LastschriftenD",
+  LastschriftproduktD = "LastschriftproduktD",
+  InstallationenD = "InstallationenD",
+  CSVExportD = "CSVExportD",
+  GdpduD = "GdpduD",
+  DataFileD = "DataFileD",
+  Rechnungsvorlagelink = "Rechnungsvorlagelink",
+  KundenRechnungsvorlage = "KundenRechnungsvorlage"
 }
 
 export const months = {
@@ -83,4 +113,27 @@ export const months = {
     '10': '(10) Oktober',
     '11': '(11) November',
     '12': '(12) Dezember',
+}
+
+export enum ServerFunction {
+    getOrCreateRootFolder = "getOrCreateRootFolder",
+    getOrCreateAusgabenFolder = "getOrCreateAusgabenFolder",
+    getNamedRangeData = "getNamedRangeData",
+    getSpreadsheetIdbyFolderIdAndName = "getSpreadsheetIdbyFolderIdAndName",
+    EroeffnungsbilanzAusVorjahrAktualisieren = "EroeffnungsbilanzAusVorjahrAktualisieren",
+    BuchungenFuerUmsatzsteuerBerechnenUndEintragen = "BuchungenFuerUmsatzsteuerBerechnenUndEintragen",
+    businessModelUpdate = "businessModelUpdate",
+    getOrCreateOfficeOneFolders = "getOrCreateOfficeOneFolders",
+    SimbaExportErstellen = "SimbaExportErstellen",
+    getOrCreateGutschriftenFolder = "getOrCreateGutschriftenFolder",
+    gutschriftenFolderScannen = "gutschriftenFolderScannen",
+    ausgabenFolderScannen = "ausgabenFolderScannen",
+    bankbuchungenFolderScannen = "bankbuchungenFolderScannen",
+    UStVAberechnen = "UStVAberechnen",
+    UStVAverschicken = "UStVAverschicken",
+    UStVAbuchen = "UStVAbuchen",
+    updateDrive = "updateDrive",
+    businessModelBatchUpdate = "businessModelBatchUpdate",
+    vertraegeFolderScannen = "vertraegeFolderScannen",
+    unbehandelterFehler = "unbehandelterFehler"
 }

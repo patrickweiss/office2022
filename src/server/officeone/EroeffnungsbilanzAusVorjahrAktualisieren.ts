@@ -1,16 +1,13 @@
 import { AusgabenRechnung, Bewirtungsbeleg, EinnahmenRechnung, Konto,EURechnung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { office } from "../oo21lib/systemEnums";
-import { ServerFunction } from "./enums";
+import { office, ServerFunction } from "../oo21lib/systemEnums";
 
 export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, rootFolderNameVorjahr: string) {
-  console.log(`RootFolderId:${rootFolderId}, rootFolderNameVorjahr:${rootFolderNameVorjahr}`);
-
-  var BMnow = new BusinessModel(rootFolderId);
-
+  const BMnow = new BusinessModel(rootFolderId,"EroeffnungsbilanzAusVorjahrAktualisieren");
+ try{
   var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
 
-  var BMlastYear = new BusinessModel(rootFolderIdLastYear);
+  var BMlastYear = new BusinessModel(rootFolderIdLastYear,"EroeffnungsbilanzAusVorjahrAktualisieren");
   KontenStammdatenAusVorjahrAktualisieren(BMlastYear, BMnow);
 //  AnlagenUndAbschreibungenAusVorjahrAktualisieren(BMlastYear, BMnow);
 //  OffenePostenAusVorjahrAktualisieren(BMlastYear, BMnow);
@@ -28,7 +25,13 @@ export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, r
     serverFunction: ServerFunction.EroeffnungsbilanzAusVorjahrAktualisieren,
     testName: createObjectArray(BMlastYear.getBilanzkontenArray()),
   }
+  BMnow.saveLog("EroeffnungsbilanzAusVorjahrAktualisieren");
   return JSON.stringify(result);
+}
+catch (e) {
+  BMnow.saveError(e)
+  throw e;
+}
 }
 
 function KontenStammdatenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {

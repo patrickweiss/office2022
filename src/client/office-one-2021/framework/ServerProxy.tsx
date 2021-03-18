@@ -9,31 +9,20 @@ import { UStVA } from '../bm/BusinessDataFacade';
 //import { Server } from 'http';
 import { Leafs } from './OfficeLeaf';
 import { createVorjahrInstanceNameFromFolderName } from './DriveLeaf';
+import { ServerFunction } from '../../../server/oo21lib/systemEnums';
 
 
-export enum ServerFunction {
-    getOrCreateRootFolder = "getOrCreateRootFolder",
-    getOrCreateAusgabenFolder = "getOrCreateAusgabenFolder",
-    getNamedRangeData = "getNamedRangeData",
-    getSpreadsheetIdbyFolderIdAndName = "getSpreadsheetIdbyFolderIdAndName",
-    EroeffnungsbilanzAusVorjahrAktualisieren = "EroeffnungsbilanzAusVorjahrAktualisieren",
-    BuchungenFuerUmsatzsteuerBerechnenUndEintragen = "BuchungenFuerUmsatzsteuerBerechnenUndEintragen",
-    businessModelUpdate = "businessModelUpdate",
-    getOrCreateOfficeOneFolders = "getOrCreateOfficeOneFolders",
-    SimbaExportErstellen = "SimbaExportErstellen",
-    getOrCreateGutschriftenFolder = "getOrCreateGutschriftenFolder",
-    gutschriftenFolderScannen = "gutschriftenFolderScannen",
-    ausgabenFolderScannen = "ausgabenFolderScannen",
-    bankbuchungenFolderScannen = "bankbuchungenFolderScannen",
-    UStVAberechnen = "UStVAberechnen",
-    UStVAverschicken = "UStVAverschicken",
-    UStVAbuchen = "UStVAbuchen",
-    updateDrive = "updateDrive",
-    businessModelBatchUpdate = "businessModelBatchUpdate",
-    vertraegeFolderScannen = "vertraegeFolderScannen"
-}
 
 export const reducerFunctions = {};
+
+reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, serverResponse: any) {
+    if (serverResponse.error){
+        newState.UI.error = serverResponse.error;
+        newState.UI.leaf = Leafs.ServerError;
+        return;
+    }
+}
+
 reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newState: any, serverResponse: any) {
     if (serverResponse.error){
         newState.BM.serverError = serverResponse.error;

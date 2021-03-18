@@ -1,8 +1,8 @@
 import { EinnahmenRechnungTableCache, Kunde, KundenTableCache, LastschriftenTableCache, Lastschriftmandat, LastschriftmandatTableCache } from "../../officeone/BusinessDataFacade"
-import { ranges } from "../../server/oo21lib/systemEnums";
+import { ooTables } from "../../server/oo21lib/systemEnums";
 
 export default function createInvoicesAndSepaXml() {
-    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ranges.OfficeRootID).getValue().toString();
+    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
     const lastschriftenTableCache = new LastschriftenTableCache(rootId);
     const kundenTC = new KundenTableCache(rootId);
     const kundenEmailHash = kundenTC.getOrCreateHashTable("E-Mail");
