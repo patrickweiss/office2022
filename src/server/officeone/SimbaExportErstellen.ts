@@ -128,8 +128,8 @@ export function SimbaExportErstellen(rootFolderId: string) {
     return JSON.stringify(result);
   }
   catch (e) {
-    bm.saveError(e)
-    throw e;
+    return bm.saveError(e)
+    
   }
 }
 

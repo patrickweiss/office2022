@@ -1,37 +1,37 @@
-import { AusgabenRechnung, Bewirtungsbeleg, EinnahmenRechnung, Konto,EURechnung } from "../../officeone/BusinessDataFacade";
+import { AusgabenRechnung, Bewirtungsbeleg, EinnahmenRechnung, Konto, EURechnung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { office, ServerFunction } from "../oo21lib/systemEnums";
 
 export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, rootFolderNameVorjahr: string) {
-  const BMnow = new BusinessModel(rootFolderId,"EroeffnungsbilanzAusVorjahrAktualisieren");
- try{
-  var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
+  const BMnow = new BusinessModel(rootFolderId, "EroeffnungsbilanzAusVorjahrAktualisieren");
+  try {
+    var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
 
-  var BMlastYear = new BusinessModel(rootFolderIdLastYear,"EroeffnungsbilanzAusVorjahrAktualisieren");
-  KontenStammdatenAusVorjahrAktualisieren(BMlastYear, BMnow);
-//  AnlagenUndAbschreibungenAusVorjahrAktualisieren(BMlastYear, BMnow);
-//  OffenePostenAusVorjahrAktualisieren(BMlastYear, BMnow);
-//    AnfangsbestaendeVonKontenGruppeBestandAktualisieren(BMlastYear, BMnow);
-  //Der Anfangsbestand kommt über den ersten Transaktionsimport im Januar des nächsten Jahres in die Tabelle
-  //AnfangsbestandBankkontenAktualisieren(BMlastYear, BMnow);
+    var BMlastYear = new BusinessModel(rootFolderIdLastYear, "EroeffnungsbilanzAusVorjahrAktualisieren");
+    KontenStammdatenAusVorjahrAktualisieren(BMlastYear, BMnow);
+    //  AnlagenUndAbschreibungenAusVorjahrAktualisieren(BMlastYear, BMnow);
+    //  OffenePostenAusVorjahrAktualisieren(BMlastYear, BMnow);
+    //    AnfangsbestaendeVonKontenGruppeBestandAktualisieren(BMlastYear, BMnow);
+    //Der Anfangsbestand kommt über den ersten Transaktionsimport im Januar des nächsten Jahres in die Tabelle
+    //AnfangsbestandBankkontenAktualisieren(BMlastYear, BMnow);
 
 
-  OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear, BMnow);
-  AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear, BMnow);
+    OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear, BMnow);
+    AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear, BMnow);
 
-  BMnow.save();
+    BMnow.save();
 
-  var result = {
-    serverFunction: ServerFunction.EroeffnungsbilanzAusVorjahrAktualisieren,
-    testName: createObjectArray(BMlastYear.getBilanzkontenArray()),
+    var result = {
+      serverFunction: ServerFunction.EroeffnungsbilanzAusVorjahrAktualisieren,
+      testName: createObjectArray(BMlastYear.getBilanzkontenArray()),
+    }
+    BMnow.saveLog("EroeffnungsbilanzAusVorjahrAktualisieren");
+    return JSON.stringify(result);
   }
-  BMnow.saveLog("EroeffnungsbilanzAusVorjahrAktualisieren");
-  return JSON.stringify(result);
-}
-catch (e) {
-  BMnow.saveError(e)
-  throw e;
-}
+  catch (e) {
+    return BMnow.saveError(e)
+
+  }
 }
 
 function KontenStammdatenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
@@ -42,8 +42,8 @@ function KontenStammdatenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMno
       aktuellesKonto.setSubtyp(element.getSubtyp());
       aktuellesKonto.setGruppe(element.getGruppe());
       aktuellesKonto.setSKR03(element.getSKR03());
-      aktuellesKonto.setFormula("SKR04",element.getFormula("SKR04"));
-      aktuellesKonto.setFormula("Exportgruppe",element.getFormula("Exportgruppe"));
+      aktuellesKonto.setFormula("SKR04", element.getFormula("SKR04"));
+      aktuellesKonto.setFormula("Exportgruppe", element.getFormula("Exportgruppe"));
       aktuellesKonto.setFormular(element.getFormular());
       aktuellesKonto.setZN(element.getZN());
     }
@@ -91,7 +91,7 @@ function OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear: BusinessMod
       aktuelleGutschrift.setDateiTyp(offeneGutschrift.getDateiTyp());
 
       //Korrekturbuchung
-      aktuelleGutschrift = BMnow.getOrCreateGutschrift(offeneGutschrift.getId()+"KO");
+      aktuelleGutschrift = BMnow.getOrCreateGutschrift(offeneGutschrift.getId() + "KO");
       aktuelleGutschrift.setFileId(offeneGutschrift.getFileId());
       aktuelleGutschrift.setLink(offeneGutschrift.getLink());
       aktuelleGutschrift.setStatus("offener Posten");
@@ -120,7 +120,7 @@ function OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear: BusinessMod
     aktuelleUmbuchung.setText("offener Posten aus Vorjahr");
 
     //Korrekturbuchung
-    aktuelleUmbuchung = BMnow.getOrCreateUmbuchung(offeneUmbuchung.getId()+"KO");
+    aktuelleUmbuchung = BMnow.getOrCreateUmbuchung(offeneUmbuchung.getId() + "KO");
     aktuelleUmbuchung.setFileId(offeneUmbuchung.getFileId());
     aktuelleUmbuchung.setLink(offeneUmbuchung.getLink());
     aktuelleUmbuchung.setDatum(offeneUmbuchung.getDatum());
@@ -135,7 +135,7 @@ function OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear: BusinessMod
 
 function AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
   BMlastYear.getBilanzkontenArray().forEach(bestandsKonto => {
-    if (!bestandsKonto.isDatenschluerferKonto()&& !bestandsKonto.isBankkonto() && bestandsKonto.getSumme()!=0) {
+    if (!bestandsKonto.isDatenschluerferKonto() && !bestandsKonto.isBankkonto() && bestandsKonto.getSumme() != 0) {
       var anfangsbestandsbuchung = BMnow.getOrCreateUmbuchung("UmEB" + bestandsKonto.getId().toString().replace(/ /g, "-"));
       anfangsbestandsbuchung.setDatum(BMlastYear.endOfYear());
       anfangsbestandsbuchung.setKonto("Geld Vorjahre");
@@ -231,11 +231,11 @@ function OffenePostenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMnow: B
     aktuelleUmbuchung.setLink(offeneUmbuchung.getLink());
     aktuelleUmbuchung.setDatum(offeneUmbuchung.getDatum());
     let konto = offeneUmbuchung.getKonto()
-    if (BMlastYear.getKontenTableCache().getOrCreateRowById(konto).getSubtyp()==="Bestand")konto="Fehler in "+offeneUmbuchung.getId();
+    if (BMlastYear.getKontenTableCache().getOrCreateRowById(konto).getSubtyp() === "Bestand") konto = "Fehler in " + offeneUmbuchung.getId();
     aktuelleUmbuchung.setKonto(konto);
     aktuelleUmbuchung.setBetrag(offeneUmbuchung.getBetrag());
-    let gegenkonto=offeneUmbuchung.getGegenkonto();
-    if (BMlastYear.getKontenTableCache().getOrCreateRowById(gegenkonto).getSubtyp()==="Bestand")gegenkonto="Fehler in "+offeneUmbuchung.getId();
+    let gegenkonto = offeneUmbuchung.getGegenkonto();
+    if (BMlastYear.getKontenTableCache().getOrCreateRowById(gegenkonto).getSubtyp() === "Bestand") gegenkonto = "Fehler in " + offeneUmbuchung.getId();
     aktuelleUmbuchung.setGegenkonto(offeneUmbuchung.getGegenkonto());
     //bezahlt am wird nicht überschrieben
     aktuelleUmbuchung.setText("offener Posten aus Vorjahr");
@@ -296,7 +296,7 @@ function AusgabeKopierenOhneBezahltAmZuUeberschreiben(vorjahrAusgabe: AusgabenRe
   aktuelleAnlage.setDateiTyp(vorjahrAusgabe.getDateiTyp());
 
   //Korrektur Offener Posten
-  aktuelleAnlage = BMnow.getOrCreateAusgabenRechnung(vorjahrAusgabe.getId()+"KO");
+  aktuelleAnlage = BMnow.getOrCreateAusgabenRechnung(vorjahrAusgabe.getId() + "KO");
   aktuelleAnlage.setFileId(vorjahrAusgabe.getFileId());
   aktuelleAnlage.setLink(vorjahrAusgabe.getLink());
   aktuelleAnlage.setDatum(vorjahrAusgabe.getDatum());
@@ -329,8 +329,8 @@ function BewirtungsbelegKopierenOhneBezahltAmZuUeberschreiben(vorjahrAusgabe: Be
   aktuellerBewirtungsbeleg.setText(text);
   aktuellerBewirtungsbeleg.setDateiTyp(vorjahrAusgabe.getDateiTyp());
 
-//Korrekturbuchung
-  aktuellerBewirtungsbeleg = BMnow.getOrCreateBewirtungsbeleg(vorjahrAusgabe.getId()+"KO");
+  //Korrekturbuchung
+  aktuellerBewirtungsbeleg = BMnow.getOrCreateBewirtungsbeleg(vorjahrAusgabe.getId() + "KO");
   aktuellerBewirtungsbeleg.setFileId(vorjahrAusgabe.getFileId());
   aktuellerBewirtungsbeleg.setLink(vorjahrAusgabe.getLink());
   aktuellerBewirtungsbeleg.setDatum(vorjahrAusgabe.getDatum());
@@ -382,8 +382,8 @@ function RechnungKopierenOhneBezahltAmzuUeberschreiben(vorjahrRechnung: Einnahme
   aktuelleRechnung.setDokumententyp(vorjahrRechnung.getDokumententyp());
   aktuelleRechnung.setZahlungsziel(vorjahrRechnung.getZahlungsziel());
 
-//Korrekturtbuchung
-  aktuelleRechnung = BMnow.getOrCreateEinnahmenRechnung(vorjahrRechnung.getId()+"KO");
+  //Korrekturtbuchung
+  aktuelleRechnung = BMnow.getOrCreateEinnahmenRechnung(vorjahrRechnung.getId() + "KO");
   aktuelleRechnung.setFileId(vorjahrRechnung.getFileId());
   aktuelleRechnung.setLink(vorjahrRechnung.getLink());
   aktuelleRechnung.setStatus("offener Posten");
@@ -451,8 +451,8 @@ function EURechnungKopierenOhneBezahltAmzuUeberschreiben(vorjahrRechnung: EURech
   aktuelleRechnung.setDokumententyp(vorjahrRechnung.getDokumententyp());
   aktuelleRechnung.setZahlungsziel(vorjahrRechnung.getZahlungsziel());
 
-//Korrekturtbuchung
-  aktuelleRechnung = BMnow.getOrCreateEURechnung(vorjahrRechnung.getId()+"KO");
+  //Korrekturtbuchung
+  aktuelleRechnung = BMnow.getOrCreateEURechnung(vorjahrRechnung.getId() + "KO");
   aktuelleRechnung.setFileId(vorjahrRechnung.getFileId());
   aktuelleRechnung.setLink(vorjahrRechnung.getLink());
   aktuelleRechnung.setStatus("offener Posten");
@@ -488,7 +488,7 @@ function EURechnungKopierenOhneBezahltAmzuUeberschreiben(vorjahrRechnung: EURech
 }
 
 function AnfangsbestandBankkontenAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
-  const bankkonten = BMlastYear.getKontenArray().filter(konto => konto.isBankkonto()&&!konto.isDatenschluerferKonto());
+  const bankkonten = BMlastYear.getKontenArray().filter(konto => konto.isBankkonto() && !konto.isDatenschluerferKonto());
   bankkonten.forEach(bankkonto => {
     const bestand = BMlastYear.getBankbestand(bankkonto.getKonto());
     const ebBuchung = BMnow.getOrCreateBankbuchung("EB" + bankkonto.getKonto() + BMnow.endOfYear().getFullYear().toString());

@@ -28,8 +28,7 @@ export function doGetUStVA(e: GoogleAppsScript.Events.DoGet) {
         return HtmlService.createHtmlOutput(`<b>UStVA Daten verschickt für ${months[zeitraum]} ${bm.endOfYear().getFullYear()}</b>`);
     }
     catch (e) {
-        bm.saveError(e)
-        throw e;
+        return bm.saveError(e)
     }
 
 }

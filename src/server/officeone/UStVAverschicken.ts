@@ -72,8 +72,7 @@ export function UStVAverschicken(rootFolderId: string, ustvaID: string) {
     return JSON.stringify(result);
   }
   catch (e) {
-    BM.saveError(e)
-    throw e;
+    return BM.saveError(e)
   }
 
 }

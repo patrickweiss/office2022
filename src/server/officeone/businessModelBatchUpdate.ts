@@ -15,7 +15,6 @@ export function businessModelBatchUpdate(rootFolderId: string, action: string) {
     return JSON.stringify(result);
   }
   catch (e) {
-    BM.saveError(e)
-    throw e;
+    return BM.saveError(e)
   }
 }
