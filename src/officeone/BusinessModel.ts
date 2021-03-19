@@ -1,5 +1,5 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
-import { currentOOversion, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
+import { belegNr, currentOOversion, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -322,8 +322,11 @@ export class BusinessModel {
     }
     public umsatzsteuerJahresabrechnung() {
         let fealligeUmsatzsteuer19 = 0;
-        let umsatzMit19 = 0
-        let umsatzMit0 = 0
+        let umsatzMit19 = 0;//9313
+        let umsatzMit16 = 0;//9312
+        let umsatzMit7 = 0;//9302
+        let umsatzMit5 = 0;//9320
+        let umsatzMit0 = 0;//9300
 
         const mwstSummieren = (rechnung: Rechnung) => {
             if (rechnung.getBetrag()===0)return; 
@@ -344,7 +347,7 @@ export class BusinessModel {
         this.getImGeschaeftsjahrBezahlteGutschriften().forEach(mwstSummieren);
 
         //Alle Buchungen für 19% Umsatzsteuer
-        let istUmsatzBuchung19 = this.getOrCreateUmbuchung("mwstIstUmsatz19");
+        let istUmsatzBuchung19 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz19);
         istUmsatzBuchung19.setDatum(this.endOfYear());
         istUmsatzBuchung19.setKonto("Umsatz9310");
         istUmsatzBuchung19.setBetrag(umsatzMit19);
@@ -352,7 +355,7 @@ export class BusinessModel {
         istUmsatzBuchung19.setBezahltAm(this.endOfYear());
         istUmsatzBuchung19.setText("bezahlter Umsatz im Geschaeftsjahr mit 19% Umsatzsteuer");
 
-        let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung("mwstUStRechnungUSt19");
+        let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt19);
         faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
         faelligeMehrwertsteuerUmsatzsteuer19.setKonto("USt. in Rechnung gestellt");
         faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(fealligeUmsatzsteuer19);
@@ -360,7 +363,7 @@ export class BusinessModel {
         faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
         faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
 
-        let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung("mwstUmsatzsteuer19AufVMwSt");
+        let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
         umsatzsteuer19VMwSt.setDatum(this.endOfYear());
         umsatzsteuer19VMwSt.setKonto("Umsatzsteuer19");
         umsatzsteuer19VMwSt.setBetrag(fealligeUmsatzsteuer19);
@@ -369,7 +372,7 @@ export class BusinessModel {
         umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1790");
 
         //Alle Buchungen für 0% Umsatzsteuer
-        let istUmsatzBuchung0 = this.getOrCreateUmbuchung("mwstIstUmsatz0");
+        let istUmsatzBuchung0 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz0);
         istUmsatzBuchung0.setDatum(this.endOfYear());
         istUmsatzBuchung0.setKonto("Umsatz9310");
         istUmsatzBuchung0.setBetrag(umsatzMit0);
@@ -383,7 +386,7 @@ export class BusinessModel {
         //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Bewirtungs Rechnungen
         this.getBewirtungsbelegeArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
 
-        let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung("mwstVorsteuerAufVMwSt");
+        let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
         faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
         faelligeMehrwertsteuerVorsteuer.setKonto("Vorsteuer");
         faelligeMehrwertsteuerVorsteuer.setBetrag(-vorsteuer);
@@ -405,7 +408,7 @@ export class BusinessModel {
                 ausgabe.getKonto() === "UStVA" &&
                 (ausgabe.getId() as string).substr(0, 4) !== "mwst") ustva += ausgabe.getBetrag();
         })
-        let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung("mwstUStVAAufVMwSt");
+        let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
         mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
         mwstUStVAaufVerbindlichkeiten.setKonto("UStVA");
         mwstUStVAaufVerbindlichkeiten.setBetrag(-ustva);
@@ -414,15 +417,13 @@ export class BusinessModel {
         mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1790");
 
         //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
-        let mwstFinanzamtOP = this.getOrCreateUmbuchung("mwstFinanzamtOP");
+        let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstFinanzamtOP);
         mwstFinanzamtOP.setDatum(this.endOfYear());
         mwstFinanzamtOP.setKonto("Umsatzsteuer Vorjahr");
         mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 - vorsteuer - ustva);
         mwstFinanzamtOP.setGegenkonto("Umsatzsteuer Vorjahr");
         //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
         mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
-
-
     }
     public getUStVAVorjahr(): AusgabenRechnung[] {
         return this.getAusgabenRechnungArray().filter(ausgabe => {

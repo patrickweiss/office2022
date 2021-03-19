@@ -2,7 +2,7 @@ import { string } from "prop-types";
 import { Konto } from "../../client/office-one-2021/bm/BusinessDataFacade";
 import { AbschreibungenTableCache, AusgabenTableCache, BankbuchungenTableCache, BewirtungsbelegeTableCache, CSVExport, CSVTableCache, EinnahmenRechnungTableCache, EURechnungTableCache, GutschriftenTableCache, KontenTableCache, UmbuchungenTableCache, VerpflegungsmehraufwendungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { ooTables, ServerFunction } from "../oo21lib/systemEnums";
+import { belegNr, ooTables, ServerFunction } from "../oo21lib/systemEnums";
 import { DriveConnector, oooVersion } from "./driveconnector";
 
 interface agent {
@@ -489,10 +489,10 @@ function negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a: ag
 
 function negativenBetragTranformierenAusCSVExport(csvRow: CSVExport) {
   if (csvRow.getValue("Exportgruppe") === "") csvRow.setValue("Exportgruppe", exportgruppe.laufendeBuchungen);
-  if (csvRow.getValue("BelegNr") === "mwstUStVAAufVMwSt" ||
-    csvRow.getValue("BelegNr") === "mwstVorsteuerAufVMwSt" ||
-    csvRow.getValue("BelegNr") === "mwstUmsatzsteuerAufVMwSt" ||
-    csvRow.getValue("BelegNr") === "mwstFinanzamtOP") csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
+  if (csvRow.getValue("BelegNr") === belegNr.mwstUStVAAufVMwSt ||
+    csvRow.getValue("BelegNr") === belegNr.mwstVorsteuerAufVMwSt ||
+    csvRow.getValue("BelegNr") === belegNr.mwstUmsatzsteuer19AufVMwSt ||
+    csvRow.getValue("BelegNr") === belegNr.mwstFinanzamtOP) csvRow.setValue("Exportgruppe", exportgruppe.mwstAbschluss);
   if (csvRow.getValue("Betrag") < 0) {
     var altSoll = csvRow.getValue("Konto (Soll)");
     var altHaben = csvRow.getValue("Konto (Haben)");
