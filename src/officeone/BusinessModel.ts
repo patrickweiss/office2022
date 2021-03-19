@@ -1,6 +1,6 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
 import { currentOOversion, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
-import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache } from "./BusinessDataFacade";
+import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
 export enum BelegTyp {
@@ -40,8 +40,8 @@ interface IBelegZuBankbuchungZuordnen extends IAction {
     datum: Date;
 }
 export class BusinessModel {
-    private logMessage:string;
-    private beginBM:Date;
+    private logMessage: string;
+    private beginBM: Date;
     private rootFolderId: string;
     private einnahmenRechnungTableCache: EinnahmenRechnungTableCache;
     private kundenTableCache: KundenTableCache;
@@ -62,20 +62,22 @@ export class BusinessModel {
     private configurationCache: ValuesCache;
 
     //Server specific code
-    constructor(rootfolderId: string,functionName:string) { 
-        this.rootFolderId = rootfolderId; 
-        this.logMessage=functionName;
-        this.beginBM=new Date();
+    constructor(rootfolderId: string, functionName: string) {
+        this.rootFolderId = rootfolderId;
+        this.logMessage = functionName;
+        this.beginBM = new Date();
     }
 
-    public addLogMessage(message:string){
-        this.logMessage+="\n"+message;    
+    public addLogMessage(message: string) {
+        this.logMessage += "\n" + message;
     }
-    public saveError(error:Error){
+    public saveError(error: Error) {
         this.addLogMessage(error.message)
         const errorMail = this.getConfigurationCache().getValueByName(office.fehlerEmail);
-        if (errorMail!=""){
-            GmailApp.sendEmail(errorMail,"Fehler bei "+this.logMessage.split("\n")[0],this.logMessage+"\n"+error.stack);
+        if (errorMail != "") {
+            try{
+            GmailApp.sendEmail(errorMail, "Fehler bei " + this.logMessage.split("\n")[0], this.logMessage + "\n" + error.stack);
+            }catch(e){this.addLogMessage("ungültige fehlerEmail, keine gültige Email Adresse")}
         }
         this.saveLog(error.stack);
 
@@ -83,18 +85,18 @@ export class BusinessModel {
             serverFunction: ServerFunction.unbehandelterFehler,
             error: this.logMessage,
         }
-        return  JSON.stringify(result);
+        return JSON.stringify(result);
     }
-    public saveLog(message:string){
+    public saveLog(message: string) {
         this.addLogMessage(message);
-        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId,ooTables.log,currentOOversion);
+        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, currentOOversion);
         let sheet = logSpreadsheet.getSheetByName("log")
-        if (!sheet){
-            sheet =logSpreadsheet.insertSheet()
+        if (!sheet) {
+            sheet = logSpreadsheet.insertSheet()
             sheet.setName("log")
         }
         let now = new Date();
-        sheet.appendRow([this.beginBM,now,now.valueOf()-this.beginBM.valueOf(),this.logMessage]);
+        sheet.appendRow([this.beginBM, now, now.valueOf() - this.beginBM.valueOf(), this.logMessage]);
     }
 
     public getRootFolderId() { return this.rootFolderId; }
@@ -155,7 +157,7 @@ export class BusinessModel {
             return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat) - 1);
         });
     }
-    public getImGeschaeftsjahrBezahlteEinnahmenRechnungen(): EinnahmenRechnung[] { return this.getEinnahmenRechnungArray().filter(rechnung => { return rechnung.isBezahlt() && (rechnung.getBezahltAm() as Date).getFullYear()===this.endOfYear().getFullYear() }) }
+    public getImGeschaeftsjahrBezahlteEinnahmenRechnungen(): EinnahmenRechnung[] { return this.getEinnahmenRechnungArray().filter(rechnung => { return rechnung.isBezahlt() && (rechnung.getBezahltAm() as Date).getFullYear() === this.endOfYear().getFullYear() }) }
     public getGutschriftenArray(): Gutschrift[] { return this.getGutschriftenTableCache().getRowArray() as Gutschrift[]; }
     public createGutschrift() { return this.getGutschriftenTableCache().createNewRow(); }
     public getOrCreateGutschrift(id: string) { return this.getGutschriftenTableCache().getOrCreateRowById(id); }
@@ -167,7 +169,7 @@ export class BusinessModel {
             return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat) - 1);
         });
     }
-    public getImGeschaeftsjahrBezahlteGutschriften(): Gutschrift[] { return this.getGutschriftenArray().filter(gutschrift => { return gutschrift.isBezahlt()&& (gutschrift.getBezahltAm() as Date).getFullYear()===this.endOfYear().getFullYear(); }) }
+    public getImGeschaeftsjahrBezahlteGutschriften(): Gutschrift[] { return this.getGutschriftenArray().filter(gutschrift => { return gutschrift.isBezahlt() && (gutschrift.getBezahltAm() as Date).getFullYear() === this.endOfYear().getFullYear(); }) }
     public getAusgabenRechnungArray(): AusgabenRechnung[] { return this.getAusgabenTableCache().getRowArray() as AusgabenRechnung[]; }
     public createAusgabenRechnung() { return this.getAusgabenTableCache().createNewRow(); }
     public getOrCreateAusgabenRechnung(id: string): AusgabenRechnung { return this.getAusgabenTableCache().getOrCreateRowById(id); }
@@ -319,43 +321,78 @@ export class BusinessModel {
         }
     }
     public umsatzsteuerJahresabrechnung() {
-        let fealligeUmsatzsteuer = 0;
-        this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(rechnung => { fealligeUmsatzsteuer += rechnung.getMehrwertsteuer() });
-        this.getImGeschaeftsjahrBezahlteGutschriften().forEach(rechnung => { fealligeUmsatzsteuer += rechnung.getMehrwertsteuer() });
+        let fealligeUmsatzsteuer19 = 0;
+        let umsatzMit19 = 0
+        let umsatzMit0 = 0
 
-        let faelligeMehrwertsteuerUmsatzsteuer = this.getOrCreateUmbuchung("mwstUStRechnungUmsatzsteuer");
-        faelligeMehrwertsteuerUmsatzsteuer.setDatum(this.endOfYear());
-        faelligeMehrwertsteuerUmsatzsteuer.setKonto("USt. in Rechnung gestellt");
-        faelligeMehrwertsteuerUmsatzsteuer.setBetrag(fealligeUmsatzsteuer);
-        faelligeMehrwertsteuerUmsatzsteuer.setGegenkonto("Umsatzsteuer");
-        faelligeMehrwertsteuerUmsatzsteuer.setBezahltAm(this.endOfYear());
-        faelligeMehrwertsteuerUmsatzsteuer.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer");
+        const mwstSummieren = (rechnung: Rechnung) => {
+            if (rechnung.getBetrag()===0)return; 
+            const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
+            if (almostEqual(mwstSatz, 1.19, 0.0001)) {
+                umsatzMit19+=rechnung.getNettoBetrag();
+                fealligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
+                return
+            }
+            if (almostEqual(mwstSatz, 1.0, 0.0001)) {
+                umsatzMit0+=rechnung.getNettoBetrag();
+                return
+            }
+            throw new Error(rechnung.getId()+" hat keinen eindeutigen Mehrwertsteuersatz, MwSt:"+(mwstSatz-1)*100+"%");
+        }
 
-        let umsatzsteuerVMwSt = this.getOrCreateUmbuchung("mwstUmsatzsteuerAufVMwSt");
-        umsatzsteuerVMwSt.setDatum(this.endOfYear());
-        umsatzsteuerVMwSt.setKonto("Umsatzsteuer");
-        umsatzsteuerVMwSt.setBetrag(fealligeUmsatzsteuer);
-        umsatzsteuerVMwSt.setGegenkonto("Umsatzsteuer Vorjahr");
-        umsatzsteuerVMwSt.setBezahltAm(this.endOfYear());
-        umsatzsteuerVMwSt.setText("Umsatzsteuer auf 1790");
+        this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(mwstSummieren);
+        this.getImGeschaeftsjahrBezahlteGutschriften().forEach(mwstSummieren);
 
+        //Alle Buchungen für 19% Umsatzsteuer
+        let istUmsatzBuchung19 = this.getOrCreateUmbuchung("mwstIstUmsatz19");
+        istUmsatzBuchung19.setDatum(this.endOfYear());
+        istUmsatzBuchung19.setKonto("Umsatz9310");
+        istUmsatzBuchung19.setBetrag(umsatzMit19);
+        istUmsatzBuchung19.setGegenkonto("Umsatz9313");
+        istUmsatzBuchung19.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung19.setText("bezahlter Umsatz im Geschaeftsjahr mit 19% Umsatzsteuer");
+
+        let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung("mwstUStRechnungUSt19");
+        faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer19.setKonto("USt. in Rechnung gestellt");
+        faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(fealligeUmsatzsteuer19);
+        faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto("Umsatzsteuer19");
+        faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
+
+        let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung("mwstUmsatzsteuer19AufVMwSt");
+        umsatzsteuer19VMwSt.setDatum(this.endOfYear());
+        umsatzsteuer19VMwSt.setKonto("Umsatzsteuer19");
+        umsatzsteuer19VMwSt.setBetrag(fealligeUmsatzsteuer19);
+        umsatzsteuer19VMwSt.setGegenkonto("Umsatzsteuer Vorjahr");
+        umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
+        umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1790");
+
+        //Alle Buchungen für 0% Umsatzsteuer
+        let istUmsatzBuchung0 = this.getOrCreateUmbuchung("mwstIstUmsatz0");
+        istUmsatzBuchung0.setDatum(this.endOfYear());
+        istUmsatzBuchung0.setKonto("Umsatz9310");
+        istUmsatzBuchung0.setBetrag(umsatzMit0);
+        istUmsatzBuchung0.setGegenkonto("Umsatz9300");
+        istUmsatzBuchung0.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
 
         let vorsteuer = 0;
         //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Ausgaben Rechnungen
         this.getAusgabenRechnungArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
         //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Bewirtungs Rechnungen
         this.getBewirtungsbelegeArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
-        
-          let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung("mwstVorsteuerAufVMwSt");
-          faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
-          faelligeMehrwertsteuerVorsteuer.setKonto("Vorsteuer");
-          faelligeMehrwertsteuerVorsteuer.setBetrag(-vorsteuer);
-          faelligeMehrwertsteuerVorsteuer.setGegenkonto("Umsatzsteuer Vorjahr");
-          faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
-          faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1790");
- 
+
+        let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung("mwstVorsteuerAufVMwSt");
+        faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerVorsteuer.setKonto("Vorsteuer");
+        faelligeMehrwertsteuerVorsteuer.setBetrag(-vorsteuer);
+        faelligeMehrwertsteuerVorsteuer.setGegenkonto("Umsatzsteuer Vorjahr");
+        faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1790");
+
         //UStVA auf Verbindlichkeiten Umsatzsteuer buchen
-        
+
         let ustva = 0;
         this.getAusgabenRechnungArray().forEach(ausgabe => {
             if (
@@ -366,7 +403,7 @@ export class BusinessModel {
             if (
                 ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
                 ausgabe.getKonto() === "UStVA" &&
-                (ausgabe.getId() as string).substr(0,4)!=="mwst") ustva += ausgabe.getBetrag();
+                (ausgabe.getId() as string).substr(0, 4) !== "mwst") ustva += ausgabe.getBetrag();
         })
         let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung("mwstUStVAAufVMwSt");
         mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
@@ -380,23 +417,12 @@ export class BusinessModel {
         let mwstFinanzamtOP = this.getOrCreateUmbuchung("mwstFinanzamtOP");
         mwstFinanzamtOP.setDatum(this.endOfYear());
         mwstFinanzamtOP.setKonto("Umsatzsteuer Vorjahr");
-        mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer-vorsteuer-ustva);
+        mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 - vorsteuer - ustva);
         mwstFinanzamtOP.setGegenkonto("Umsatzsteuer Vorjahr");
         //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
         mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
 
 
-        //SimbaIstUmsatz
-        /*
-        let simbaIstUmsatz = fealligeUmsatzsteuer / 19 * 100;
-        let simbaIstUmsatzBuchung = this.getOrCreateUmbuchung("simbaIstUmsatzBuchung");
-        simbaIstUmsatzBuchung.setDatum(this.endOfYear());
-        simbaIstUmsatzBuchung.setKonto("E9310");
-        simbaIstUmsatzBuchung.setBetrag(simbaIstUmsatz);
-        simbaIstUmsatzBuchung.setGegenkonto("E9313");
-        simbaIstUmsatzBuchung.setBezahltAm(this.endOfYear());
-        simbaIstUmsatzBuchung.setText("Bezahlter Umsatz im Geschaeftsjahr damit Simba Umsatzsteuerautomatik funktioniert");
-  */
     }
     public getUStVAVorjahr(): AusgabenRechnung[] {
         return this.getAusgabenRechnungArray().filter(ausgabe => {
@@ -510,5 +536,7 @@ export class BusinessModel {
 function padToFour(number: number) { return ("000" + number).slice(-4); }
 function moneyString(number: number) { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number); }
 
-
+function almostEqual(one: number, two: number, tolerance: number) {
+    return (Math.abs(one - two) < tolerance);
+}
 

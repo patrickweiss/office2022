@@ -12,11 +12,11 @@ export function BuchungenFuerUmsatzsteuerBerechnenUndEintragen(rootFolderId: str
         testName:createUmsatzsteuerArray( BM.getImGeschaeftsjahrBezahlteEinnahmenRechnungen()),
         gutsch:createUmsatzsteuerArray( BM.getImGeschaeftsjahrBezahlteGutschriften()),
       }
+      BM.saveLog("BuchungenFuerUmsatzsteuerBerechnenUndEintragen")
       return JSON.stringify(result);
     }
     catch (e) {
-      return BM.saveError(e)
-      
+      return BM.saveError(e)   
     } 
 }
 
