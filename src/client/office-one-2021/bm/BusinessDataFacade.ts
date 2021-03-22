@@ -1,3 +1,4 @@
+import { ooTables } from '../../../server/oo21lib/systemEnums';
 import { IOfficeWindow } from '../framework/OfficeWindow';
 
 declare let window: IOfficeWindow;
@@ -73,10 +74,10 @@ class TableCache<RowType extends TableRow> {
     }
     return this.rowArray;
   }
-  public getRowByIndex(rowIndex: string):RowType {
-    return new TableRow(this, rowIndex) as RowType;
+  public getRowByIndex(rowIndex: string): RowType {
+    return new TableRow(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex) as RowType;
   }
-
+ 
   public createNewRow():RowType {
     let newDataArray = Array.apply(null, Array(this.dataArray[0].length)).map(String.prototype.valueOf, "")
     let newFormulaArray = new Array(this.formulaArray[0].length);
@@ -139,20 +140,31 @@ class TableCache<RowType extends TableRow> {
 function padToFive(number: number) { return ("0000" + number).slice(-5); }
 //Abstrakte Basisklasse fuer Tabellenzeilen
 export class TableRow {
-  private tableCache: TableCache<TableRow>;
-  private index: string;
-  constructor(tableCache: TableCache<TableRow>, tableCacheIndex: string) {
-    if (tableCacheIndex == "0") throw new Error("TableRow with index 0 contains column names, no data");
-    this.tableCache = tableCache;
-    this.index = tableCacheIndex;
+  //private tableCache: TableCache<TableRow>;
+  //private index: string;
+  private titleRow: Array<string>
+  private valueRow: Array<string | number | Date | boolean>
+  private formatRow: Array<string>
+  private formulaRow: Array<string>
+  private backgroundRow: Array<string>
+  private columnIndex: {};
+
+
+  constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formatRow: Array<string>, backgroundRow: Array<string>,columnIndex:{}) {
+    this.titleRow = titleRow
+    this.valueRow = valueRow
+    this.formatRow = formatRow
+    this.formulaRow = formatRow
+    this.backgroundRow = backgroundRow
+    this.columnIndex=columnIndex
   }
   public getId() { return this.getDataArray()[0].toString(); }
   public setId(value: string) { this.getDataArray()[0] = value; }
-  public getTitlesArray() { return this.tableCache.dataArray[0]; }
-  public getDataArray() { return this.tableCache.dataArray[this.index]; }
-  public getTitle(columnName: string) { return this.tableCache.dataArray[0][this.tableCache.columnIndex[columnName]].toString(); }
+  public getTitlesArray() { return this.titleRow }
+  public getDataArray() { return this.valueRow; }
+  public getTitle(columnName: string) { return this.titleRow[this.columnIndex[columnName]].toString(); }
   public getValueStringOrNumber(columnName: string) {
-    const value = this.tableCache.dataArray[this.index][this.tableCache.columnIndex[columnName]];
+    const value = this.getDataArray()[this.columnIndex[columnName]];
     if (typeof value === "string") {
       let a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
       if (a) {
@@ -162,25 +174,25 @@ export class TableRow {
     if (value instanceof Date) {
       return this.getDateString(value);
     }
-    return value.toFixed(2).replace(".", ",");
+    return (value as number).toFixed(2).replace(".", ",");
   }
-  public setValue(columnName: string, value: string | number | Date | Object) {
-    this.tableCache.dataArray[this.index][this.tableCache.columnIndex[columnName]] = value;
+  public setValue(columnName: string, value: string | number | Date | boolean) {
+    this.valueRow[this.columnIndex[columnName]] = value;
   }
   public getValue(columnName: string) {
-    return this.tableCache.dataArray[this.index][this.tableCache.columnIndex[columnName]];
+    return this.valueRow[this.columnIndex[columnName]];
   }
   public getFormat(columnName: string) {
-    return this.tableCache.formatsArray[this.index][this.tableCache.columnIndex[columnName]];
+    return this.formatRow[this.columnIndex[columnName]];
   }
   public setFormula(columnName: string, value: string) {
-    this.tableCache.formulaArray[this.index][this.tableCache.columnIndex[columnName]] = value;
+    this.formulaRow[this.columnIndex[columnName]] = value;
   }
   public getFormula(columnName: string) {
-    return this.tableCache.formulaArray[this.index][this.tableCache.columnIndex[columnName]];
+    return this.formulaRow[this.columnIndex[columnName]];
   }
   public setBackground(columnName: string, value: string) {
-    this.tableCache.backgroundArray[this.index][this.tableCache.columnIndex[columnName]] = value;
+    this.backgroundRow[this.columnIndex[columnName]] = value;
   }
   protected getDateString(date: Date) {
     var mm = date.getMonth() + 1; // getMonth() is zero-based
@@ -191,117 +203,78 @@ export class TableRow {
     (dd > 9 ? '' : '0') + dd
     ].join('')
   }
-  protected parseDateFromCSVString(date: string) {
-    var datum = date.split(".");
-    return new Date(parseInt(datum[2], 10), parseInt(datum[1], 10) - 1, parseInt(datum[0], 10));
-  }
-  protected parseNumberFromCommaString(numberString: string) {
-    return (parseFloat(numberString.replace(",", ".")))
-  }
 
 }
 //Caches der Tabellen Daten
 export class EMailIdTableCache extends TableCache<EMailId> {
-  constructor(rootId: string) { super(rootId, "EMailIdD"); }
-  public getRowByIndex(rowIndex: string): EMailId { return new EMailId(this, rowIndex); }
-
+  constructor(rootId: string) { super(rootId, ooTables.EMailIdD); }
 }
 export class AusgabenTableCache extends TableCache<AusgabenRechnung> {
-  constructor(rootId: string) { super(rootId, "AusgabenD"); }
-  public getRowByIndex(rowIndex: string): AusgabenRechnung { return new AusgabenRechnung(this, rowIndex); }
-
+  constructor(rootId: string) { super(rootId, ooTables.AusgabenD); }
 }
 export class VertraegeTableCache extends TableCache<Vertrag> {
   constructor(rootId: string) {
-    super(rootId, "VerträgeD");
+    super(rootId, ooTables.VerträgeD);
   }
-  public getRowByIndex(rowIndex: string): Vertrag { return new Vertrag(this, rowIndex); }
-
 }
 export class BewirtungsbelegeTableCache extends TableCache<Bewirtungsbeleg> {
-  constructor(rootId: string) {
-    super(rootId, "BewirtungsbelegeD");
-  }
-  public getRowByIndex(rowIndex: string): Bewirtungsbeleg { return new Bewirtungsbeleg(this, rowIndex); }
-
+  constructor(rootId: string) { super(rootId, ooTables.BewirtungsbelegeD); }
 }
 export class AbschreibungenTableCache extends TableCache<Abschreibung> {
   constructor(rootId: string) {
-    super(rootId, "AbschreibungenD");
+    super(rootId, ooTables.AbschreibungenD);
   }
-  public getRowByIndex(rowIndex: string): Abschreibung { return new Abschreibung(this, rowIndex); }
-
 }
 export class VerpflegungsmehraufwendungenTableCache extends TableCache<Verpflegungsmehraufwendung> {
   constructor(rootId: string) {
-    super(rootId, "VerpflegungsmehraufwendungenD");
+    super(rootId, ooTables.VerpflegungsmehraufwendungenD);
   }
-  public getRowByIndex(rowIndex: string): Verpflegungsmehraufwendung { return new Verpflegungsmehraufwendung(this, rowIndex); }
-
 }
 export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
   constructor(rootId: string) {
-    super(rootId, "RechnungenD");
+    super(rootId, ooTables.RechnungenD);
   }
-  public getRowByIndex(rowIndex: string): EinnahmenRechnung { return new EinnahmenRechnung(this, rowIndex); }
-
 }
 export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
   constructor(rootId: string) {
-    super(rootId, "RechnungSchreibenD");
+    super(rootId, ooTables.RechnungSchreibenD);
   }
-  public getRowByIndex(rowIndex: string): RechnungSchreiben { return new RechnungSchreiben(this, rowIndex); }
 }
 export class KundenTableCache extends TableCache<Kunde> {
-  constructor(rootId: string) { super(rootId, "KundenD"); }
-  public getRowByIndex(rowIndex: string): Kunde { return new Kunde(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.KundenD); }
 }
 export class ProdukteTableCache extends TableCache<Produkt>{
-  constructor(rootId: string) { super(rootId, "ProdukteD"); }
-  public getRowByIndex(rowIndex: string): Produkt { return new Produkt(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.ProdukteD); }
 }
 export class EURechnungTableCache extends TableCache<EURechnung> {
   constructor(rootId: string) {
-    super(rootId, "EURechnungenD");
+    super(rootId, ooTables.EURechnungenD);
   }
-  public getRowByIndex(rowIndex: string): EURechnung { return new EURechnung(this, rowIndex); }
-
 }
 export class GutschriftenTableCache extends TableCache<Gutschrift> {
   constructor(rootId: string) {
-    super(rootId, "GutschriftenD");
+    super(rootId, ooTables.GutschriftenD);
   }
-  public getRowByIndex(rowIndex: string): Gutschrift { return new Gutschrift(this, rowIndex); }
 }
 export class PositionenarchivTableCache extends TableCache<PositionenArchiv>{
   constructor(rootId: string) {
-    super(rootId, "PositionenarchivD");
+    super(rootId, ooTables.PositionenarchivD);
   }
-  public getRowByIndex(rowIndex: string): PositionenArchiv { return new PositionenArchiv(this, rowIndex); }
-
 }
 export class BankbuchungenTableCache extends TableCache<Bankbuchung> {
   constructor(rootId: string) {
-    super(rootId, "BankbuchungenD");
+    super(rootId, ooTables.BankbuchungenD);
   }
-  public getRowByIndex(rowIndex: string): Bankbuchung { return new Bankbuchung(this, rowIndex); }
-
 }
 export class UmbuchungenTableCache extends TableCache<Umbuchung> {
   constructor(rootId: string) {
-    super(rootId, "UmbuchungenD");
+    super(rootId, ooTables.UmbuchungenD);
   }
-  public getRowByIndex(rowIndex: string): Umbuchung { return new Umbuchung(this, rowIndex); }
-
 }
 export class KontenTableCache extends TableCache<Konto> {
-
   private kontenSpalten: Object;
   constructor(rootId: string) {
-    super(rootId, "KontenD");
-  }
-  public getRowByIndex(rowIndex: string): Konto {
-    return new Konto(this, rowIndex) as Konto;
+    super(rootId, ooTables.KontenD);
   }
   public getOrCreateRowById(kontoName: string): Konto {
     return super.getOrCreateRowById(kontoName) as Konto;
@@ -347,7 +320,7 @@ export class KontenTableCache extends TableCache<Konto> {
 
     //Kontenspalte befüllen
     for (let buchungRow of normalisierteBuchungen) {
-      let kontoRow = this.getOrCreateRowById(buchungRow.getKonto());
+      let kontoRow = this.getOrCreateRowById(buchungRow.getKonto().toString());
       if (kontoRow.getQuelle() === "") kontoRow.setQuelle(buchungRow.getQuelltabelle());
       if (kontoRow.getBeispiel() === "") kontoRow.setBeispiel(buchungRow.getLink());
       //Kontenspalte befüllen
@@ -386,8 +359,8 @@ export class KontenTableCache extends TableCache<Konto> {
     for (let zeile of this.getRowArray()) {
       let kontoRow = zeile;
       let aktuellerBetrag = kontoRow.getValue("Summe");
-      if (aktuellerBetrag >= groessterBetrag[kontoRow.getValue("Kontentyp")]) groessterBetrag[kontoRow.getValue("Kontentyp")] = aktuellerBetrag;
-      if (aktuellerBetrag <= kleinsterBetrag[kontoRow.getValue("Kontentyp")]) kleinsterBetrag[kontoRow.getValue("Kontentyp")] = aktuellerBetrag;
+      if (aktuellerBetrag >= groessterBetrag[kontoRow.getKontentyp()]) groessterBetrag[kontoRow.getKontentyp()] = aktuellerBetrag;
+      if (aktuellerBetrag <= kleinsterBetrag[kontoRow.getKontentyp()]) kleinsterBetrag[kontoRow.getKontentyp()] = aktuellerBetrag;
     }
 
 
@@ -397,13 +370,13 @@ export class KontenTableCache extends TableCache<Konto> {
       var kontoRow = zeile;
       var aktuellerBetrag = kontoRow.getValue("Summe");
       if (kontoRow.getValue("Kontentyp") === "GuV") {
-        kontoRow.setBackground("Summe", this.createGuVColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
-        kontoRow.setBackground("Konto", this.createGuVColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
+        kontoRow.setBackground("Summe", this.createGuVColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
+        kontoRow.setBackground("Konto", this.createGuVColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
 
       }
       if (kontoRow.getValue("Kontentyp") === "Bilanz") {
-        kontoRow.setBackground("Summe", this.createBilanzColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
-        kontoRow.setBackground("Konto", this.createBilanzColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
+        kontoRow.setBackground("Summe", this.createBilanzColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
+        kontoRow.setBackground("Konto", this.createBilanzColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
 
       }
 
@@ -416,10 +389,10 @@ export class KontenTableCache extends TableCache<Konto> {
         if (parseInt(spalte, 10) >= 12) {
           let spaltenName = this.getData()[0][0][spalte] as string;
           let aktuellerBetrag = kontoRow.getValue(spaltenName);
-          if (kontoRow.getValue("Kontentyp") === "GuV")
-            kontoRow.setBackground(spaltenName, this.createGuVColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
-          if (kontoRow.getValue("Kontentyp") === "Bilanz")
-            kontoRow.setBackground(spaltenName, this.createBilanzColor(kleinsterBetrag[kontoRow.getValue("Kontentyp")], groessterBetrag[kontoRow.getValue("Kontentyp")], aktuellerBetrag));
+          if (kontoRow.getKontentyp() === "GuV")
+            kontoRow.setBackground(spaltenName, this.createGuVColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
+          if (kontoRow.getKontentyp() === "Bilanz")
+            kontoRow.setBackground(spaltenName, this.createBilanzColor(kleinsterBetrag[kontoRow.getKontentyp()], groessterBetrag[kontoRow.getKontentyp()], aktuellerBetrag));
         }
       }
     }
@@ -483,59 +456,57 @@ function toHex(n) {
 }
 export class UStVATableCache extends TableCache<UStVA> {
   constructor(rootId: string) {
-    super(rootId, "UStVAD");
+    super(rootId, ooTables.UStVAD);
   }
-  public getRowByIndex(rowIndex: string): UStVA { return new UStVA(this, rowIndex); }
   public UStVASummenAktualisieren(normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date, periode: string) {
-    this.deleteAll();
     //ZN spalte befüllen
 
     // alle Eintrage mit Status "aktuelle Daten" neu generieren
     //Stati: "aktuelle Daten", "verschickt","bestätigt", "berichtigt"  
 
-    let periodeUndStatusMonatlich = {
-      "1": "01 Januar",
-      "2": "02 Februar",
-      "3": "03 März",
-      "4": "04 April",
-      "5": "05 Mai",
-      "6": "06 Juni",
-      "7": "07 Juli",
-      "8": "08 August",
-      "9": "09 September",
-      "10": "10 Oktober",
-      "11": "11 November",
-      "12": "12 Dezember"
+    let belegNrMonatlich = {
+      "1": "01aktuell",
+      "2": "02aktuell",
+      "3": "03aktuell",
+      "4": "04aktuell",
+      "5": "05aktuell",
+      "6": "06aktuell",
+      "7": "07aktuell",
+      "8": "08aktuell",
+      "9": "09aktuell",
+      "10": "10aktuell",
+      "11": "11aktuell",
+      "12": "12aktuell"
     }
-    let periodeUndStatusProQuartal = {
-      "1": "1. Quartal",
-      "2": "1. Quartal",
-      "3": "1. Quartal",
-      "4": "2. Quartal",
-      "5": "2. Quartal",
-      "6": "2. Quartal",
-      "7": "3. Quartal",
-      "8": "3. Quartal",
-      "9": "3. Quartal",
-      "10": "4. Quartal",
-      "11": "4. Quartal",
-      "12": "4. Quartal"
+    let belegNrMonatlichProQuartal = {
+      "1": "41aktuell",
+      "2": "41aktuell",
+      "3": "41aktuell",
+      "4": "42aktuell",
+      "5": "42aktuell",
+      "6": "42aktuell",
+      "7": "43aktuell",
+      "8": "43aktuell",
+      "9": "43aktuell",
+      "10": "44aktuell",
+      "11": "44aktuell",
+      "12": "44aktuell"
     }
 
     //let periodenHash = periodeUndStatusProQuartal;
-    if (periode === "monatlich") this.aktualisieren(periodeUndStatusMonatlich, normalisierteBuchungen, beginnOfYear);
-    else this.aktualisieren(periodeUndStatusProQuartal, normalisierteBuchungen, beginnOfYear);
+    if (periode === "monatlich") this.aktualisieren(belegNrMonatlich, normalisierteBuchungen, beginnOfYear);
+    else this.aktualisieren(belegNrMonatlichProQuartal, normalisierteBuchungen, beginnOfYear);
   }
   private aktualisieren(periodenHash: Object, normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date) {
-    let summenHash = this.getOrCreateHashTable("Periode und Status");
+    let summenHash = this.getRowHashTable();
     //alle Perioden initialisieren------------------------------------------------------------------------------------------------------
     for (var index in periodenHash) {
       let periode = periodenHash[index];
       let ustvaRow = summenHash[periode] as UStVA;
       if (ustvaRow == undefined) {
-        ustvaRow = this.createNewRow();
-        ustvaRow.setValue("Periode und Status", periode);
-        summenHash = this.getOrCreateHashTable("Periode und Status");
+        ustvaRow = this.getOrCreateRowById(periode);
+        ustvaRow.setValue("Periode und Status", "aktuell");
+        summenHash = this.getRowHashTable();
         ustvaRow.setDatum(
           new Date(beginnOfYear.getFullYear(), parseInt(index) - 1)
         );
@@ -551,40 +522,40 @@ export class UStVATableCache extends TableCache<UStVA> {
 
     //Summen für Formularfelder aus Buchungen berechnen---------------------------------------------------------------------------------
     for (let buchungRow of normalisierteBuchungen) {
-      if ((buchungRow.getFileId() as string).substr(0,4) !== "mwst") {
-       // console.log(buchungRow.getId())
+      if ((buchungRow.getFileId() as string).substr(0, 4) !== "mwst") {
+        // console.log(buchungRow.getId())
         switch (buchungRow.getValue("Gegenkonto")) {
           case "USt. in Rechnung gestellt":
             var monat = buchungRow.getValue("Monat bezahlt").toString();
             if (monat == "") break;//wenn nicht bezahlt wurde, muss bei Ist-Versteuerung keine Mehrwertsteuer bezahlt werden
             var periode = periodenHash[monat];
             if (periode == undefined) break;
-            var ustvaRow = summenHash[periode] as UStVA;
-            console.log(buchungRow.getDatum().getFullYear()+" "+parseInt(buchungRow.getValue("Monat").toString(),10));
-            if (buchungRow.getDatum().getFullYear() === 2020 && parseInt(buchungRow.getValue("Monat").toString(),10) >= 7) {
+            let ustvaRow = summenHash[periode] as UStVA;
+            console.log(buchungRow.getDatum().getFullYear() + " " + parseInt(buchungRow.getValue("Monat").toString(), 10));
+            if (buchungRow.getDatum().getFullYear() === 2020 && parseInt(buchungRow.getValue("Monat").toString(), 10) >= 7) {
               //CoronaMwST: 16% in 35 und 36
-              console.log(ustvaRow.getPeriodeundStatus()+" Corona Einnahme 16%"+buchungRow.getId()+" "+buchungRow.getBetrag())
+              console.log(ustvaRow.getPeriodeundStatus() + " Corona Einnahme 16%" + buchungRow.getId() + " " + buchungRow.getBetrag())
               let aktuellerBetrag: number = Number(buchungRow.getValue("Betrag")) / 0.16;
               let aktuelleMwSt: number = Number(buchungRow.getValue("Betrag"));
               ustvaRow.set36(ustvaRow.get36() + aktuelleMwSt);
-              let aktuelleSumme: number = ustvaRow.getValue("35");
-              ustvaRow.setValue("35", aktuellerBetrag + aktuelleSumme);
+              let aktuelleSumme: number = ustvaRow.get35();
+              ustvaRow.set35(aktuellerBetrag + aktuelleSumme);
             }
             else {
               //normale MwSt: 19% in 81
-              console.log(ustvaRow.getPeriodeundStatus()+" Einnahme 19%"+buchungRow.getId()+" "+buchungRow.getBetrag())
+              console.log(ustvaRow.getPeriodeundStatus() + " Einnahme 19%" + buchungRow.getId() + " " + buchungRow.getBetrag())
               var aktuellerBetrag = Number(buchungRow.getValue("Betrag")) / 0.19;
-              var aktuelleSumme = ustvaRow.getValue("81");
-              ustvaRow.setValue("81", aktuellerBetrag + aktuelleSumme);
+              var aktuelleSumme = ustvaRow.get81();
+              ustvaRow.set81(aktuellerBetrag + aktuelleSumme);
             }
             break;
           case "Vorsteuer":
             var monat = buchungRow.getValue("Monat").toString();
             var periode = periodenHash[monat];
             if (periode == undefined) break;
-            var ustvaRow = summenHash[periode];
+            ustvaRow = summenHash[periode] as UStVA;
             var aktuellerBetrag = -Number(buchungRow.getValue("Betrag"));
-            var aktuelleSumme = ustvaRow.getValue("66");
+            var aktuelleSumme = ustvaRow.get66();
             ustvaRow.setValue("66", aktuellerBetrag + aktuelleSumme);
             break;
           default:
@@ -595,19 +566,18 @@ export class UStVATableCache extends TableCache<UStVA> {
     //Feld 81 runden Feld 83 berechnen
     for (var index in periodenHash) {
       var periode = periodenHash[index];
-      ustvaRow = summenHash[periode] as UStVA;
-      ustvaRow.setValue("81", Math.floor(ustvaRow.getValue("81")));
-      ustvaRow.setValue("83", ustvaRow.getValue("81") * 0.19 + ustvaRow.get36() - ustvaRow.getValue("66"));
+      let ustvaRow = summenHash[periode] as UStVA;
+      ustvaRow.setValue("81", Math.floor(ustvaRow.get81()));
+      ustvaRow.setValue("83", ustvaRow.get81() * 0.19 + ustvaRow.get36() - ustvaRow.get66());
     }
   }
 }
 export class EURTableCache extends TableCache<EUR> {
   private kontenSpalten: Object;
   constructor(rootId: string) {
-    super(rootId, "EÜRD");
+    super(rootId, ooTables.EÜRD);
   }
-  public getRowByIndex(rowIndex: string): EUR { return new EUR(this, rowIndex); }
-
+ 
   public setKontenSpalten(geschaeftsjahr: number) {
     this.kontenSpalten = {
       "1": "Januar",
@@ -657,20 +627,19 @@ export class EURTableCache extends TableCache<EUR> {
 }
 export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBuchung> {
   constructor(rootId: string) {
-    super(rootId, "BuchungenD");
+    super(rootId, ooTables.BuchungenD);
   }
-  public getRowByIndex(rowIndex: string): NormalisierteBuchung { return new NormalisierteBuchung(this, rowIndex); }
   public kontenStammdatenAktualisieren(kontenTableCache: KontenTableCache) {
     const buchungen = this.getRowArray() as NormalisierteBuchung[];
     buchungen.forEach(buchung => {
       let kontoString: string = buchung.getKonto().toString();
-//      console.log("BDM.kontenStammdatenAktualisieren " + kontoString + " " + kontoString.substring(1));
-//      console.log(kontoString.substr(0, 1))
-//      console.log(/^\d+$/.test(kontoString.substr(1)));
-//      kontoString.substr(0, 1)
+      //      console.log("BDM.kontenStammdatenAktualisieren " + kontoString + " " + kontoString.substring(1));
+      //      console.log(kontoString.substr(0, 1))
+      //      console.log(/^\d+$/.test(kontoString.substr(1)));
+      //      kontoString.substr(0, 1)
       let konto: Konto = kontenTableCache.getRowHashTable()[kontoString] as Konto;
       if (!konto) {
-        if (buchung.getKonto()==="")console.log(buchung.getFileId()+buchung.getText()+buchung.getQuelltabelle()+buchung.getLink());
+        if (buchung.getKonto() === "") console.log(buchung.getFileId() + buchung.getText() + buchung.getQuelltabelle() + buchung.getLink());
         konto = kontenTableCache.getOrCreateRowById(buchung.getKonto());
         if (konto.isDatenschluerferKonto()) {
           let skrKonto: Konto = kontenTableCache.getOrCreateHashTable("SKR03")[kontoString.substring(1)] as Konto;
@@ -679,8 +648,8 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
             konto.setSubtyp("Z" + skrKonto.getSubtyp());
             konto.setGruppe(skrKonto.getGruppe());
             konto.setSKR03(skrKonto.getSKR03());
-            konto.setFormula("SKR04",`=VLOOKUP(INDIRECT("R[0]C[-1]";false);'SKR04'!$A$1:$C$1443;2)`);
-            konto.setFormula("Exportgruppe",`=VLOOKUP(INDIRECT("R[0]C[-2]";false);'SKR04'!$A$1:$C$1443;3)`);
+            konto.setFormula("SKR04", `=VLOOKUP(INDIRECT("R[0]C[-1]";false);'SKR04'!$A$1:$C$1443;2)`);
+            konto.setFormula("Exportgruppe", `=VLOOKUP(INDIRECT("R[0]C[-2]";false);'SKR04'!$A$1:$C$1443;3)`);
             konto.setFormula("ZN", `=DSUM($E$7:$L$1000;"Summe";{"SKR03";INDIRECT("R[0]C[-6]";false)})-2*INDIRECT("R[0]C[1]";false)`);
           } else {
             konto.setKontentyp("unbekannt");
@@ -699,43 +668,35 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
   }
 }
 export class ElsterTransferTableCache extends TableCache<ElsterTransfer> {
-  constructor(rootId: string) { super(rootId, "ElsterTransferD"); }
-  public getRowByIndex(rowIndex: string): ElsterTransfer { return new ElsterTransfer(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.ElsterTransferD); }
 }
 export class LastschriftmandatTableCache extends TableCache<Lastschriftmandat>{
-  constructor(rootId: string) { super(rootId, "LastschriftmandatD"); }
-  public getRowByIndex(rowIndex: string): Lastschriftmandat { return new Lastschriftmandat(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftmandatD); }
 }
 export class LastschriftenTableCache extends TableCache<Lastschrift>{
-  constructor(rootId: string) { super(rootId, "LastschriftenD"); }
-  public getRowByIndex(rowIndex: string): Lastschrift { return new Lastschrift(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftenD); }
 }
 export class LastschriftproduktTableCache extends TableCache<Lastschriftprodukt>{
-  constructor(rootId: string) { super(rootId, "LastschriftproduktD"); }
-  public getRowByIndex(rowIndex: string): Lastschriftprodukt { return new Lastschriftprodukt(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.LastschriftproduktD); }
 }
 export class InstallationenTableCache extends TableCache<Installation>{
-  constructor(rootId: string) { super(rootId, "InstallationenD"); }
-  public getRowByIndex(rowIndex: string): Installation { return new Installation(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.InstallationenD); }
 }
 export class CSVTableCache extends TableCache<CSVExport>{
-  constructor(rootId: string) { super(rootId, "CSVExportD"); }
-  public getRowByIndex(rowIndex: string): CSVExport { return new CSVExport(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.CSVExportD); }
 }
 export class GdpduTableCache extends TableCache<Gdpdu>{
-  constructor(rootId: string) { super(rootId, "GdpduD"); }
-  public getRowByIndex(rowIndex: string): Gdpdu { return new Gdpdu(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.GdpduD); }
 }
 export class DataFileTableCache extends TableCache<DataFile>{
-  constructor(rootId: string) { super(rootId, "DataFileD"); }
-  public getRowByIndex(rowIndex: string): DataFile { return new DataFile(this, rowIndex); }
+  constructor(rootId: string) { super(rootId, ooTables.DataFileD); }
 }
 
 //EMAil
 export class EMailId extends TableRow {
   public getZeitstempel() { return this.getValue("Zeitstempel"); }
   public setZeitstempel(value) { this.setValue("Zeitstempel", value); }
-  public getEMail() { return this.getValue("E-Mail"); }
+  public getEMail() { return this.getValue("E-Mail").toString(); }
   public setEMail(value) { this.setValue("E-Mail", value); }
   public getAuswahl() { return this.getValue("Auswahl"); }
   public setAuswahl(value) { this.setValue("Auswahl", value); }
@@ -764,17 +725,17 @@ export class EMailId extends TableRow {
 }
 //Abstrakte Fassaden für Buchungssätze ---------------------------------------------------------------------------------
 export class FinanzAction extends TableRow {
-  public getBetrag(): number { return this.getValue("Betrag"); }
+  public getBetrag(): number { return this.getValue("Betrag")as number; }
   public setBetrag(value: number) { this.setValue("Betrag", value); }
-  public getDatum() { return new Date(this.getValue("Datum")); }
+  public getDatum() { return this.getValue("Datum")as Date; }
   public setDatum(value: any) { this.setValue("Datum", value); }
-  public getKonto(): string { return this.getValue("Konto") }
+  public getKonto(): string { return this.getValue("Konto").toString() }
   public setKonto(value: string) { this.setValue("Konto", value); }
-  public getText() { return this.getValue("Text"); }
+  public getText() { return this.getValue("Text").toString(); }
   public setText(text: string) { this.setValue("Text", text); }
 }
 export class Buchung extends FinanzAction {
-  public getGegenkonto() { return this.getValue("Gegenkonto"); }
+  public getGegenkonto() { return this.getValue("Gegenkonto").toString(); }
   public setGegenkonto(konto: string) { this.setValue("Gegenkonto", konto); }
   public getLink(): string { return this.getFormula("Link"); }
   public setLink(link: string) { this.setFormula("Link", link); }
@@ -786,16 +747,16 @@ export class Buchung extends FinanzAction {
 export class Umbuchung extends Buchung {
   public getNettoBetragMitVorzeichen() { return this.getBetragMitVorzeichen() };
   public getBetragMitVorzeichen() { return -this.getBetrag() };
-  public getFileId() { return this.getValue("ID"); }
+  public getFileId() { return this.getValue("ID").toString(); }
   public setFileId(value: string) { this.setValue("ID", value); }
-  public getBezahltAm() { return this.getValue("bezahlt am"); }
+  public getBezahltAm() { return this.getValue("bezahlt am") as Date; }
   public setBezahltAm(datum: Date) { this.setValue("bezahlt am", datum); }
-  public nichtBezahlt(): boolean { return this.getBezahltAm() === ""; }
+  public nichtBezahlt(): boolean { return this.getValue("bezahlt am")  === ""; }
   public isBezahlt(): boolean { return !this.nichtBezahlt(); }
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date, quellTabelle: string) {
     this.monat = belegMonat(geschaeftsjahr, this.getDatum());
     if (this.monat === null) this.monat = Number.NaN;
-    if (this.getBezahltAm() !== "offen") this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getBezahltAm());
+    if (this.isBezahlt()) this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getBezahltAm());
 
     //Buchung auf Konto
     let normBuchung = tableCache.createNewRow();
@@ -817,26 +778,22 @@ export class Umbuchung extends Buchung {
     normBuchung.setLink(this.getLink());
     normBuchung.setDatum(this.getDatum());
     normBuchung.setbezahltam(this.getBezahltAm());
-    normBuchung.setText(this.getText());
+    normBuchung.setText(this.getText().toString());
     normBuchung.setMonat(this.monat);
     normBuchung.setMonatbezahlt(this.monatBezahlt);
     normBuchung.setQuelltabelle(quellTabelle);
   }
 }
 export class Rechnung extends Umbuchung {
-  public getBezahltAm() { return this.getValue("bezahlt am"); }
-  public setBezahltAm(datum: Date) { this.setValue("bezahlt am", datum); }
-  public nichtBezahlt(): boolean { return this.getBezahltAm() === ""; }
-  public isBezahlt(): boolean { return !this.nichtBezahlt(); }
-  public getBetrag() { return this.getValue("brutto Betrag"); }
+  public getBetrag() { return this.getValue("brutto Betrag")as number; }
   public setBetrag(value: any) { this.setValue("brutto Betrag", value); }
   public getBetragMitVorzeichen() { return this.getBetrag() };
   public getNettoBetragMitVorzeichen() { return this.getNettoBetrag() };
-  public getNettoBetrag() { return this.getValue("netto Betrag"); }
+  public getNettoBetrag() { return this.getValue("netto Betrag")as number; }
   public setNettoBetrag(betrag: number) { this.setValue("netto Betrag", betrag); }
-  public getMehrwertsteuer() { return this.getValue("Summe Umsatzsteuer"); }
+  public getMehrwertsteuer() { return this.getValue("Summe Umsatzsteuer") as number; }
   public setMehrwertsteuer(value: any) { this.setValue("Summe Umsatzsteuer", value); }
-  public getDateiTyp() { return this.getValue("Dateityp"); }
+  public getDateiTyp() { return this.getValue("Dateityp").toString(); }
   public setDateiTyp(dateityp: string) { this.setValue("Dateityp", dateityp); }
 }
 //Fassade der Tabellen in Einnahmen
@@ -849,13 +806,13 @@ export class EinnahmenRechnung extends Rechnung {
   public setRechnungsNr(value: any) { this.setValue("Rechnungs-Nr", value); }
   public getName() { return this.getValue("Name"); }
   public setName(value: any) { this.setValue("Name", value); }
-  public getLeistungvon() { return this.getValue("Leistung von"); }
+  public getLeistungvon() { return this.getValue("Leistung von")as Date; }
   public setLeistungvon(value: any) { this.setValue("Leistung von", value); }
-  public getLeistungbis() { return this.getValue("Leistung bis"); }
+  public getLeistungbis() { return this.getValue("Leistung bis")as Date; }
   public setLeistungbis(value: any) { this.setValue("Leistung bis", value); }
-  public getNettoBetrag() { return this.getValue("Summe netto"); }
+  public getNettoBetrag() { return this.getValue("Summe netto") as number; }
   public setNettoBetrag(value: any) { this.setValue("Summe netto", value); }
-  public getBetrag() { return this.getValue("Rechnungsbetrag"); }
+  public getBetrag() { return this.getValue("Rechnungsbetrag") as number; }
   public setBetrag(value: any) { this.setValue("Rechnungsbetrag", value); }
   public getBestellnummer() { return this.getValue("Bestellnummer"); }
   public setBestellnummer(value: any) { this.setValue("Bestellnummer", value); }
@@ -970,17 +927,19 @@ export class Produkt extends TableRow {
 
 }
 export class Gutschrift extends Rechnung {
-  public getText() { return this.getKonto() + " " + this.getNettoBetragMitVorzeichen() + " €" }
   public getKonto() { return "Leistung:" + this.getValue("Name"); }
   public getName() { return this.getValue("Name"); }
   public setName(value: string) { this.setValue("Name", value); }
   public getStatus() { return this.getValue("Status"); }
   public setStatus(value: any) { this.setValue("Status", value); }
-  public getNettoBetrag() { return this.getValue("Summe netto"); }
+  public getNettoBetrag() { return this.getValue("Summe netto")as number; }
   public setNettoBetrag(value: any) { this.setValue("Summe netto", value); }
-  public getBetrag() { return this.getValue("Gutschriftbetrag"); }
+  public getBetrag() { return this.getValue("Gutschriftbetrag")as number; }
   public setBetrag(value: any) { this.setValue("Gutschriftbetrag", value); }
-  public getDokumententyp() { return this.getValue("Dokumententyp"); }
+  public getText() { return this.getDokumententyp(); }
+  public setText(text: string) { this.setDokumententyp(text); }
+
+  public getDokumententyp() { return this.getValue("Dokumententyp").toString(); }
   public setDokumententyp(value: any) { this.setValue("Dokumententyp", value); }
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     const quellTabelle = "Gutschrift";
@@ -1006,16 +965,16 @@ export class Gutschrift extends Rechnung {
 }
 export class EURechnung extends EinnahmenRechnung {
   public getBetragMitVorzeichen() { return this.getBetrag() };
-  public getNettoBetragMitVorzeichen() {return this.getBetragMitVorzeichen()};
-  public getBetrag() { return this.getValue("Rechnungsbetrag"); }
+  public getNettoBetragMitVorzeichen() { return this.getBetragMitVorzeichen() };
+  public getBetrag() { return this.getValue("Rechnungsbetrag")as number; }
   public getText() { return this.getKonto() + " " + this.getBetrag() + " €" }
   public getKonto() { return "Leistung:" + this.getValue("USt-IdNr"); }
 
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     const quellTabelle = "EURechnung";
-    this.monat = belegMonat(geschaeftsjahr, this.getValue("Datum"));
+    this.monat = belegMonat(geschaeftsjahr, this.getDatum());
     if (this.monat === null) this.monat = Number.NaN;
-    if (this.getBezahltAm() !== "offen") this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getBezahltAm());
+    if (this.isBezahlt()) this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getBezahltAm());
 
     //Buchung auf Konto
     let normBuchung = tableCache.createNewRow();
@@ -1054,7 +1013,7 @@ export class PositionenArchiv extends TableRow {
 }
 //Fassade der Tabellen in Ausgaben
 export class AusgabenRechnung extends Rechnung {
-  public getMehrwertsteuer() { return this.getValue("Vorsteuer"); }
+  public getMehrwertsteuer() { return this.getValue("Vorsteuer")as number; }
   public setMehrwertsteuer(betrag: number) { this.setValue("Vorsteuer", betrag); }
   public getBetragMitVorzeichen() { return -this.getBetrag() };
   public getNettoBetragMitVorzeichen() { return -this.getNettoBetrag() };
@@ -1082,16 +1041,16 @@ export class AusgabenRechnung extends Rechnung {
 
 }
 export class Bewirtungsbeleg extends AusgabenRechnung {
-  public getFileId() { return this.getValue("ID"); }
+ // public getFileId() { return this.getValue("ID"); }
   public setFileId(value: string) { this.setValue("ID", value); }
   public getKonto() { return "abziehbare Bewirtungskosten" };
   public getNettoBetragMitVorzeichen() { return -this.getAbziehbareBewirtungskosten() };
 
-  public getTrinkgeld() { return this.getValue("Trinkgeld"); }
+  public getTrinkgeld() { return this.getValue("Trinkgeld")as number; }
   public setTrinkgeld(betrag: number) { this.setValue("Trinkgeld", betrag); }
-  public getAbziehbareBewirtungskosten() { return this.getValue("abziehbare Bewirtungskosten"); }
+  public getAbziehbareBewirtungskosten() { return this.getValue("abziehbare Bewirtungskosten") as number; }
   public setAbziehbareBewirtungskosten(value: any) { this.setValue("abziehbare Bewirtungskosten", value); }
-  public getNichtAbziehbareBewirtungskosten() { return this.getValue("nicht abziehbare Bewirtungskosten"); }
+  public getNichtAbziehbareBewirtungskosten() { return this.getValue("nicht abziehbare Bewirtungskosten")as number; }
   public setNichtAbziehbareBewirtungskosten(value: any) { this.setValue("nicht abziehbare Bewirtungskosten", value); }
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     super.addToTableCache(tableCache, geschaeftsjahr);
@@ -1119,7 +1078,7 @@ export class Abschreibung extends Umbuchung {
   public getBezahltAm() { return this.getDatum() };
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     const quellTabelle = "Abschreibung";
-    this.monat = belegMonat(geschaeftsjahr, this.getValue("Datum"));
+    this.monat = belegMonat(geschaeftsjahr, this.getDatum());
     this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getDatum());
 
     //Buchung auf Konto
@@ -1139,12 +1098,12 @@ export class Abschreibung extends Umbuchung {
 }
 export class Verpflegungsmehraufwendung extends Umbuchung {
   public getBezahltAm() { return this.getDatum() };
-  public getBetrag() { return this.getValue("Verpflegungsmehr-aufwendung"); }
+  public getBetrag() { return this.getValue("Verpflegungsmehr-aufwendung")as number; }
   public getKonto() { return "Verpflegungsmehraufwendung" };
   public getGegenkonto() { return "bar" };
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     const quellTabelle = "Verpflegungsmehraufwendung";
-    this.monat = belegMonat(geschaeftsjahr, this.getValue("Datum"));
+    this.monat = belegMonat(geschaeftsjahr, this.getDatum());
     this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getDatum());
 
     //Buchung auf Konto
@@ -1163,15 +1122,15 @@ export class Verpflegungsmehraufwendung extends Umbuchung {
   }
 }
 export class Vertrag extends Umbuchung {
-  public getBezahltAm() { return ""; }
+  public getBezahltAm() { return new Date(0); }
   public setBezahltAm(datum: Date) { this.setValue("Zahlungsdatum", this.getValue("Zahlungsdatum").toString() + "," + datum.toString()); }
-  public nichtBezahlt(): boolean { return this.getBezahltAm() === ""; }
+  public nichtBezahlt(): boolean { return true; }
   public isBezahlt(): boolean { return !this.nichtBezahlt(); }
-  public getGegenkonto() { return this.getValue("Konto") };
+  public getGegenkonto() { return this.getValue("Konto").toString() };
 }
 //Fassade der Tabellen in Bankbuchungen
 export class Bankbuchung extends Umbuchung {
-  public getKonto() { return this.getValue("Bilanzkonto") }
+  public getKonto() { return this.getValue("Bilanzkonto").toString() }
   public setKonto(value: string) { this.setValue("Bilanzkonto", value); }
   public getGegenkonto() {
     let gegenkonto = super.getGegenkonto();
@@ -1181,13 +1140,13 @@ export class Bankbuchung extends Umbuchung {
   public getBezahltAm() { return this.getDatum() };
   public getNr() { return this.getValue("Nr") }
   public setNr(value: string) { this.setValue("Nr", value); }
-  public getBelegID() { return this.getValue("BelegID") }
+  public getBelegID() { return this.getValue("BelegID").toString() }
   public setBelegID(value: string) { this.setValue("BelegID", value); }
   public getGegenkontoBank() { return this.getValue("GegenkontoBank") }
   public setGegenkontoBank(value: string) { this.setValue("GegenkontoBank", value); }
   public addToTableCache(tableCache: NormalisierteBuchungenTableCache, geschaeftsjahr: Date) {
     const quellTabelle = "Bankbuchung";
-    this.monat = belegMonat(geschaeftsjahr, this.getValue("Datum"));
+    this.monat = belegMonat(geschaeftsjahr, this.getDatum());
     this.monatBezahlt = bezahltMonat(geschaeftsjahr, this.getDatum());
 
     //Buchung auf Konto
@@ -1221,14 +1180,14 @@ export class Bankbuchung extends Umbuchung {
 }
 // Fassade der Tabelle in Datenschlürfer für import in NormalisierteBuchung
 export class Gdpdu extends Umbuchung {
-  public getId() { return this.getValue("Beleg-Nr") }
+  public getId() { return this.getValue("Beleg-Nr").toString() }
   public getLink() { return super.getId() }
-  public getDatum(): Date { return this.getValue("Bg-Datum") }
+  public getDatum(): Date { return this.getValue("Bg-Datum")as Date }
   public getBezahltAm() { return this.getDatum() }
-  public getText() { return this.getValue("Buchungstext") }
+  public getText() { return this.getValue("Buchungstext").toString() }
   public getKonto() { return "G" + this.getValue("Konto-Nr") }
   public getGegenkonto() { return "G" + super.getGegenkonto() }
-  public getFilename() { return this.getValue("Filename") }
+  public getFilename() { return this.getValue("Filename").toString() }
   public getNettoBetragMitVorzeichen() {
     if (this.getValue("SoFkt") == 3)
       return -super.getNettoBetragMitVorzeichen()
@@ -1248,15 +1207,15 @@ export class Gdpdu extends Umbuchung {
 //Fassade der Tabellen in Steuern EÜR
 //Fassade der Tabellen in Bilanz und GuV
 export class Konto extends TableRow {
-  public getId() { return this.getValue("Konto"); }
+  public getId() { return this.getValue("Konto").toString(); }
   public setId(value: string) { this.setValue("Konto", value); }
-  public getKontentyp() { return this.getValue("Kontentyp"); }
+  public getKontentyp() { return this.getValue("Kontentyp").toString(); }
   public setKontentyp(value: any) { this.setValue("Kontentyp", value); }
   public getSubtyp(): string { return this.getValue("Subtyp").toString(); }
   public setSubtyp(value: any) { this.setValue("Subtyp", value); }
-  public getGruppe() { return this.getValue("Gruppe"); }
+  public getGruppe() { return this.getValue("Gruppe").toString(); }
   public setGruppe(value: any) { this.setValue("Gruppe", value); }
-  public getKonto() { return this.getValue("Konto"); }
+  public getKonto() { return this.getValue("Konto").toString(); }
   public setKonto(value: any) { this.setValue("Konto", value); }
   public getSKR03() { return this.getValue("SKR03"); }
   public setSKR03(value: any) { this.setValue("SKR03", value); }
@@ -1273,16 +1232,16 @@ export class Konto extends TableRow {
   public isAnlage(): boolean { return this.getGruppe() === "Anlage"; }
   public isBilanzkonto(): boolean { return this.getKontentyp() === "Bilanz"; }
   public isBankkonto(): boolean { return this.getGruppe() === "Bankkonto"; }
-  public getSumme() { return this.getValue("Summe"); }
+  public getSumme() { return this.getValue("Summe")as number; }
   public getDefaultMwSt() { return this.getGruppe().split(",")[1]; }
-  public isDatenschluerferKonto():boolean{return this.getKonto().substr(0, 1) === "G" && /^\d+$/.test(this.getKonto().substr(1))}
+  public isDatenschluerferKonto(): boolean { return this.getKonto().substr(0, 1) === "G" && /^\d+$/.test(this.getKonto().substr(1)) }
 }
 export class UStVA extends TableRow {
   public getFileId() { return this.getValue("ID"); }
   public setFileId(value: string) { this.setValue("ID", value); }
   public getLink() { return this.getValue("Link"); }
   public setLink(value) { this.setValue("Link", value); }
-  public getDatum() { return this.getValue("Datum"); }
+  public getDatum() { return this.getValue("Datum")as Date; }
   public setDatum(value) { this.setValue("Datum", value); }
   public getKonto() { return this.getValue("Konto"); }
   public setKonto(value) { this.setValue("Konto", value); }
@@ -1296,23 +1255,23 @@ export class UStVA extends TableRow {
   public setPeriodeundStatus(value) { this.setValue("Periode und Status", value); }
   public geterstelltam() { return this.getValue("erstellt am"); }
   public seterstelltam(value) { this.setValue("erstellt am", value); }
-  public get21() { return this.getValue("21"); }
-  public set21(value) { this.setValue("21", value); }
-  public get81() { return this.getValue("81"); }
-  public set81(value) { this.setValue("81", value); }
-  public get48() { return this.getValue("48"); }
-  public set48(value) { this.setValue("48", value); }
-  public get35() { return this.getValue("35"); }
-  public set35(value) { this.setValue("35", value); }
-  public get36() { return parseFloat(this.getValue("36")) as number; }
+  public get21() { return this.getValue("21") as number; }
+  public set21(value:number) { this.setValue("21", value); }
+  public get81() { return this.getValue("81") as number; }
+  public set81(value:number) { this.setValue("81", value); }
+  public get48() { return this.getValue("48") as number; }
+  public set48(value:number) { this.setValue("48", value); }
+  public get35() { return this.getValue("35") as number; }
+  public set35(value:number) { this.setValue("35", value); }
+  public get36() { return this.getValue("36") as number; }
   public set36(value: number) { this.setValue("36", value); }
-  public get66() { return this.getValue("66"); }
-  public set66(value) { this.setValue("66", value); }
-  public get83() { return this.getValue("83"); }
-  public set83(value) { this.setValue("83", value); }
+  public get66() { return this.getValue("66") as number; }
+  public set66(value:number) { this.setValue("66", value); }
+  public get83() { return this.getValue("83") as number; }
+  public set83(value:number) { this.setValue("83", value); }
 }
 export class EUR extends TableRow {
-  public getId() { return this.getValue("ZN"); }
+  public getId() { return this.getValue("ZN").toString(); }
   public setId(value: string) { this.setValue("ZN", value); }
   public getZN() { return this.getValue("ZN"); }
   public setZN(value) { this.setValue("ZN", value); }
@@ -1320,7 +1279,7 @@ export class EUR extends TableRow {
   public setSumme(value) { this.setValue("Summe", value); }
 }
 export class NormalisierteBuchung extends FinanzAction {
-  public getFileId() { return this.getValue("ID"); }
+  public getFileId() { return this.getValue("ID").toString(); }
   public setFileId(value: string) { this.setValue("ID", value); }
   public getLink(): string { return this.getFormula("Link"); }
   public setLink(link: string) { this.setFormula("Link", link); }
@@ -1344,13 +1303,13 @@ export class NormalisierteBuchung extends FinanzAction {
   public setGruppe(value) { this.setValue("Gruppe", value); }
   //Das ist wahrscheinlich falsch, Tabellenspalte muss semantisch "Konto" heißen
   //kann ich umstellen, wenn der ganze Code auf TS migriert ist
-  public getKonto() { return this.getValue("Gegenkonto"); }
+  public getKonto() { return this.getValue("Gegenkonto").toString(); }
   public setKonto(value) { this.setValue("Gegenkonto", value); }
   public getSKR03() { return this.getValue("SKR03"); }
   public setSKR03(value) { this.setValue("SKR03", value); }
   public getFormular() { return this.getValue("Formular"); }
   public setFormular(value) { this.setValue("Formular", value); }
-  public getZN() { return this.getValue("ZN"); }
+  public getZN() { return this.getValue("ZN").toString(); }
   public setZN(value) { this.setValue("ZN", value); }
   public getQuelltabelle() { return this.getValue("Quelltabelle"); }
   public setQuelltabelle(value) { this.setValue("Quelltabelle", value); }
@@ -1372,9 +1331,9 @@ export class ElsterTransfer extends TableRow {
 export class Lastschriftmandat extends TableRow {
   public getZeitstempel() { return this.getValue("Zeitstempel"); }
   public setZeitstempel(value) { this.setValue("Zeitstempel", value); }
-  public getProdukt() { return this.getValue("Produkt"); }
+  public getProdukt() { return this.getValue("Produkt").toString(); }
   public setProdukt(value) { this.setValue("Produkt", value); }
-  public getEMailAdresse() { return this.getValue("E-Mail-Adresse"); }
+  public getEMailAdresse() { return this.getValue("E-Mail-Adresse").toString(); }
   public setEMailAdresse(value) { this.setValue("E-Mail-Adresse", value); }
   public getKontoinhaber() { return this.getValue("Kontoinhaber"); }
   public setKontoinhaber(value) { this.setValue("Kontoinhaber", value); }
@@ -1400,7 +1359,7 @@ export class Lastschriftmandat extends TableRow {
   public setStatus(value) { this.setValue("Status", value); }
 }
 export class Lastschrift extends TableRow {
-  public getLm() { return this.getValue("Lm"); }
+  public getLm() { return this.getValue("Lm").toString(); }
   public setLm(value) { this.setValue("Lm", value); }
   public getBetrag() { return this.getValue("Betrag"); }
   public setBetrag(value) { this.setValue("Betrag", value); }
@@ -1421,7 +1380,7 @@ export class Lastschriftprodukt extends TableRow {
 }
 
 export class Installation extends TableRow {
-  public getFolderId() { return this.getValue("ID"); }
+  public getFolderId() { return this.getValue("ID").toString(); }
   public setFolderId(value: string) { this.setValue("ID", value); }
 
   public getLink(): string { return this.getFormula("Link"); }
@@ -1475,7 +1434,7 @@ export class Installation extends TableRow {
 export class CSVExport extends TableRow {
   setBelegNr(belegNr: string) {
     this.setValue("BelegNr", belegNr);
-  //  this.setValue("BelegNr", shortBelegNr(belegNr));
+    //  this.setValue("BelegNr", shortBelegNr(belegNr));
   }
 }
 //Datenschlürfer

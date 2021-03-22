@@ -253,7 +253,7 @@ export class BusinessModel {
     public getUStVAArray(): UStVA[] { return this.getUStVATableCache().getRowArray() as UStVA[]; }
     public getUStVAFuerMonat(monat: string): UStVA[] {
         return this.getUStVAArray().filter(ausgabe => {
-            const ausgabeDatum = new Date(ausgabe.getDatum());
+            const ausgabeDatum = ausgabe.getDatum();
             return (ausgabeDatum.getFullYear() === this.endOfYear().getFullYear() && ausgabeDatum.getMonth() === parseInt(monat) - 1);
         });
     }

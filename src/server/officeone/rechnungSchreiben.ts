@@ -151,18 +151,18 @@ export function mrechnungErstellen() {
   //Rechnungslink bei Kunde eintragen, ggf. neuen Kunden anlegen
   var kundenCache = new KundenTableCache(rootId);
   var kundenHash = kundenCache.getOrCreateHashTable("Name");
-  var aktuellerKunde = kundenHash[neueRechnungRow.getValue("Name")] as Kunde;
+  var aktuellerKunde = kundenHash[neueRechnungRow.getValue("Name")as string] as Kunde;
   if (aktuellerKunde != undefined) {
     //Kunden auswählen
     aktuellerKunde.setValue("Auswahl", "Ja");
     aktuellerKunde.farbeAuswahlJa();
-    aktuellerKunde.setFormula("Aktuelles Dokument", neueRechnungRow.getValue("Link"));
+    aktuellerKunde.setFormula("Aktuelles Dokument", neueRechnungRow.getValue("Link")as string);
   } else {
     //neuen Kunden anlegen und auswählen
     aktuellerKunde = kundenCache.createNewRow();
     aktuellerKunde.setValue("Auswahl", "Ja");
     aktuellerKunde.farbeAuswahlJa();
-    aktuellerKunde.setFormula("Aktuelles Dokument", neueRechnungRow.getValue("Link"));
+    aktuellerKunde.setFormula("Aktuelles Dokument", neueRechnungRow.getValue("Link")as string);
     aktuellerKunde.setValue("Name", neueRechnungRow.getValue("Name"));
     aktuellerKunde.setValue("Strasse", neueRechnungRow.getValue("Strasse"));
     aktuellerKunde.setValue("Hausnummer", neueRechnungRow.getValue("Hausnummer"));
@@ -171,15 +171,15 @@ export function mrechnungErstellen() {
     aktuellerKunde.setValue("Ort", neueRechnungRow.getValue("Ort"));
     aktuellerKunde.setValue("E-Mail", neueRechnungRow.getValue("E-Mail"));
     //neuen Ordner für Kunden anlegen
-    var kontaktId = kundenRootOrdner.createFolder(neueRechnungRow.getValue("Name")).getId();
+    var kontaktId = kundenRootOrdner.createFolder(neueRechnungRow.getValue("Name")as string).getId();
     aktuellerKunde.setFolderId(kontaktId);
-    aktuellerKunde.createLink(kontaktId,neueRechnungRow.getValue("Name") );
+    aktuellerKunde.createLink(kontaktId,neueRechnungRow.getValue("Name")as string );
   }
 
   kundenCache.save();
 
   //Link auf Rechnung in Kontaktordner des Kunden eintragen
-  var kundenOrdner = DriveApp.getFolderById(aktuellerKunde.getValue("ID"));
+  var kundenOrdner = DriveApp.getFolderById(aktuellerKunde.getValue("ID")as string);
   kundenOrdner.addFile(DriveApp.getFileById(neueRechnung.getId()));
   resizeValidationRange("KundenNamen", "Name");
   var datenValidierung = SpreadsheetApp.newDataValidation()
@@ -403,11 +403,11 @@ export function replaceDocumentVariablesByRechnungenData(dokument, positionsRow:
 
       if (format == "#,##0.00\\ [$€-1]") variableData = formatMoney(variableData);
       if (format == "0%") {
-        variableData = formatPercent(variableData);
+        variableData = formatPercent(variableData as number);
       }
       var variableText = variableData;
       try {
-        variableText = variableData.getDate() + "." + (variableData.getMonth() + 1) + "." + variableData.getFullYear();
+        variableText = (variableData as Date).getDate() + "." + ((variableData as Date).getMonth() + 1) + "." + (variableData as Date).getFullYear();
       } catch (e) { }
       dokument.replaceText(templateVars[i], variableText || "");
       //Falls es Header oder Footer gibt, hier auch Variablen ersetzen

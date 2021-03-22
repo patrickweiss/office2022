@@ -41,7 +41,6 @@ enum exportgruppe {
 export function SimbaExportErstellen(rootFolderId: string) {
   const bm = new BusinessModel(rootFolderId, "SimbaExportErstellen");
   try {
-    var thisSpreadsheet = DriveConnector.getSpreadsheet(rootFolderId, ooTables.KontenD, oooVersion);
     const ausgabenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.AusgabenD, oooVersion).getId();
     const einnahmenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.RechnungenD, oooVersion).getId();
     const bankkontenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.BankbuchungenD, oooVersion).getId();
@@ -99,15 +98,15 @@ export function SimbaExportErstellen(rootFolderId: string) {
       if (index !== "0") {
         var csvRow = a.csvCache.getRowByIndex(index);
         if (csvRow.getValue("Exportgruppe") != "") {
-          if (buchungenCSV[csvRow.getValue("Exportgruppe")] === undefined) buchungenCSV[csvRow.getValue("Exportgruppe")] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
+          if (buchungenCSV[csvRow.getValue("Exportgruppe") as string] === undefined) buchungenCSV[csvRow.getValue("Exportgruppe") as string] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
           var datum = isoDate(csvRow.getValue("Datum"));
-          buchungenCSV[csvRow.getValue("Exportgruppe")] +=
+          buchungenCSV[csvRow.getValue("Exportgruppe") as string] +=
             datum + ";" +
             formatBetrag(csvRow.getValue("Betrag")) + ";" +
             csvRow.getValue("SKR03 (Soll)") + ";" +
             csvRow.getValue("SKR03 (Haben)") + ";" +
             csvRow.getValue("Buchungstext") + ";" +
-            belegNrInSimbaFormat(csvRow.getValue("BelegNr")) + ";" +
+            belegNrInSimbaFormat(csvRow.getValue("BelegNr")as string) + ";" +
             csvRow.getId() + ";" +
             csvRow.getValue("USt-IDNr") + ";1\n";
         }

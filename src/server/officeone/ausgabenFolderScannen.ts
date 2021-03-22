@@ -147,11 +147,11 @@ function neuenBewirtungsbelegEintragen(beleg, belegWoerter, monat, BM: BusinessM
         neuerBewirtungsbelegRow.setNettoBetrag(neuerBewirtungsbelegRow.getBetrag() - neuerBewirtungsbelegRow.getMehrwertsteuer());
     }
     else
-        neuerBewirtungsbelegRow.setNettoBetrag(round2Fixed(neuerBewirtungsbelegRow.getValue("brutto Betrag") / 1.19));
+        neuerBewirtungsbelegRow.setNettoBetrag(round2Fixed(neuerBewirtungsbelegRow.getBetrag() / 1.19));
 
-    neuerBewirtungsbelegRow.setMehrwertsteuer(neuerBewirtungsbelegRow.getValue("brutto Betrag") - neuerBewirtungsbelegRow.getValue("netto Betrag"));
-    neuerBewirtungsbelegRow.setAbziehbareBewirtungskosten(round2Fixed(neuerBewirtungsbelegRow.getValue("netto Betrag") * 0.7));
-    neuerBewirtungsbelegRow.setNichtAbziehbareBewirtungskosten(neuerBewirtungsbelegRow.getValue("netto Betrag") - neuerBewirtungsbelegRow.getValue("abziehbare Bewirtungskosten"));
+    neuerBewirtungsbelegRow.setMehrwertsteuer(neuerBewirtungsbelegRow.getBetrag() - neuerBewirtungsbelegRow.getNettoBetrag());
+    neuerBewirtungsbelegRow.setAbziehbareBewirtungskosten(round2Fixed(neuerBewirtungsbelegRow.getNettoBetrag() * 0.7));
+    neuerBewirtungsbelegRow.setNichtAbziehbareBewirtungskosten(neuerBewirtungsbelegRow.getNettoBetrag() - neuerBewirtungsbelegRow.getAbziehbareBewirtungskosten());
     checkParsedFile(neuerBewirtungsbelegRow);
 
 }
@@ -195,8 +195,8 @@ function neueAusgabeEintragen(beleg, belegWoerter, datum, BM: BusinessModel) {
         if (belegName.indexOf("16%") != -1) prozent = "16%";
         if (belegName.indexOf("5%") != -1) prozent = "5%";
 
-        neueAusgabeRow.setNettoBetrag(netto(neueAusgabeRow.getValue("brutto Betrag"), prozent));
-        neueAusgabeRow.setMehrwertsteuer(vorsteuer(neueAusgabeRow.getValue("brutto Betrag"), prozent));
+        neueAusgabeRow.setNettoBetrag(netto(neueAusgabeRow.getBetrag(), prozent));
+        neueAusgabeRow.setMehrwertsteuer(vorsteuer(neueAusgabeRow.getBetrag(), prozent));
 
         neueAusgabeRow.setKonto(konto);
 

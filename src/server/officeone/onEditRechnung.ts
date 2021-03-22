@@ -188,9 +188,9 @@ function positionFertig(e){
             
             //wenn ja, neues Produkt speichern
             var neuesProdukt = produkteCache.createNewRow();
-            neuesProdukt.setValue("Produktname",positionsValues[0][0]);
-            neuesProdukt.setValue("Einheit",positionsValues[0][4]);
-            neuesProdukt.setValue("Preis pro Einheit netto",positionsValues[0][5]);
+            neuesProdukt.setValue("Produktname",positionsValues[0][0].toString());
+            neuesProdukt.setValue("Einheit",positionsValues[0][4].toString());
+            neuesProdukt.setValue("Preis pro Einheit netto",positionsValues[0][5] as number);
             neuesProdukt.setValue("MwSt-Satz",positionsValues[0][6]);
             produkteCache.save();
             
