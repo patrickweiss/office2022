@@ -191,10 +191,6 @@ export class TableRow {
     (dd > 9 ? '' : '0') + dd
     ].join('')
   }
-  protected parseDateFromCSVString(date: string) {
-    var datum = date.split(".");
-    return new Date(parseInt(datum[2], 10), parseInt(datum[1], 10) - 1, parseInt(datum[0], 10));
-  }
   protected parseNumberFromCommaString(numberString: string) {
     return (parseFloat(numberString.replace(",", ".")))
   }
