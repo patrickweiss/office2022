@@ -180,6 +180,11 @@ export class TableRow {
   public getValue(columnName: string) {
     return this.valueRow[this.columnIndex[columnName]];
   }
+  public getValueAsDate(columnName: string):Date{
+    let value= this.getValue(columnName);
+    if (!(value instanceof Date))value = new Date(value as string);
+    return value
+  }
   public getFormat(columnName: string) {
     return this.formatRow[this.columnIndex[columnName]];
   }
@@ -725,7 +730,7 @@ export class EMailId extends TableRow {
 export class FinanzAction extends TableRow {
   public getBetrag(): number { return this.getValue("Betrag")as number; }
   public setBetrag(value: number) { this.setValue("Betrag", value); }
-  public getDatum() { return this.getValue("Datum")as Date; }
+  public getDatum() { return this.getValueAsDate("Datum"); }
   public setDatum(value: any) { this.setValue("Datum", value); }
   public getKonto(): string { return this.getValue("Konto").toString() }
   public setKonto(value: string) { this.setValue("Konto", value); }
@@ -747,7 +752,7 @@ export class Umbuchung extends Buchung {
   public getBetragMitVorzeichen() { return -this.getBetrag() };
   public getFileId() { return this.getValue("ID").toString(); }
   public setFileId(value: string) { this.setValue("ID", value); }
-  public getBezahltAm() { return this.getValue("bezahlt am") as Date; }
+  public getBezahltAm() { return this.getValueAsDate("bezahlt am"); }
   public setBezahltAm(datum: Date) { this.setValue("bezahlt am", datum); }
   public nichtBezahlt(): boolean { return this.getValue("bezahlt am")  === ""; }
   public isBezahlt(): boolean { return !this.nichtBezahlt(); }
@@ -804,9 +809,9 @@ export class EinnahmenRechnung extends Rechnung {
   public setRechnungsNr(value: any) { this.setValue("Rechnungs-Nr", value); }
   public getName() { return this.getValue("Name"); }
   public setName(value: any) { this.setValue("Name", value); }
-  public getLeistungvon() { return this.getValue("Leistung von")as Date; }
+  public getLeistungvon() { return this.getValueAsDate("Leistung von"); }
   public setLeistungvon(value: any) { this.setValue("Leistung von", value); }
-  public getLeistungbis() { return this.getValue("Leistung bis")as Date; }
+  public getLeistungbis() { return this.getValueAsDate("Leistung bis"); }
   public setLeistungbis(value: any) { this.setValue("Leistung bis", value); }
   public getNettoBetrag() { return this.getValue("Summe netto") as number; }
   public setNettoBetrag(value: any) { this.setValue("Summe netto", value); }
@@ -1180,7 +1185,7 @@ export class Bankbuchung extends Umbuchung {
 export class Gdpdu extends Umbuchung {
   public getId() { return this.getValue("Beleg-Nr").toString() }
   public getLink() { return super.getId() }
-  public getDatum(): Date { return this.getValue("Bg-Datum")as Date }
+  public getDatum(): Date { return this.getValueAsDate("Bg-Datum") }
   public getBezahltAm() { return this.getDatum() }
   public getText() { return this.getValue("Buchungstext").toString() }
   public getKonto() { return "G" + this.getValue("Konto-Nr") }
@@ -1239,7 +1244,7 @@ export class UStVA extends TableRow {
   public setFileId(value: string) { this.setValue("ID", value); }
   public getLink() { return this.getValue("Link"); }
   public setLink(value) { this.setValue("Link", value); }
-  public getDatum() { return this.getValue("Datum")as Date; }
+  public getDatum() { return this.getValueAsDate("Datum"); }
   public setDatum(value) { this.setValue("Datum", value); }
   public getKonto() { return this.getValue("Konto"); }
   public setKonto(value) { this.setValue("Konto", value); }
