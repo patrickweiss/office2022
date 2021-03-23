@@ -20,8 +20,10 @@ export class TableCache<RowType extends TableRow> {
       data = DriveConnector.getNamedRangeDataAndFormat(rootId, tableName, oooVersion)
       this.formatsArray = data[3];
     }
-    else
+    else {
       data = DriveConnector.getNamedRangeData(rootId, tableName, oooVersion);
+      this.formatsArray = data[0];//da muss was drin stehen, sonst können keine TableRows bei Aufruf in getRowByIndex erzeugt werden
+    }
     this.dataArray = data[0];
     this.backgroundArray = data[1];
     this.formulaArray = data[2];
@@ -211,73 +213,121 @@ export class TableRow {
 //Caches der Tabellen Daten
 export class EMailIdTableCache extends TableCache<EMailId> {
   constructor(rootId: string) { super(rootId, ooTables.EMailIdD); }
+  public getRowByIndex(rowIndex: string): EMailId {
+    return new EMailId(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class AusgabenTableCache extends TableCache<AusgabenRechnung> {
   constructor(rootId: string) { super(rootId, ooTables.AusgabenD); }
+  public getRowByIndex(rowIndex: string): AusgabenRechnung {
+    return new AusgabenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class VertraegeTableCache extends TableCache<Vertrag> {
   constructor(rootId: string) {
     super(rootId, ooTables.VerträgeD);
   }
+  public getRowByIndex(rowIndex: string): Vertrag {
+    return new Vertrag(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class BewirtungsbelegeTableCache extends TableCache<Bewirtungsbeleg> {
   constructor(rootId: string) { super(rootId, ooTables.BewirtungsbelegeD); }
+  public getRowByIndex(rowIndex: string): Bewirtungsbeleg {
+    return new Bewirtungsbeleg(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class AbschreibungenTableCache extends TableCache<Abschreibung> {
   constructor(rootId: string) {
     super(rootId, ooTables.AbschreibungenD);
+  }
+  public getRowByIndex(rowIndex: string): Abschreibung {
+    return new Abschreibung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class VerpflegungsmehraufwendungenTableCache extends TableCache<Verpflegungsmehraufwendung> {
   constructor(rootId: string) {
     super(rootId, ooTables.VerpflegungsmehraufwendungenD);
   }
+  public getRowByIndex(rowIndex: string): Verpflegungsmehraufwendung {
+    return new Verpflegungsmehraufwendung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
   constructor(rootId: string) {
     super(rootId, ooTables.RechnungenD);
+  }
+  public getRowByIndex(rowIndex: string): EinnahmenRechnung {
+    return new EinnahmenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
   constructor(rootId: string) {
     super(rootId, ooTables.RechnungSchreibenD);
   }
+  public getRowByIndex(rowIndex: string): RechnungSchreiben {
+    return new RechnungSchreiben(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class KundenTableCache extends TableCache<Kunde> {
   constructor(rootId: string) { super(rootId, ooTables.KundenD); }
+  public getRowByIndex(rowIndex: string): Kunde {
+    return new Kunde(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class ProdukteTableCache extends TableCache<Produkt>{
   constructor(rootId: string) { super(rootId, ooTables.ProdukteD); }
+  public getRowByIndex(rowIndex: string): Produkt {
+    return new Produkt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class EURechnungTableCache extends TableCache<EURechnung> {
   constructor(rootId: string) {
     super(rootId, ooTables.EURechnungenD);
+  }
+  public getRowByIndex(rowIndex: string): EURechnung {
+    return new EURechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class GutschriftenTableCache extends TableCache<Gutschrift> {
   constructor(rootId: string) {
     super(rootId, ooTables.GutschriftenD);
   }
+  public getRowByIndex(rowIndex: string): Gutschrift {
+    return new Gutschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class PositionenarchivTableCache extends TableCache<PositionenArchiv>{
   constructor(rootId: string) {
     super(rootId, ooTables.PositionenarchivD);
+  }
+  public getRowByIndex(rowIndex: string): PositionenArchiv {
+    return new PositionenArchiv(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class BankbuchungenTableCache extends TableCache<Bankbuchung> {
   constructor(rootId: string) {
     super(rootId, ooTables.BankbuchungenD);
   }
+  public getRowByIndex(rowIndex: string): Bankbuchung {
+    return new Bankbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class UmbuchungenTableCache extends TableCache<Umbuchung> {
   constructor(rootId: string) {
     super(rootId, ooTables.UmbuchungenD);
+  }
+  public getRowByIndex(rowIndex: string): Umbuchung {
+    return new Umbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class KontenTableCache extends TableCache<Konto> {
   private kontenSpalten: Object;
   constructor(rootId: string) {
     super(rootId, ooTables.KontenD);
+  }
+  public getRowByIndex(rowIndex: string): Konto {
+    return new Konto(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public getOrCreateRowById(kontoName: string): Konto {
     return super.getOrCreateRowById(kontoName) as Konto;
@@ -446,20 +496,14 @@ export class KontenTableCache extends TableCache<Konto> {
 
     return farbe;
   }
-
 }
 
-function rgbToHex(R, G, B) { return toHex(R) + toHex(G) + toHex(B) }
-function toHex(n) {
-  n = parseInt(n, 10);
-  if (isNaN(n)) return "00";
-  n = Math.max(0, Math.min(n, 255));
-  return "0123456789ABCDEF".charAt((n - n % 16) / 16)
-    + "0123456789ABCDEF".charAt(n % 16);
-}
 export class UStVATableCache extends TableCache<UStVA> {
   constructor(rootId: string) {
     super(rootId, ooTables.UStVAD);
+  }
+  public getRowByIndex(rowIndex: string): UStVA {
+    return new UStVA(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public UStVASummenAktualisieren(normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date, periode: string) {
     //ZN spalte befüllen
@@ -580,7 +624,9 @@ export class EURTableCache extends TableCache<EUR> {
   constructor(rootId: string) {
     super(rootId, ooTables.EÜRD);
   }
- 
+  public getRowByIndex(rowIndex: string): EUR {
+    return new EUR(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
   public setKontenSpalten(geschaeftsjahr: number) {
     this.kontenSpalten = {
       "1": "Januar",
@@ -632,6 +678,9 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
   constructor(rootId: string) {
     super(rootId, ooTables.BuchungenD);
   }
+  public getRowByIndex(rowIndex: string): NormalisierteBuchung {
+    return new NormalisierteBuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
   public kontenStammdatenAktualisieren(kontenTableCache: KontenTableCache) {
     const buchungen = this.getRowArray() as NormalisierteBuchung[];
     buchungen.forEach(buchung => {
@@ -672,27 +721,51 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
 }
 export class ElsterTransferTableCache extends TableCache<ElsterTransfer> {
   constructor(rootId: string) { super(rootId, ooTables.ElsterTransferD); }
+  public getRowByIndex(rowIndex: string): ElsterTransfer {
+    return new ElsterTransfer(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class LastschriftmandatTableCache extends TableCache<Lastschriftmandat>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftmandatD); }
+  public getRowByIndex(rowIndex: string): Lastschriftmandat {
+    return new Lastschriftmandat(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class LastschriftenTableCache extends TableCache<Lastschrift>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftenD); }
+  public getRowByIndex(rowIndex: string): Lastschrift {
+    return new Lastschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class LastschriftproduktTableCache extends TableCache<Lastschriftprodukt>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftproduktD); }
+  public getRowByIndex(rowIndex: string): Lastschriftprodukt {
+    return new Lastschriftprodukt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class InstallationenTableCache extends TableCache<Installation>{
   constructor(rootId: string) { super(rootId, ooTables.InstallationenD); }
+  public getRowByIndex(rowIndex: string): Installation {
+    return new Installation(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class CSVTableCache extends TableCache<CSVExport>{
   constructor(rootId: string) { super(rootId, ooTables.CSVExportD); }
+  public getRowByIndex(rowIndex: string): CSVExport {
+    return new CSVExport(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class GdpduTableCache extends TableCache<Gdpdu>{
   constructor(rootId: string) { super(rootId, ooTables.GdpduD); }
+  public getRowByIndex(rowIndex: string): Gdpdu {
+    return new Gdpdu(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 export class DataFileTableCache extends TableCache<DataFile>{
   constructor(rootId: string) { super(rootId, ooTables.DataFileD); }
+  public getRowByIndex(rowIndex: string): DataFile {
+    return new DataFile(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+  }
 }
 
 //EMAil
@@ -1476,3 +1549,11 @@ function shortBelegNr(belegNr: string) {
 
 function uid() { return Math.random.toString() }
 
+function rgbToHex(R, G, B) { return toHex(R) + toHex(G) + toHex(B) }
+function toHex(n) {
+  n = parseInt(n, 10);
+  if (isNaN(n)) return "00";
+  n = Math.max(0, Math.min(n, 255));
+  return "0123456789ABCDEF".charAt((n - n % 16) / 16)
+    + "0123456789ABCDEF".charAt(n % 16);
+}
