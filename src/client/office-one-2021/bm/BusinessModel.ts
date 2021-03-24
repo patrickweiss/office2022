@@ -139,6 +139,12 @@ export class BusinessModel {
             neueGutschrift.setGegenkonto(action.gegenkonto);
         }
     }
+    public getOffenerBelegBetrag(umbuchung:Umbuchung){
+        let offnerBelegBetrag = umbuchung.getBetragMitVorzeichen();
+        this.getBankbuchungenArray().filter(bankbuchung => umbuchung.getId()===bankbuchung.getBelegID())
+        .forEach(bankbuchung => {offnerBelegBetrag-=bankbuchung.getBetrag()})
+        return offnerBelegBetrag;
+    }
     public getEinnahmenRechnungArray(): EinnahmenRechnung[] { return this.getEinnahmenRechnungTableCache().getRowArray() as EinnahmenRechnung[]; }
     public getEURechnungArray():EURechnung[] {return this.getEURechnungTableCache().getRowArray()as EURechnung[];}
     public getOrCreateEinnahmenRechnung(id: string) { return this.getEinnahmenRechnungTableCache().getOrCreateRowById(id); }
@@ -186,20 +192,24 @@ export class BusinessModel {
     private belegZuordnen(beleg: Umbuchung, action: IBelegZuBankbuchungZuordnen) {
         if (action.bankbuchungID !== "") {
             let bankbuchung = this.getOrCreateBankbuchung(action.bankbuchungID);
-            if ((Math.abs(bankbuchung.getBetrag())+0.0001) >= Math.abs(beleg.getBetragMitVorzeichen()))beleg.setBezahltAm(bankbuchung.getDatum());
+            let offnerBelegBetrag = beleg.getBetragMitVorzeichen();
+            if (action.belegTyp!==BelegTyp.Vertrag)offnerBelegBetrag=this.getOffenerBelegBetrag(beleg);
+            if (
+                (Math.abs(bankbuchung.getBetrag())+0.0001) >= Math.abs(offnerBelegBetrag)
+                || action.belegTyp===BelegTyp.Vertrag)beleg.setBezahltAm(bankbuchung.getDatum());
             bankbuchung.setBelegID(beleg.getId());
             bankbuchung.setLink(beleg.getLink());
             bankbuchung.setGegenkonto(beleg.getGegenkonto());
             //this.addLogMessage(`Bank:${bankbuchung.getBetrag()} Beleg:${beleg.getBetragMitVorzeichen()}${beleg.getId()}`)
             if ((action.belegTyp != BelegTyp.Vertrag || beleg.getBetrag() !== 0) &&
-             (Math.abs(bankbuchung.getBetrag()) >(Math.abs(beleg.getBetragMitVorzeichen())+0.001))
+             (Math.abs(bankbuchung.getBetrag()) >(Math.abs(offnerBelegBetrag)+0.001))
              ) {
                 const splitBuchung = this.getBankbuchungenTableCache().createNewRow();
                 //this.addLogMessage("Bankbuchung ist größer als Belegsumme, Restbetrag:"+(bankbuchung.getBetrag()-beleg.getBetragMitVorzeichen()));
                 splitBuchung.setKonto(beleg.getGegenkonto());
                 splitBuchung.setNr(bankbuchung.getId());
                 splitBuchung.setDatum(bankbuchung.getDatum());
-                splitBuchung.setBetrag(bankbuchung.getBetrag() - beleg.getBetragMitVorzeichen());
+                splitBuchung.setBetrag(bankbuchung.getBetrag() - offnerBelegBetrag);
                 splitBuchung.setText(bankbuchung.getText());
             }
         }

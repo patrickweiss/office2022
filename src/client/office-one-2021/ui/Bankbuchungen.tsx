@@ -100,13 +100,15 @@ class Bankbuchungen extends DriveLeaf {
       </div>
     );
   }
-  protected renderOffeneRechnung(umbuchung: Umbuchung, belegtyp: string) {
+  protected renderOffeneRechnung(umbuchung: Umbuchung, belegtyp: BelegTyp) {
+    let offnerBelegBetrag = umbuchung.getBetragMitVorzeichen();
+    if (belegtyp!==BelegTyp.Vertrag)offnerBelegBetrag=this.getBM().getOffenerBelegBetrag(umbuchung);
     return (
       <tr key={umbuchung.getId()}>
         <td><ServerButton
-          text={this.formatMoney(umbuchung.getBetragMitVorzeichen())}
+          text={this.formatMoney(offnerBelegBetrag)}
           onClick={this.belegZuordnen}
-          strong={this.bankbuchungOhneZuordnung !== undefined && Math.abs(this.bankbuchungOhneZuordnung.getBetrag() - umbuchung.getBetragMitVorzeichen()) < 0.001}
+          strong={this.bankbuchungOhneZuordnung !== undefined && Math.abs(this.bankbuchungOhneZuordnung.getBetrag() - offnerBelegBetrag) < 0.001}
           id={umbuchung.getId()}
           a={belegtyp} />
         </td>
