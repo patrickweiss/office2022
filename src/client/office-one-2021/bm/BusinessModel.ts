@@ -186,27 +186,26 @@ export class BusinessModel {
     private belegZuordnen(beleg: Umbuchung, action: IBelegZuBankbuchungZuordnen) {
         if (action.bankbuchungID !== "") {
             let bankbuchung = this.getOrCreateBankbuchung(action.bankbuchungID);
-            beleg.setBezahltAm(bankbuchung.getDatum());
+            if ((Math.abs(bankbuchung.getBetrag())+0.0001) >= Math.abs(beleg.getBetragMitVorzeichen()))beleg.setBezahltAm(bankbuchung.getDatum());
             bankbuchung.setBelegID(beleg.getId());
             bankbuchung.setLink(beleg.getLink());
             bankbuchung.setGegenkonto(beleg.getGegenkonto());
-            if ((action.belegTyp != BelegTyp.Vertrag || beleg.getBetrag()!==0) && Math.abs(bankbuchung.getBetrag() - beleg.getBetragMitVorzeichen()) > 0.001) {
+            //this.addLogMessage(`Bank:${bankbuchung.getBetrag()} Beleg:${beleg.getBetragMitVorzeichen()}${beleg.getId()}`)
+            if ((action.belegTyp != BelegTyp.Vertrag || beleg.getBetrag() !== 0) &&
+             (Math.abs(bankbuchung.getBetrag()) >(Math.abs(beleg.getBetragMitVorzeichen())+0.001))
+             ) {
                 const splitBuchung = this.getBankbuchungenTableCache().createNewRow();
-                //Wenn eine eine Zeile im Array erzeugt wird, wird die aktuelle bankbuchung nach unten verschoben
-                //um weiterhin auf deren Daten zugreifen zu können, muss ein neuer Wrapper erzeugt werden
-                bankbuchung = this.getOrCreateBankbuchung(action.bankbuchungID);
+                //this.addLogMessage("Bankbuchung ist größer als Belegsumme, Restbetrag:"+(bankbuchung.getBetrag()-beleg.getBetragMitVorzeichen()));
                 splitBuchung.setKonto(beleg.getGegenkonto());
                 splitBuchung.setNr(bankbuchung.getId());
                 splitBuchung.setDatum(bankbuchung.getDatum());
                 splitBuchung.setBetrag(bankbuchung.getBetrag() - beleg.getBetragMitVorzeichen());
                 splitBuchung.setText(bankbuchung.getText());
-                //todo ...
-                //throw new Error("Betrag des Beleges stimmt nicht mit Bankbuchungsbetrag überein"); 
             }
         }
         else beleg.setBezahltAm(action.datum);
     }
-    public getBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeTableCache().getRowArray() as Bewirtungsbeleg[] }
+   public getBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeTableCache().getRowArray() as Bewirtungsbeleg[] }
     public createBewirtungsbeleg(): Bewirtungsbeleg { return this.getBewirtungsbelegeTableCache().createNewRow() };
     public getOrCreateBewirtungsbeleg(id: string) { return this.getBewirtungsbelegeTableCache().getOrCreateRowById(id); }
     public getOffeneBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeArray().filter(bewirtung => { return (bewirtung.nichtBezahlt() && bewirtung.getId() !== ""); }) }

@@ -107,6 +107,7 @@ reducerFunctions[ServerFunction.BuchungenFuerUmsatzsteuerBerechnenUndEintragen] 
 reducerFunctions[ServerFunction.businessModelUpdate] = function (newState: any, serverResponse: any) {
 }
 reducerFunctions[ServerFunction.businessModelBatchUpdate] = function (newState: any, serverResponse: any) {
+    ServerProxy.actionBatch=[];
     newState.UI.leaf = Leafs.C2021OfficeOnePocket;
     newState.UI.actionBatch = false;
 }
