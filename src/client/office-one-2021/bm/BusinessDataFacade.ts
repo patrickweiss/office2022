@@ -27,7 +27,7 @@ class TableCache<RowType extends TableRow> {
     this.backgroundArray = data[1];
     this.formulaArray = data[2];
     //es gibt keine Formate ... hier muss nur was stehen sonst muss ich alle TableCaches clientspezifisch machen ...
-  //  this.formatsArray = data[0];
+    this.formatsArray = data[1];
     this.columnIndex = this.getColumnIndex(this.dataArray[0]);
     //  this.loadRowCount = this.dataArray.length;
     //  this.rootId = rootId;
