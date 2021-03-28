@@ -257,7 +257,7 @@ export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
     super(rootId, ooTables.RechnungenD);
   }
   public getRowByIndex(rowIndex: string): EinnahmenRechnung {
-    return new EinnahmenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EinnahmenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex,this.formatsArray[rowIndex]);
   }
 }
 export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
@@ -285,7 +285,7 @@ export class EURechnungTableCache extends TableCache<EURechnung> {
     super(rootId, ooTables.EURechnungenD);
   }
   public getRowByIndex(rowIndex: string): EURechnung {
-    return new EURechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EURechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex,this.formatsArray[rowIndex]);
   }
 }
 export class GutschriftenTableCache extends TableCache<Gutschrift> {
@@ -873,6 +873,10 @@ export class Rechnung extends Umbuchung {
 }
 //Fassade der Tabellen in Einnahmen
 export class EinnahmenRechnung extends Rechnung {
+  constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formulaRow: Array<string>, backgroundRow: Array<string>,columnIndex:{},formatRow: Array<string>) {
+    super(titleRow,valueRow,formulaRow,backgroundRow,columnIndex)
+    this.formatRow = formatRow;
+  }
   public getText() { return this.getKonto() + " " + this.getNettoBetragMitVorzeichen() + " €" }
   public getKonto() { return "Leistung:" + this.getValue("Name"); }
   public getStatus() { return this.getValue("Status"); }
