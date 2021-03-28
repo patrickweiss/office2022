@@ -11,15 +11,15 @@ export interface IServerButton {
 }
 
 class ServerButton extends React.Component<IServerButton, object> {
-    protected text: string;
-    protected id?:string;
-    protected a?:string;
+    //protected text: string;
+    //protected id?:string;
+    //protected a?:string;
     protected onClick: (event: MouseEvent) => void;
     constructor(props: IServerButton) {
         super(props);
-        this.text = props.text;
-        this.id=props.id;
-        this.a=props.a;
+      //  this.text = props.text;
+      //  this.id=props.id;
+      //  this.a=props.a;
         this.onClick=props.onClick;
         this.handleClick=this.handleClick.bind(this);
     }
@@ -27,9 +27,9 @@ class ServerButton extends React.Component<IServerButton, object> {
         let disabled = true;
         if (window.store.getState().UI.waitingForResponse===false)disabled=false;
 
-        if (this.props.strong) return <button onClick={this.handleClick} disabled={disabled}><strong id={this.id} data-a={this.a}>{this.text}</strong></button>
+        if (this.props.strong) return <button onClick={this.handleClick} disabled={disabled}><strong id={this.props.id} data-a={this.props.a}>{this.props.text}</strong></button>
         else
-            return <button onClick={this.handleClick} disabled={disabled} id={this.id} data-a={this.a}>{this.text}</button>
+            return <button onClick={this.handleClick} disabled={disabled} id={this.props.id} data-a={this.props.a}>{this.props.text}</button>
     }
     handleClick(e:any){
         this.onClick(e);

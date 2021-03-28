@@ -8,7 +8,7 @@ class TableCache<RowType extends TableRow> {
   dataArray: any[][];
   backgroundArray: string[][];
   formulaArray: string[][];
-  formatsArray: string[][];
+//  formatsArray: string[][];
   columnIndex: {};
   //private loadRowCount: number;
   //private rootId: string;
@@ -27,7 +27,7 @@ class TableCache<RowType extends TableRow> {
     this.backgroundArray = data[1];
     this.formulaArray = data[2];
     //es gibt keine Formate ... hier muss nur was stehen sonst muss ich alle TableCaches clientspezifisch machen ...
-    this.formatsArray = data[0];
+  //  this.formatsArray = data[0];
     this.columnIndex = this.getColumnIndex(this.dataArray[0]);
     //  this.loadRowCount = this.dataArray.length;
     //  this.rootId = rootId;
@@ -76,7 +76,7 @@ class TableCache<RowType extends TableRow> {
     return this.rowArray;
   }
   public getRowByIndex(rowIndex: string): RowType {
-    return new TableRow(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],null,this.backgroundArray[rowIndex],this.columnIndex) as RowType;
+    return new TableRow(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex) as RowType;
   }
  
   public createNewRow():RowType {
@@ -145,17 +145,15 @@ export class TableRow {
   //private index: string;
   private titleRow: Array<string>
   private valueRow: Array<string | number | Date | boolean>
-  private formatRow: Array<string>
   private formulaRow: Array<string>
   private backgroundRow: Array<string>
+  private formatRow: Array<string>
   private columnIndex: {};
-
-
-  constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formatRow: Array<string>, backgroundRow: Array<string>,columnIndex:{}) {
+  constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formulaRow: Array<string>, backgroundRow: Array<string>,columnIndex:{}) {
     this.titleRow = titleRow
     this.valueRow = valueRow
-    this.formatRow = formatRow
-    this.formulaRow = formatRow
+   // this.formatRow = formatRow
+    this.formulaRow = formulaRow
     this.backgroundRow = backgroundRow
     this.columnIndex=columnIndex
   }
@@ -215,13 +213,13 @@ export class TableRow {
 export class EMailIdTableCache extends TableCache<EMailId> {
   constructor(rootId: string) { super(rootId, ooTables.EMailIdD); }
   public getRowByIndex(rowIndex: string): EMailId {
-    return new EMailId(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EMailId(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class AusgabenTableCache extends TableCache<AusgabenRechnung> {
   constructor(rootId: string) { super(rootId, ooTables.AusgabenD); }
   public getRowByIndex(rowIndex: string): AusgabenRechnung {
-    return new AusgabenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new AusgabenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class VertraegeTableCache extends TableCache<Vertrag> {
@@ -229,13 +227,13 @@ export class VertraegeTableCache extends TableCache<Vertrag> {
     super(rootId, ooTables.VerträgeD);
   }
   public getRowByIndex(rowIndex: string): Vertrag {
-    return new Vertrag(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Vertrag(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class BewirtungsbelegeTableCache extends TableCache<Bewirtungsbeleg> {
   constructor(rootId: string) { super(rootId, ooTables.BewirtungsbelegeD); }
   public getRowByIndex(rowIndex: string): Bewirtungsbeleg {
-    return new Bewirtungsbeleg(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Bewirtungsbeleg(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class AbschreibungenTableCache extends TableCache<Abschreibung> {
@@ -243,7 +241,7 @@ export class AbschreibungenTableCache extends TableCache<Abschreibung> {
     super(rootId, ooTables.AbschreibungenD);
   }
   public getRowByIndex(rowIndex: string): Abschreibung {
-    return new Abschreibung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Abschreibung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class VerpflegungsmehraufwendungenTableCache extends TableCache<Verpflegungsmehraufwendung> {
@@ -251,7 +249,7 @@ export class VerpflegungsmehraufwendungenTableCache extends TableCache<Verpflegu
     super(rootId, ooTables.VerpflegungsmehraufwendungenD);
   }
   public getRowByIndex(rowIndex: string): Verpflegungsmehraufwendung {
-    return new Verpflegungsmehraufwendung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Verpflegungsmehraufwendung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
@@ -259,7 +257,7 @@ export class EinnahmenRechnungTableCache extends TableCache<EinnahmenRechnung> {
     super(rootId, ooTables.RechnungenD);
   }
   public getRowByIndex(rowIndex: string): EinnahmenRechnung {
-    return new EinnahmenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EinnahmenRechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
@@ -267,19 +265,19 @@ export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
     super(rootId, ooTables.RechnungSchreibenD);
   }
   public getRowByIndex(rowIndex: string): RechnungSchreiben {
-    return new RechnungSchreiben(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new RechnungSchreiben(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class KundenTableCache extends TableCache<Kunde> {
   constructor(rootId: string) { super(rootId, ooTables.KundenD); }
   public getRowByIndex(rowIndex: string): Kunde {
-    return new Kunde(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Kunde(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class ProdukteTableCache extends TableCache<Produkt>{
   constructor(rootId: string) { super(rootId, ooTables.ProdukteD); }
   public getRowByIndex(rowIndex: string): Produkt {
-    return new Produkt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Produkt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class EURechnungTableCache extends TableCache<EURechnung> {
@@ -287,7 +285,7 @@ export class EURechnungTableCache extends TableCache<EURechnung> {
     super(rootId, ooTables.EURechnungenD);
   }
   public getRowByIndex(rowIndex: string): EURechnung {
-    return new EURechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EURechnung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class GutschriftenTableCache extends TableCache<Gutschrift> {
@@ -295,7 +293,7 @@ export class GutschriftenTableCache extends TableCache<Gutschrift> {
     super(rootId, ooTables.GutschriftenD);
   }
   public getRowByIndex(rowIndex: string): Gutschrift {
-    return new Gutschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Gutschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class PositionenarchivTableCache extends TableCache<PositionenArchiv>{
@@ -303,7 +301,7 @@ export class PositionenarchivTableCache extends TableCache<PositionenArchiv>{
     super(rootId, ooTables.PositionenarchivD);
   }
   public getRowByIndex(rowIndex: string): PositionenArchiv {
-    return new PositionenArchiv(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new PositionenArchiv(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class BankbuchungenTableCache extends TableCache<Bankbuchung> {
@@ -311,7 +309,7 @@ export class BankbuchungenTableCache extends TableCache<Bankbuchung> {
     super(rootId, ooTables.BankbuchungenD);
   }
   public getRowByIndex(rowIndex: string): Bankbuchung {
-    return new Bankbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Bankbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class UmbuchungenTableCache extends TableCache<Umbuchung> {
@@ -319,7 +317,7 @@ export class UmbuchungenTableCache extends TableCache<Umbuchung> {
     super(rootId, ooTables.UmbuchungenD);
   }
   public getRowByIndex(rowIndex: string): Umbuchung {
-    return new Umbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Umbuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class KontenTableCache extends TableCache<Konto> {
@@ -328,7 +326,7 @@ export class KontenTableCache extends TableCache<Konto> {
     super(rootId, ooTables.KontenD);
   }
   public getRowByIndex(rowIndex: string): Konto {
-    return new Konto(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Konto(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public getOrCreateRowById(kontoName: string): Konto {
     return super.getOrCreateRowById(kontoName) as Konto;
@@ -504,7 +502,7 @@ export class UStVATableCache extends TableCache<UStVA> {
     super(rootId, ooTables.UStVAD);
   }
   public getRowByIndex(rowIndex: string): UStVA {
-    return new UStVA(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new UStVA(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public UStVASummenAktualisieren(normalisierteBuchungen: NormalisierteBuchung[], beginnOfYear: Date, periode: string) {
     //ZN spalte befüllen
@@ -626,7 +624,7 @@ export class EURTableCache extends TableCache<EUR> {
     super(rootId, ooTables.EÜRD);
   }
   public getRowByIndex(rowIndex: string): EUR {
-    return new EUR(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new EUR(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public setKontenSpalten(geschaeftsjahr: number) {
     this.kontenSpalten = {
@@ -680,7 +678,7 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
     super(rootId, ooTables.BuchungenD);
   }
   public getRowByIndex(rowIndex: string): NormalisierteBuchung {
-    return new NormalisierteBuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new NormalisierteBuchung(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
   public kontenStammdatenAktualisieren(kontenTableCache: KontenTableCache) {
     const buchungen = this.getRowArray() as NormalisierteBuchung[];
@@ -723,49 +721,49 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
 export class ElsterTransferTableCache extends TableCache<ElsterTransfer> {
   constructor(rootId: string) { super(rootId, ooTables.ElsterTransferD); }
   public getRowByIndex(rowIndex: string): ElsterTransfer {
-    return new ElsterTransfer(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new ElsterTransfer(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class LastschriftmandatTableCache extends TableCache<Lastschriftmandat>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftmandatD); }
   public getRowByIndex(rowIndex: string): Lastschriftmandat {
-    return new Lastschriftmandat(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Lastschriftmandat(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class LastschriftenTableCache extends TableCache<Lastschrift>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftenD); }
   public getRowByIndex(rowIndex: string): Lastschrift {
-    return new Lastschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Lastschrift(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class LastschriftproduktTableCache extends TableCache<Lastschriftprodukt>{
   constructor(rootId: string) { super(rootId, ooTables.LastschriftproduktD); }
   public getRowByIndex(rowIndex: string): Lastschriftprodukt {
-    return new Lastschriftprodukt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Lastschriftprodukt(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class InstallationenTableCache extends TableCache<Installation>{
   constructor(rootId: string) { super(rootId, ooTables.InstallationenD); }
   public getRowByIndex(rowIndex: string): Installation {
-    return new Installation(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Installation(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class CSVTableCache extends TableCache<CSVExport>{
   constructor(rootId: string) { super(rootId, ooTables.CSVExportD); }
   public getRowByIndex(rowIndex: string): CSVExport {
-    return new CSVExport(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new CSVExport(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class GdpduTableCache extends TableCache<Gdpdu>{
   constructor(rootId: string) { super(rootId, ooTables.GdpduD); }
   public getRowByIndex(rowIndex: string): Gdpdu {
-    return new Gdpdu(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new Gdpdu(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 export class DataFileTableCache extends TableCache<DataFile>{
   constructor(rootId: string) { super(rootId, ooTables.DataFileD); }
   public getRowByIndex(rowIndex: string): DataFile {
-    return new DataFile(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formatsArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new DataFile(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
   }
 }
 
