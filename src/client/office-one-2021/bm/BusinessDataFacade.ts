@@ -8,7 +8,7 @@ class TableCache<RowType extends TableRow> {
   dataArray: any[][];
   backgroundArray: string[][];
   formulaArray: string[][];
-//  formatsArray: string[][];
+  formatsArray: string[][];
   columnIndex: {};
   //private loadRowCount: number;
   //private rootId: string;
@@ -147,7 +147,7 @@ export class TableRow {
   private valueRow: Array<string | number | Date | boolean>
   private formulaRow: Array<string>
   private backgroundRow: Array<string>
-  private formatRow: Array<string>
+  protected formatRow: Array<string>
   private columnIndex: {};
   constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formulaRow: Array<string>, backgroundRow: Array<string>,columnIndex:{}) {
     this.titleRow = titleRow
@@ -265,7 +265,7 @@ export class RechnungSchreibenTableCache extends TableCache<RechnungSchreiben>{
     super(rootId, ooTables.RechnungSchreibenD);
   }
   public getRowByIndex(rowIndex: string): RechnungSchreiben {
-    return new RechnungSchreiben(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex);
+    return new RechnungSchreiben(this.dataArray[0]as Array<string>,this.dataArray[rowIndex],this.formulaArray[rowIndex],this.backgroundArray[rowIndex],this.columnIndex,this.formatsArray[rowIndex]);
   }
 }
 export class KundenTableCache extends TableCache<Kunde> {
@@ -1068,6 +1068,10 @@ export class EURechnung extends EinnahmenRechnung {
 
 }
 export class RechnungSchreiben extends TableRow {
+  constructor(titleRow: Array<string>, valueRow: Array<string | number | Date | boolean>, formulaRow: Array<string>, backgroundRow: Array<string>,columnIndex:{},formatRow: Array<string>) {
+    super(titleRow,valueRow,formulaRow,backgroundRow,columnIndex)
+    this.formatRow = formatRow;
+  }
   public getBeschreibung() { return this.getValue("Beschreibung"); }
   public setBeschreibung(value) { this.setValue("Beschreibung", value); }
   public getMenge() { return this.getValue("Menge"); }

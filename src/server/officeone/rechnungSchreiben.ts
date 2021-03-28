@@ -1,4 +1,4 @@
-import { EinnahmenRechnung, EinnahmenRechnungTableCache, Kunde, KundenTableCache, PositionenarchivTableCache, RechnungSchreibenTableCache } from "../../officeone/BusinessDataFacade";
+import { RechnungSchreiben,EinnahmenRechnung, EinnahmenRechnungTableCache, Kunde, KundenTableCache, PositionenarchivTableCache, RechnungSchreibenTableCache } from "../../officeone/BusinessDataFacade";
 interface agent {
   rootId: string;
   positionenCache: RechnungSchreibenTableCache;
@@ -330,7 +330,7 @@ function mpositionsZeilenBearbeiten(a, rechnung) {
 }
 
 
-export function replaceDocumentVariablesByRowData(dokument, positionsRow) {
+export function replaceDocumentVariablesByRowData(dokument, positionsRow:RechnungSchreiben) {
 
   // Search for all the variables to be replaced, for instance ${"Column name"}
   var inhalt = dokument.getText();
@@ -351,11 +351,11 @@ export function replaceDocumentVariablesByRowData(dokument, positionsRow) {
       if (format == "#,##0.00\\ [$€-1]") variableData = formatMoney(variableData);
       if (format == "0%") {
         Logger.log("Prozent:" + variableData);
-        variableData = formatPercent(variableData)
+        variableData = formatPercent(variableData as number)
       }
       var variableText = variableData;
       try {
-        variableText = variableData.getDate() + "." + (variableData.getMonth() + 1) + "." + variableData.getFullYear();
+        variableText = (variableData as Date).getDate() + "." + ((variableData as Date).getMonth() + 1) + "." + (variableData as Date).getFullYear();
       } catch (e) { }
       dokument.replaceText(templateVars[i], variableText || "");
       //Falls es Header oder Footer gibt, hier auch Variablen ersetzen
