@@ -9,7 +9,7 @@ export enum ooVersions {
     oo57 = "0057"
 }
 
-export const currentOOversion = ooVersions.oo56;
+export const currentOOversion = ooVersions.oo57;
 
 export enum belegNr {
     mwstFinanzamtOP = "mwstFinanzamtOP",
@@ -23,8 +23,8 @@ export enum belegNr {
 
 
 export enum systemMasterProperty {
-    officeOne2022_TemplateFolderId = "1b_Yxbqe6SRlL37fQZgHfBWYvwrZ5YKCV",
-    webApp_URL = "https://script.google.com/macros/s/AKfycbwJNEXkA8U-wZlJ93DTxe3xN8ihP_qiYM10RP1gjdGltOe3U0WI/exec"
+    officeOne2022_TemplateFolderId = "1oKZm25-n3sZ-VjhZ1DfiFLF1DCU1syx3",
+    webApp_URL = "https://script.google.com/macros/s/AKfycbxYH38I_OCopkN034ICBOsA2NsKddOLIxYAvIgikEf2yYxTqZY/exec"
 }
 
 export enum ooFolders {

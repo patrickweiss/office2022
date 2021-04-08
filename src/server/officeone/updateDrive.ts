@@ -18,7 +18,7 @@ export function updateDriveMaster(rootFolderId: string) {
   let oooPreviousVersion = getPreviousVersion();
 
   //copy DataTable Data
-  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion]) ) {
+  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
     if (rangeName === ooTables.ElsterTransferD || rangeName === ooTables.InstallationenD) {
       const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooPreviousVersion);
       const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, currentOOversion);
@@ -51,15 +51,20 @@ export function updateDrive(rootFolderId: string) {
   }
   //read from all Tables from new version to make sure all new Spreadsheets get copied
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[currentOOversion])) {
-    if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD ) {
+    if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD) {
       DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, currentOOversion);
     }
   }
 
   //copy value Data, except IDs of new spreadsheets!!!: 
   for (let valueName of Object.keys(DriveConnector.oooVersionValueFileMap[oooPreviousVersion])) {
+    try {
       const dataOldVersion = DriveConnector.getValueByName(rootFolderId, valueName as ooTables, oooPreviousVersion);
       DriveConnector.saveValueByName(rootFolderId, valueName as ooTables, currentOOversion, dataOldVersion)
+    } catch (e) {
+      console.log(valueName);
+      throw e;
+    }
   }
 
   //alte Tabellen in Archivordner verschieben
@@ -72,16 +77,16 @@ export function updateDrive(rootFolderId: string) {
     const eMailSpreadsheet = rootFolder.getFilesByName("0 E-Mail verschicken - Version:" + oooPreviousVersion).next();
     archiv.addFile(eMailSpreadsheet);
     rootFolder.removeFile(eMailSpreadsheet);
-  
-  
+
+
     const lastschriftSpreadsheet = rootFolder.getFilesByName("5 SEPA - Lastschriftmandat - Version:" + oooPreviousVersion).next();
     archiv.addFile(lastschriftSpreadsheet);
     rootFolder.removeFile(lastschriftSpreadsheet);
-  
+
     const posteingangSpreadsheet = rootFolder.getFilesByName("6 Posteingang - Version:" + oooPreviousVersion).next();
     archiv.addFile(posteingangSpreadsheet);
     rootFolder.removeFile(posteingangSpreadsheet);
-  
+
 
     const installationenSpreadsheet = rootFolder.getFilesByName("(1) Installationen - Version:" + oooPreviousVersion).next();
     archiv.addFile(installationenSpreadsheet);
@@ -95,6 +100,10 @@ export function updateDrive(rootFolderId: string) {
 
   }
 
+
+  const officeSpreadsheet = rootFolder.getFilesByName("00 Office - Version:" + oooPreviousVersion).next();
+  archiv.addFile(officeSpreadsheet);
+  rootFolder.removeFile(officeSpreadsheet);
 
   const einnahmenSpreadsheet = rootFolder.getFilesByName("1 Rechnung schreiben - Version:" + oooPreviousVersion).next();
   archiv.addFile(einnahmenSpreadsheet);
@@ -138,7 +147,7 @@ export function updateDrive(rootFolderId: string) {
   }
 
   return getOrCreateOfficeOneFolders();
- 
+
 }
 
 

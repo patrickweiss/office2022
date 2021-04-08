@@ -1,4 +1,4 @@
-import {  currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
+import { currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
 
@@ -9,6 +9,30 @@ export class DriveConnector {
   static rangeValues = {};
   static konfiguration: Object;
   static oooVersionsRangeFileMap = {
+    "0057": {
+      RechnungSchreibenD: "1 Rechnung schreiben",
+      GutschriftenD: "1 Rechnung schreiben",
+      EURechnungenD: "1 Rechnung schreiben",
+      KundenD: "1 Rechnung schreiben",
+      PositionenarchivD: "1 Rechnung schreiben",
+      ProdukteD: "1 Rechnung schreiben",
+      RechnungenD: "1 Rechnung schreiben",
+      AbschreibungenD: "2 Ausgaben erfassen",
+      AusgabenD: "2 Ausgaben erfassen",
+      BewirtungsbelegeD: "2 Ausgaben erfassen",
+      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen",
+      "VerträgeD": "2 Ausgaben erfassen",
+      BankbuchungenD: "3 Bankbuchungen zuordnen",
+      UmbuchungenD: "3 Bankbuchungen zuordnen",
+      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen",
+      KontenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
+      GdpduD: "7 Datenschlürfer",
+      DataFileD: "7 Datenschlürfer",
+      Konfiguration: "00 Office"
+    },
     "0056": {
       RechnungSchreibenD: "1 Rechnung schreiben",
       GutschriftenD: "1 Rechnung schreiben",
@@ -31,63 +55,25 @@ export class DriveConnector {
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
-      Konfiguration: "00 Office",
-   //   log: "00 Office"
-    },
-    "0055": {
-      RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
-      GutschriftenD: "1 Rechnung schreiben - Version:0055",
-      EURechnungenD: "1 Rechnung schreiben - Version:0055",
-      KundenD: "1 Rechnung schreiben - Version:0055",
-      PositionenarchivD: "1 Rechnung schreiben - Version:0055",
-      ProdukteD: "1 Rechnung schreiben - Version:0055",
-      RechnungenD: "1 Rechnung schreiben - Version:0055",
-      AbschreibungenD: "2 Ausgaben erfassen - Version:0055",
-      AusgabenD: "2 Ausgaben erfassen - Version:0055",
-      BewirtungsbelegeD: "2 Ausgaben erfassen - Version:0055",
-      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen - Version:0055",
-      "VerträgeD": "2 Ausgaben erfassen - Version:0055",
-      BankbuchungenD: "3 Bankbuchungen zuordnen - Version:0055",
-      UmbuchungenD: "3 Bankbuchungen zuordnen - Version:0055",
-      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      KontenD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      GdpduD: "7 Datenschlürfer - Version:0055",
-      DataFileD: "7 Datenschlürfer - Version:0055",
+      Konfiguration: "00 Office"
     }
   }
   static oooVersionValueFileMap = {
+    "0057": {
+      GutschriftenDatei: "1 Rechnung schreiben",
+      HilfeRechnungFertigstellen: "1 Rechnung schreiben",
+      HilfeRechnungSchreiben: "1 Rechnung schreiben",
+      KundenEMailVorlageDoc: "1 Rechnung schreiben",
+      Rechnungsnummer: "1 Rechnung schreiben",
+      Rechnungsvorlagelink: "1 Rechnung schreiben"
+    },
     "0056": {
       GutschriftenDatei: "1 Rechnung schreiben",
       HilfeRechnungFertigstellen: "1 Rechnung schreiben",
       HilfeRechnungSchreiben: "1 Rechnung schreiben",
       KundenEMailVorlageDoc: "1 Rechnung schreiben",
       Rechnungsnummer: "1 Rechnung schreiben",
-      Rechnungsvorlagelink: "1 Rechnung schreiben",
-      KundenRechnungsvorlage: "1 Rechnung schreiben",
-      KundenStornorechnungsvorlage: "1 Rechnung schreiben",
-      EMailID: "4 Bilanz, Gewinn und Steuererklärungen",
-      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen",
-      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen",
-      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen",
-      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen"
-    },
-    "0055": {
-      GutschriftenDatei: "1 Rechnung schreiben - Version:0055",
-      HilfeRechnungFertigstellen: "1 Rechnung schreiben - Version:0055",
-      HilfeRechnungSchreiben: "1 Rechnung schreiben - Version:0055",
-      KundenEMailVorlageDoc: "1 Rechnung schreiben - Version:0055",
-      Rechnungsnummer: "1 Rechnung schreiben - Version:0055",
-      Rechnungsvorlagelink: "1 Rechnung schreiben - Version:0055",
-      KundenRechnungsvorlage: "1 Rechnung schreiben - Version:0055",
-      KundenStornorechnungsvorlage: "1 Rechnung schreiben - Version:0055",
-      EMailID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      EinnahmenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      AusgabenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      BankkontenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055",
-      LastschriftenID: "4 Bilanz, Gewinn und Steuererklärungen - Version:0055"
+      Rechnungsvorlagelink: "1 Rechnung schreiben"
     }
   }
   public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: ooTables, version: string) {
@@ -110,16 +96,12 @@ export class DriveConnector {
 
   //alte Funktionen, alle mit rootFolderId und Version
   static getNamedRangeData(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][]] {
-    console.log(`getNamedRangeData(${rootFolderId},${rangeName},${version}`)
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
-    console.log(spreadsheet.getName());
     return [spreadsheet.getRangeByName(rangeName).getValues(),
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1()];
   }
   static getNamedRangeDataAndFormat(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][], string[][]] {
-    Logger.log(`getNamedRangeData(${rootFolderId},${rangeName},${version}`)
-
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     return [spreadsheet.getRangeByName(rangeName).getValues(),
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
@@ -145,7 +127,6 @@ export class DriveConnector {
     SpreadsheetApp.flush()
   }
   static saveNamedRangeData(rootFolderId: string, rangeName: ooTables, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
-    console.log("DriveConnector.saveNamedRangeData:" + rootFolderId + " " + rangeName);
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     let dataRange = spreadsheet.getRangeByName(rangeName);
     // wenn nötig Zeilen einfügen oder löschen
@@ -194,24 +175,19 @@ export class DriveConnector {
         var spreadsheetId = "";
         if (!spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).hasNext()) {
           spreadsheetId = this.copyAndInitializeSpreadsheet(rangeName, currentOOversion, spreadsheetFolder);
-          console.log("new spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId);
         } else {
           spreadsheetId = spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).next().getId();
-          console.log("old spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId);
         }
         spreadsheet = SpreadsheetApp.openById(spreadsheetId);
         this.spreadsheets[rootFolderId + this.getRangeFileName(rangeName, version)] = spreadsheet;
       }
       return spreadsheet as GoogleAppsScript.Spreadsheet.Spreadsheet;
     } catch (e) {
-      console.log("exception get spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId + " for version:" + version);
-      console.log(e.stack);
       return SpreadsheetApp.getActive();
     }
   }
   private static copyAndInitializeSpreadsheet(rangeName: string, version: string, spreadsheetFolder: GoogleAppsScript.Drive.Folder) {
     //throw new Error("Update needed to Version: "+oooVersion); 
-    console.log(rangeName + " " + version + " " + spreadsheetFolder.getName());
     const masterId = this.getMasterFileID(rangeName, version);
     const masterSpreadsheet = SpreadsheetApp.openById(masterId);
     const location: any[][] = masterSpreadsheet.getRangeByName("OfficeRootID").getValues();

@@ -16,7 +16,7 @@ export function getOrCreateOfficeOneFolders() {
   //is funktion invoked from within an office one spreadheet?
 
   try {
-    //Look for folders in GDrive root if function is invoked by WebApp
+    //Look for folders in GDrive root if function is invoked by Spreadsheet
     const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
     const ooFolderId = location[0][0]
     const leaf = location[0][1];
@@ -31,7 +31,7 @@ export function getOrCreateOfficeOneFolders() {
       const ooSystemFolder = ooSystemFolderIterator.next();
       const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
       console.log(systemSpreadsheetName);
-      const ssIterator = ooSystemFolder.getFilesByName(systemSpreadsheetName);
+      const ssIterator = ooSystemFolder.getFiles();
       if (ssIterator.hasNext()) {
         //System ist schon installiert, Rootfolder Ids zurückgeben
         const sheetValue = SpreadsheetApp.openById(ssIterator.next().getId()).getActiveSheet().getRange("B2").getValue().toString()
