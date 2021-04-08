@@ -1,12 +1,12 @@
-import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
-import { ooTables } from "../server/oo21lib/systemEnums";
+import { DriveConnector } from "../server/officeone/driveconnector";
+import { currentOOversion, ooTables } from "../server/oo21lib/systemEnums";
 
 
 export class ValuesCache {
     dataArray : any[][];
     dataHash = {};
     constructor (rangeName:ooTables,rootId:string){
-        this.dataArray = DriveConnector.getNamedRangeData(rootId,rangeName,oooVersion)[0];
+        this.dataArray = DriveConnector.getNamedRangeData(rootId,rangeName,currentOOversion)[0];
         for (let row of this.dataArray){
             this.dataHash[row[0]]=row[1];
         }

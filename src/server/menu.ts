@@ -1,16 +1,17 @@
 import { Installation, InstallationenTableCache } from "../officeone/BusinessDataFacade";
 import { doGetApplicant } from "../officetwo/application/doGetApplicant";
 import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
-import { DriveConnector, oooVersion } from "./officeone/driveconnector";
+import { DriveConnector } from "./officeone/driveconnector";
 import { doGetUStVA } from "./oo21lib/doGetUStVA";
 import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
+import { currentOOversion } from "./oo21lib/systemEnums";
 
 export const onOpen = () => {
   try {
     const name: String = SpreadsheetApp.getActiveSpreadsheet().getName().toString();
     console.log(name);
-    console.log(DriveConnector.oooVersionsRangeFileMap[oooVersion]["InstallationenD"]);
-    if (name === DriveConnector.oooVersionsRangeFileMap[oooVersion]["InstallationenD"]) {
+    console.log(DriveConnector.oooVersionsRangeFileMap[currentOOversion]["InstallationenD"]);
+    if (name === "(1) Installationen - Version:XXXX") {
       const menu = SpreadsheetApp.getUi()
         .createMenu('OfficeOneMaster') // edit me!
         .addItem("Version für nächstes Geschäftsjahr, wenn Spalte Status \"Jahresabschluss\" ist", "OfficeOne")
@@ -69,11 +70,11 @@ export const updateOfficeOne = () => {
   const installationenRowArray: Installation[] = installationenTableCache.getRowArray();
 
   for (let installation of installationenRowArray) {
-    if (installation.getStatus() === "" && installation.getUpdateaufVersion() === oooVersion) {
+    if (installation.getStatus() === "" && installation.getUpdateaufVersion() === currentOOversion) {
       if (installation.getProdukte() === "OfficeOneMaster") updateDriveMaster(installation.getFolderId());
       updateDrive(installation.getFolderId());
       installation.setStatus("Update abgeschlossen");
-      installation.setVersion(oooVersion);
+      installation.setVersion(currentOOversion);
       installation.setDatum(new Date());
       installationenTableCache.save();
     }

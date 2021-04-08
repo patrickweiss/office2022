@@ -1,7 +1,7 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { getTestDatum } from "../oo21lib/sendStatusMail";
-import { ooTables,ServerFunction } from "../oo21lib/systemEnums";
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { currentOOversion, ooTables,ServerFunction } from "../oo21lib/systemEnums";
+import { DriveConnector } from "./driveconnector";
 
 
 
@@ -10,7 +10,7 @@ export function UStVAverschickenFromBackend(BM: BusinessModel, ustvaID: string):
   let ustva = BM.getUStVATableCache().getOrCreateRowById(ustvaID);
 
   let ustvaElster = {};
-  const ustvaRangeData: Object[][] = DriveConnector.getNamedRangeData(BM.getRootFolderId(), ooTables.Konfiguration, oooVersion)[0];
+  const ustvaRangeData: Object[][] = DriveConnector.getNamedRangeData(BM.getRootFolderId(), ooTables.Konfiguration, currentOOversion)[0];
   for (let zeile of ustvaRangeData) {
     ustvaElster[zeile[0].toString()] = zeile[1];
   }

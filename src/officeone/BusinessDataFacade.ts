@@ -1,5 +1,5 @@
-import { DriveConnector, oooVersion } from "../server/officeone/driveconnector";
-import { ooTables } from "../server/oo21lib/systemEnums";
+import { DriveConnector } from "../server/officeone/driveconnector";
+import { currentOOversion, ooTables } from "../server/oo21lib/systemEnums";
 
 
 export class TableCache<RowType extends TableRow> {
@@ -17,11 +17,11 @@ export class TableCache<RowType extends TableRow> {
   constructor(rootId: string, tableName: ooTables) {
     let data = {}
     if (tableName === ooTables.RechnungSchreibenD || tableName === ooTables.RechnungenD) {
-      data = DriveConnector.getNamedRangeDataAndFormat(rootId, tableName, oooVersion)
+      data = DriveConnector.getNamedRangeDataAndFormat(rootId, tableName, currentOOversion)
       this.formatsArray = data[3];
     }
     else {
-      data = DriveConnector.getNamedRangeData(rootId, tableName, oooVersion);
+      data = DriveConnector.getNamedRangeData(rootId, tableName, currentOOversion);
       this.formatsArray = data[0];//da muss was drin stehen, sonst können keine TableRows bei Aufruf in getRowByIndex erzeugt werden
     }
     this.dataArray = data[0];
@@ -115,7 +115,7 @@ export class TableCache<RowType extends TableRow> {
     return tableRow as RowType;
   }
   public save() {
-    DriveConnector.saveNamedRangeData(this.rootId, this.tableName, this.loadRowCount, this.dataArray, this.backgroundArray, this.formulaArray, oooVersion);
+    DriveConnector.saveNamedRangeData(this.rootId, this.tableName, this.loadRowCount, this.dataArray, this.backgroundArray, this.formulaArray, currentOOversion);
   }
   public deleteAll() {
     this.dataArray = [this.dataArray[0]];

@@ -2,8 +2,8 @@ import { string } from "prop-types";
 import { Konto } from "../../client/office-one-2021/bm/BusinessDataFacade";
 import { AbschreibungenTableCache, AusgabenTableCache, BankbuchungenTableCache, BewirtungsbelegeTableCache, CSVExport, CSVTableCache, EinnahmenRechnungTableCache, EURechnungTableCache, GutschriftenTableCache, KontenTableCache, UmbuchungenTableCache, VerpflegungsmehraufwendungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { belegNr, ooTables, ServerFunction } from "../oo21lib/systemEnums";
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { belegNr, currentOOversion, ooTables, ServerFunction } from "../oo21lib/systemEnums";
+import { DriveConnector } from "./driveconnector";
 
 interface agent {
   rootFolderId: string;
@@ -41,9 +41,9 @@ enum exportgruppe {
 export function SimbaExportErstellen(rootFolderId: string) {
   const bm = new BusinessModel(rootFolderId, "SimbaExportErstellen");
   try {
-    const ausgabenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.AusgabenD, oooVersion).getId();
-    const einnahmenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.RechnungenD, oooVersion).getId();
-    const bankkontenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.BankbuchungenD, oooVersion).getId();
+    const ausgabenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.AusgabenD, currentOOversion).getId();
+    const einnahmenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.RechnungenD, currentOOversion).getId();
+    const bankkontenID = DriveConnector.getSpreadsheet(rootFolderId, ooTables.BankbuchungenD, currentOOversion).getId();
     let kontenCache = new KontenTableCache(rootFolderId);
 
     let a: agent = {
@@ -158,7 +158,7 @@ function ebBuchungAnpassen(a: agent, csvRow: CSVExport, soll: Konto, haben: Kont
   if (haben.getKontentyp() === "GuV") csvRow.setValue("SKR03 (Haben)", "9000");
 }
 function ausgabenCSV(a: agent) {
-  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.AusgabenD, oooVersion).getId();
+  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.AusgabenD, currentOOversion).getId();
 
 
   a.ausgabenLinkFormula = linkFormula(ausgabenID);
@@ -204,7 +204,7 @@ function ausgabenCSV(a: agent) {
 
 }
 function bewirtungsbelegeCSV(a: agent) {
-  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.BewirtungsbelegeD, oooVersion).getId();
+  var ausgabenID = DriveConnector.getSpreadsheet(a.rootFolderId, ooTables.BewirtungsbelegeD, currentOOversion).getId();
   //  a.ausgabenLinkFormula = saw.linkFormula(ausgabenID);
   a.bewirtungsbelegeCache = new BewirtungsbelegeTableCache(a.rootFolderId);
   if (a.bewirtungsbelegeCache.getRowByIndex("1").getValue("Datum") == "") return;

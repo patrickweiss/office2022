@@ -1,7 +1,6 @@
 import {  currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
-export const oooVersion = "0056";
 
 
 export class DriveConnector {
@@ -33,7 +32,7 @@ export class DriveConnector {
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
       Konfiguration: "00 Office",
-      log: "00 Office"
+   //   log: "00 Office"
     },
     "0055": {
       RechnungSchreibenD: "1 Rechnung schreiben - Version:0055",
@@ -100,7 +99,7 @@ export class DriveConnector {
   public static getOfficeProperty(rootFolderId: string, name: office, version: string) {
     if (!this.konfiguration) {
       this.konfiguration = {};
-      const konfigurationRangeData: Object[][] = DriveConnector.getNamedRangeData(rootFolderId, ooTables.Konfiguration, oooVersion)[0];
+      const konfigurationRangeData: Object[][] = DriveConnector.getNamedRangeData(rootFolderId, ooTables.Konfiguration, currentOOversion)[0];
       for (let zeile of konfigurationRangeData) {
         this.konfiguration[zeile[0].toString()] = zeile[1];
       }
@@ -194,7 +193,7 @@ export class DriveConnector {
       if (spreadsheet === undefined) {
         var spreadsheetId = "";
         if (!spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).hasNext()) {
-          spreadsheetId = this.copyAndInitializeSpreadsheet(rangeName, oooVersion, spreadsheetFolder);
+          spreadsheetId = this.copyAndInitializeSpreadsheet(rangeName, currentOOversion, spreadsheetFolder);
           console.log("new spreadsheet:" + spreadsheetId + " for range:" + rangeName + "for folder:" + rootFolderId);
         } else {
           spreadsheetId = spreadsheetFolder.getFilesByName(this.getRangeFileName(rangeName, version)).next().getId();
@@ -243,7 +242,7 @@ export class DriveConnector {
 
 export function generateAndMailTableRow() {
   let namedRange = ooTables.Konfiguration;
-  let columnArray = DriveConnector.getNamedRangeData("1-b7eO9tjq4lZcpHDnhfcd4cUdBnRbXGt", namedRange, oooVersion)[0][0];
+  let columnArray = DriveConnector.getNamedRangeData("1-b7eO9tjq4lZcpHDnhfcd4cUdBnRbXGt", namedRange, currentOOversion)[0][0];
   let getterAndSetter = "";
   columnArray.forEach(column => {
     let camelColumn = column.toString().replace(/ /g, "").replace(/-/g, "");
@@ -255,7 +254,7 @@ export function generateAndMailTableRow() {
 }
 
 export function generateAndMailoooVersionsFileNameIdMap() {
-  const newVersionFolder = getDevOpsFolder().getFoldersByName(oooVersion).next().getFoldersByName(ooFolders.office + " " + currentOOversion).next();
+  const newVersionFolder = getDevOpsFolder().getFoldersByName(currentOOversion).next().getFoldersByName(ooFolders.office + " " + currentOOversion).next();
   const spreadheets = newVersionFolder.getFilesByType("application/vnd.google-apps.spreadsheet");
   let oooVersionsFileNameIdMap = {};
   while (spreadheets.hasNext()) {

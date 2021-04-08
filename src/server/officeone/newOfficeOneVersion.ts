@@ -1,12 +1,14 @@
-import { months, ooTables } from "../oo21lib/systemEnums";
-import { DriveConnector, oooVersion } from "./driveconnector";
+import { copyFolder } from "../oo21lib/driveConnector";
+import { currentOOversion, months, ooVersions } from "../oo21lib/systemEnums";
 
 export const getDevOpsFolder = () => {return DriveApp.getFolderById("139Tyi3gOXE7ZkfUdhRXMMl8uZj0uxIb9")};
 
 export const newOfficeOneVersion = () => {
-    const nextVersion = getNextVersion();
-    const nextVersionFolder = getDevOpsFolder().createFolder(nextVersion);
+    const nextVersion = getNextVersion() as ooVersions;
 
+    copyFolder(getDevOpsFolder().getFoldersByName(currentOOversion).next().getId(),getDevOpsFolder().getId(),currentOOversion,nextVersion)
+    /*
+    const nextVersionFolder = getDevOpsFolder().createFolder(nextVersion);
     // make a copy of all Spreadsheets
     //read from all Tables from new version to make sure all new Spreadsheets get copied
     for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
@@ -20,6 +22,7 @@ export const newOfficeOneVersion = () => {
     }
     createNewOfficOneFolders(nextVersionFolder.getId());
     copyTemplates(getDevOpsFolder().getFoldersByName(oooVersion).next().getId(), nextVersionFolder.getId());
+    */
 }
 
 export const copyTemplates = (sourceFolderId: string, destinationFolderId: string) => {
@@ -50,7 +53,6 @@ export const createNewOfficOneFolders = (rootFolderId: string):string => {
     const bank = rootFolder.createFolder("3 Bankkonten");
     monthFolders(bank);
     rootFolder.createFolder("4 Umsatzsteuervoranmeldungen und EÜR (Steuererklärungen, Finanzamtbescheide)");
-    rootFolder.createFolder("6 Posteingang");
     rootFolder.createFolder("6 Verträge");
     return sawFolderId;
 }
@@ -62,7 +64,7 @@ const monthFolders = (folder: GoogleAppsScript.Drive.Folder) => {
 }
 
 export function getNextVersion() {
-    let oooNextVersion = (parseInt(oooVersion, 10) + 1).toString();
+    let oooNextVersion = (parseInt(currentOOversion, 10) + 1).toString();
     let nix = "";
     for (let nullen = 0; nullen < 4 - oooNextVersion.length; nullen++) {
         nix += "0";

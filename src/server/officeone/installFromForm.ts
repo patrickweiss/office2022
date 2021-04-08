@@ -1,11 +1,11 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { DriveConnector, oooVersion } from "./driveconnector";
-import { copyTemplates, createNewOfficOneFolders, getDevOpsFolder } from "./newOfficeOneVersion";
+import { DriveConnector } from "./driveconnector";
+import { createNewOfficOneFolders, getDevOpsFolder } from "./newOfficeOneVersion";
 import { dataRangeByKeyFromColumn } from "./onEditRechnung";
 import { cell } from "./rechnungSchreiben";
 import { linkFormula } from "./SimbaExportErstellen";
 import numeral from "numeral";
-import { ooTables } from "../oo21lib/systemEnums";
+import { currentOOversion, ooTables } from "../oo21lib/systemEnums";
 
 interface agent {
     order: string;
@@ -75,11 +75,10 @@ function eMailMitLink(kundenEmail, kundenName, e) {
     } catch (e) {
         //var aktuelleInstallation;
         aktuelleInstallation = newDataRange("Installationen");
-        var neueVersionString = oooVersion;
         let clientFolder = DriveApp.getFolderById("0Bww6H6AlfkCfT0Vnc281SU1YR28")
-            .createFolder("XXXX " + kundenName + ".Office " + oooVersion);
+            .createFolder("XXXX " + kundenName + ".Office " + currentOOversion);
         let bm = new BusinessModel(clientFolder.getId(),"eMailMitLink");
-        clientFolder.setName(bm.endOfYear().getFullYear() + " " + kundenName + ".Office " + oooVersion);
+        clientFolder.setName(bm.endOfYear().getFullYear() + " " + kundenName + ".Office " + currentOOversion);
 
 
         agent.clientFolder = clientFolder;
@@ -92,8 +91,8 @@ function eMailMitLink(kundenEmail, kundenName, e) {
         cell(aktuelleInstallation, "Name").setValue(kundenName);
         cell(aktuelleInstallation, "E-Mail").setValue(kundenEmail);
         cell(aktuelleInstallation, "Datum").setValue(new Date());
-        cell(aktuelleInstallation, "Version").setValue(oooVersion);
-        cell(aktuelleInstallation, "Update auf Version").setValue(oooVersion);   
+        cell(aktuelleInstallation, "Version").setValue(currentOOversion);
+        cell(aktuelleInstallation, "Update auf Version").setValue(currentOOversion);   
         cell(aktuelleInstallation, "Produkte").setValue("OfficeOne,OfficeBanking");
         cell(aktuelleInstallation, "MIBeruf").setValue(agent.event.namedValues["Was bieten Sie an oder auch wie nennen Sie Ihr Unternehmen?"]);
         cell(aktuelleInstallation, "MIStrasse").setValue(agent.event.namedValues["Straße"]);
@@ -120,16 +119,16 @@ function installationStarten(installationDataRange: GoogleAppsScript.Spreadsheet
 
     //neue, leere Tabelle ins Kunden Office kopieren
     cell(installationDataRange, "Datum").setValue(new Date());
-    var versionEUR = oooVersion  //Installationstabell unter neueVersion
+    var versionEUR = currentOOversion  //Installationstabell unter neueVersion
     cell(installationDataRange, "Status").setValue("Version " + versionEUR + " in Kundenordner kopieren");
 
     var kundenName = cell(installationDataRange, "Name").getValue();
     agent.kundenName = kundenName;
     let clientFolder = agent.clientFolder;
     //read from all Tables from new version to make sure all new Spreadsheets get copied
-    for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
+    for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[currentOOversion])) {
         if (rangeName !== "ElsterTransferD" && rangeName !== "InstallationenD" && rangeName !== "TestsystemeD") {
-            DriveConnector.getNamedRangeData(clientFolder.getId(), rangeName as ooTables, oooVersion);
+            DriveConnector.getNamedRangeData(clientFolder.getId(), rangeName as ooTables, currentOOversion);
         }
     }
     const sawClientFolderId = createNewOfficOneFolders(clientFolder.getId());
@@ -137,12 +136,12 @@ function installationStarten(installationDataRange: GoogleAppsScript.Spreadsheet
    // Magic Invoice
    let neuerVorlagenOrdner = clientFolder.getFoldersByName("0 Vorlagen").next();
       
-   var rechnungsVorlageMagicInvoice =  getDevOpsFolder().getFoldersByName(oooVersion).next()
+   var rechnungsVorlageMagicInvoice =  getDevOpsFolder().getFoldersByName(currentOOversion).next()
    .getFoldersByName("0 Vorlagen").next().getFilesByName("Rechnungsvorlage Magic Invoice").next();
    var neueRechnungsVorlageMagicInvoice = rechnungsVorlageMagicInvoice.makeCopy("Rechnungsvorlage "+agent.event.namedValues["Geben Sie hier Ihren Namen ein"]+" - "+agent.event.namedValues["Was bieten Sie an oder auch wie nennen Sie Ihr Unternehmen?"],neuerVorlagenOrdner);
    replaceDocumentVariablesByRangeData(DocumentApp.openById(neueRechnungsVorlageMagicInvoice.getId()), agent.kundeRange);
    
-   var stornorechnungsVorlageMagicInvoice =  getDevOpsFolder().getFoldersByName(oooVersion).next()
+   var stornorechnungsVorlageMagicInvoice =  getDevOpsFolder().getFoldersByName(currentOOversion).next()
    .getFoldersByName("0 Vorlagen").next().getFilesByName("Stornorechnungsvorlage Magic Invoice").next();
    var neueStornorechnungsVorlageMagicInvoice = stornorechnungsVorlageMagicInvoice.makeCopy("Stornorechnungsvorlage "+agent.event.namedValues["Geben Sie hier Ihren Namen ein"]+" - "+agent.event.namedValues["Was bieten Sie an oder auch wie nennen Sie Ihr Unternehmen?"],neuerVorlagenOrdner);
    replaceDocumentVariablesByRangeData(DocumentApp.openById(neueStornorechnungsVorlageMagicInvoice.getId()), agent.kundeRange);
@@ -150,7 +149,7 @@ function installationStarten(installationDataRange: GoogleAppsScript.Spreadsheet
    
    
    //Link für Rechnungs- und Stornorechnungsvorlage eintragen, Link auf E-Mailvorlage löschen (muss Benutzer nach Installation selbst erstellen und einfügen)
-   DriveConnector.saveFormulaByName(clientFolder.getId(),ooTables.Rechnungsvorlagelink,oooVersion,linkFormula(neueRechnungsVorlageMagicInvoice.getId()))
+   DriveConnector.saveFormulaByName(clientFolder.getId(),ooTables.Rechnungsvorlagelink,currentOOversion,linkFormula(neueRechnungsVorlageMagicInvoice.getId()))
   // DriveConnector.saveFormulaByName(clientFolder.getId(),"KundenEMailVorlageDoc",oooVersion,linkFormula(neueeMailVorlageDoc.getId()))
   // copyTemplates(getDevOpsFolder().getFoldersByName(oooVersion).next().getId(), clientFolder.getId());
   //Kundenordner Schwarz auf Weiss aktualisieren

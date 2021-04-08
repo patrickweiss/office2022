@@ -8,7 +8,7 @@ import * as Action from './Action';
 import { TableRow } from '../bm/BusinessDataFacade';
 import { BusinessModel } from '../bm/BusinessModel';
 import { ServerButton } from './ServerButton';
-import { oooVersion } from "../../../server/officeone/driveconnector";
+import { currentOOversion } from "../../../server/oo21lib/systemEnums";
 
 declare let window: IOfficeWindow;
 
@@ -20,7 +20,7 @@ export interface IOOFolderSelected extends Action.IAction {
 export interface IOOFolderDisconnected extends Action.IAction { }
 
 export function createVorjahrInstanceNameFromFolderName(folderName:string){
-   return (parseInt(folderName.substr(0, 4)) - 1).toString() + folderName.substr(4) + " "+ oooVersion;
+   return (parseInt(folderName.substr(0, 4)) - 1).toString() + folderName.substr(4) + " "+ currentOOversion;
 }
 
 Action.reducerFunctions[Action.Type.OOFolderSelected] = function (newState: any, action: IOOFolderSelected) {
