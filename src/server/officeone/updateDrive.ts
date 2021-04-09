@@ -3,6 +3,7 @@ import { currentOOversion, ooTables } from "../oo21lib/systemEnums";
 import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
 import { ServerFunction } from "../oo21lib/systemEnums";
+import { installTrigger } from "../oo21lib/systemFunction";
 
 export function getPreviousVersion() {
   let oooPreviousVersion = (parseInt(currentOOversion, 10) - 1).toString();
@@ -146,6 +147,7 @@ export function updateDrive(rootFolderId: string) {
     }
   }
 
+  installTrigger();
   return getOrCreateOfficeOneFolders();
 
 }

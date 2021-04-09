@@ -31,7 +31,8 @@ export class DriveConnector {
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
-      Konfiguration: "00 Office"
+      Konfiguration: "00 Office",
+      log:"00 Office"
     },
     "0056": {
       RechnungSchreibenD: "1 Rechnung schreiben",
@@ -55,7 +56,8 @@ export class DriveConnector {
       CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
-      Konfiguration: "00 Office"
+      Konfiguration: "00 Office",
+      log:"00 Office"
     }
   }
   static oooVersionValueFileMap = {

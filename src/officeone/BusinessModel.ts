@@ -89,6 +89,8 @@ export class BusinessModel {
     }
     public saveLog(message: string) {
         this.addLogMessage(message);
+    //    console.log(this.rootFolderId);
+    //    console.log(this.logMessage);
         const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, currentOOversion);
         let sheet = logSpreadsheet.getSheetByName("log")
         if (!sheet) {
@@ -294,7 +296,6 @@ export class BusinessModel {
     public getGdpduArray(): Gdpdu[] { return this.getGdpduTableCache().getRowArray() }
     public kontoSummenAktualisieren() {
         //weitere Buchungen zum Eintragen siehe legacy Version 0050 function buchungenAktualisieren()
-        console.log("BM.kontoSummenAktualisieren");
         this.getNormalisierteBuchungenTableCache().reset();
         this.addToNormalisierteBuchungen(this.getUmbuchungenArray());
         this.addToNormalisierteBuchungen(this.getEinnahmenRechnungArray());
@@ -317,7 +318,6 @@ export class BusinessModel {
 
     }
     private addToNormalisierteBuchungen(umbuchungen: Umbuchung[]) {
-        console.log("BM.AddtoNormaliesierte Buchungen Anzahl:" + umbuchungen.length);
         for (let umbuchung of umbuchungen) {
             try {
                 umbuchung.addToTableCache(this.getNormalisierteBuchungenTableCache(), this.beginOfYear(), "Umbuchung");

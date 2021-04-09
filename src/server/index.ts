@@ -30,6 +30,7 @@ import { installTestsystemTest, testFromForm } from './officeone/testFromForm';
 import { addEmailId } from '../officetwo/application/addEMailId';
 import { vertraegeFolderScannen } from './officeone/vertraegeFolderScannen';
 import { rechnungsVorlageErstellen } from './oo21lib/rechnungsVorlageErstellen';
+import { daily } from './oo21lib/systemFunction';
 
 
 global.onOpen = publicUiFunctions.onOpen;
@@ -77,6 +78,7 @@ interface IOfficeGlobal {
     createLastschriften: any;
     createInvoicesAndSepaXml: any;
     deleteData: any;
+    daily: () => void;
 }
 
 declare let global: IOfficeGlobal;
@@ -120,5 +122,6 @@ global.mrechnungErstellen = mrechnungErstellen;
 global.addEmailId = addEmailId;
 global.vertraegeFolderScannen = vertraegeFolderScannen;
 global.getOrCreateRootFolder = getOrCreateRootFolder;
-global.rechnungsVorlageErstellen = rechnungsVorlageErstellen ;
+global.rechnungsVorlageErstellen = rechnungsVorlageErstellen;
+global.daily=daily;
 

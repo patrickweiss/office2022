@@ -1,5 +1,6 @@
 import { copyFolder } from "../oo21lib/driveConnector";
 import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ServerFunction, systemMasterProperty } from "../oo21lib/systemEnums";
+import { installTrigger } from "../oo21lib/systemFunction";
 import { DriveConnector } from "./driveconnector";
 
 //oo21lib stuff
@@ -24,44 +25,35 @@ export function getOrCreateOfficeOneFolders() {
     const version = folder.getName().slice(-4);
     foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: leaf };
   } catch (e) {
-    console.log(e);
-    //Funktion wurde von WebApp aufgerufen
-    const ooSystemFolderIterator = DriveApp.getFoldersByName(ooFolders.system)
-    if (ooSystemFolderIterator.hasNext()) {
-      const ooSystemFolder = ooSystemFolderIterator.next();
-      const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
-      console.log(systemSpreadsheetName);
-      const ssIterator = ooSystemFolder.getFiles();
-      if (ssIterator.hasNext()) {
-        //System ist schon installiert, Rootfolder Ids zurückgeben
-        const sheetValue = SpreadsheetApp.openById(ssIterator.next().getId()).getActiveSheet().getRange("B2").getValue().toString()
-        console.log(sheetValue);
-        const folderIds = JSON.parse(sheetValue) as Array<string>;
-        console.log(folderIds)
-        for (let ooFolderId of folderIds) {
-          console.log(ooFolderId);
-          const folder = DriveApp.getFolderById(ooFolderId);
-          const version = folder.getName().slice(-4);
-          foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
-
-        }
-      } else {/*
-
-      console.log("System installieren")
-      const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office+" "+currentOOversion);
-      const oo22dv = new oo22.DriveConnector(ooRoot.getId(),ooTables.officeConfiguration,currentOOversion);
-      oo22dv.installSystem();
-      const ooFolderId = oo22dv.officeFolder.getId();
-      const folder = DriveApp.getFolderById(ooFolderId);
-      const version = folder.getName().slice(-4);
-      foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
-      */
+    const folderIds = getSystemFolderIds();
+    console.log(folderIds)
+    if (folderIds) {
+      for (let ooFolderId of folderIds) {
+        console.log(ooFolderId);
+        const folder = DriveApp.getFolderById(ooFolderId);
+        const version = folder.getName().slice(-4);
+        foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
       }
     }
-
   }
   console.log(JSON.stringify(result));
   return JSON.stringify(result);
+}
+
+export function getSystemFolderIds(): Array<string> {
+  const ooSystemFolderIterator = DriveApp.getRootFolder().getFoldersByName(ooFolders.system)
+  if (ooSystemFolderIterator.hasNext()) {
+    const ooSystemFolder = ooSystemFolderIterator.next();
+    const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
+    const ssIterator = ooSystemFolder.getFiles();
+    if (ssIterator.hasNext()) {
+      //System ist schon installiert, Rootfolder Ids zurückgeben
+      const sheetValue = SpreadsheetApp.openById(ssIterator.next().getId()).getActiveSheet().getRange("B2").getValue().toString()
+      return JSON.parse(sheetValue) as Array<string>;
+    } else {
+      throw new Error(Session.getActiveUser().getEmail() + " keine systemIds gefunden in rootID:" + DriveApp.getRootFolder().getId())
+    }
+  }
 }
 
 export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVersion: string) {
@@ -104,6 +96,7 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
     id: officeRootId,
     name: DriveApp.getFolderById(officeRootId).getName()
   }
+  installTrigger();
   return JSON.stringify(result);
 }
 
