@@ -24,7 +24,7 @@ export function installTrigger() {
         for (let i = 0; i < triggers.length; i++) {
             ScriptApp.deleteTrigger(triggers[i]);
         }
-        ScriptApp.newTrigger("daily").timeBased().everyMinutes(1).create()
+        // ScriptApp.newTrigger("daily").timeBased().everyMinutes(1).create()
         // ScriptApp.newTrigger("daily").timeBased().atHour(0).everyDays(1).create()
     }
     catch (e) {

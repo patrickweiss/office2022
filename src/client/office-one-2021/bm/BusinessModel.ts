@@ -140,10 +140,10 @@ export class BusinessModel {
         }
     }
     public getOffenerBelegBetrag(umbuchung:Umbuchung){
-        let offnerBelegBetrag = umbuchung.getBetragMitVorzeichen();
+        let offenerBelegBetrag = umbuchung.getBetragMitVorzeichen();
         this.getBankbuchungenArray().filter(bankbuchung => umbuchung.getId()===bankbuchung.getBelegID())
-        .forEach(bankbuchung => {offnerBelegBetrag-=bankbuchung.getBetrag()})
-        return offnerBelegBetrag;
+        .forEach(bankbuchung => {offenerBelegBetrag-=bankbuchung.getBetrag()})
+        return offenerBelegBetrag;
     }
     public getEinnahmenRechnungArray(): EinnahmenRechnung[] { return this.getEinnahmenRechnungTableCache().getRowArray() as EinnahmenRechnung[]; }
     public getEURechnungArray():EURechnung[] {return this.getEURechnungTableCache().getRowArray()as EURechnung[];}

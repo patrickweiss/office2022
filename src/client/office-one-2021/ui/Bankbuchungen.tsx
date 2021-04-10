@@ -63,7 +63,6 @@ class Bankbuchungen extends DriveLeaf {
     if (this.bankbuchungOhneZuordnung !== undefined) bankbuchungHTML = <p>{this.formatDate(this.bankbuchungOhneZuordnung.getDatum())} <strong>{this.formatMoney(this.bankbuchungOhneZuordnung.getBetrag())}</strong> {this.bankbuchungOhneZuordnung.getText()}</p>
 
     const offeneAusgaben = this.getBM().getOffeneAusgabenRechnungArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.Ausgabe));
-    console.log(offeneAusgaben[0]);
     const offeneBewirtungsbelege = this.getBM().getOffeneBewirtungsbelegeArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.Bewirtungsbeleg));
     const offeneEinnahmen = this.getBM().getOffeneEinnahmenRechnungArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.Rechnung));
     const offeneEUEinnahmen = this.getBM().getEURechnungArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.EURechnung));
