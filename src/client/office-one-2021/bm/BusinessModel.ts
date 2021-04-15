@@ -15,7 +15,7 @@ import {
     NormalisierteBuchungenTableCache, NormalisierteBuchung,
     GdpduTableCache, Gdpdu
 } from './BusinessDataFacade';
-import { Type } from '../framework/Action';
+import { IAction, Type } from '../framework/Action';
 import { IOfficeWindow } from '../framework/OfficeWindow';
 import { IBelegZuBankbuchungZuordnen } from '../ui/Bankbuchungen';
 import { ValuesCache } from './ValuesCache';
@@ -103,7 +103,8 @@ export class BusinessModel {
         if (jahr==="")throw new Error("Konfiguration:zeitraumJahr fehlt");
         return new Date(parseInt(jahr,10), 11, 31); }
     public beginOfYear() { return new Date(this.endOfYear().getFullYear(), 0, 1) }
-    public handleAction(action: any) {
+    public handleAction(action: IBelegZuBankbuchungZuordnen) {
+        if (action.type === Type.buchungZurueckstellen)this.getBankbuchungenTableCache().putBackFirstRow();
         if (action.type === Type.BelegZuBankbuchungZuordnen) {
             if (action.belegTyp === BelegTyp.Ausgabe) this.belegZuordnen(this.getOrCreateAusgabenRechnung(action.belegID), action);
             if (action.belegTyp === BelegTyp.Bewirtungsbeleg) this.belegZuordnen(this.getOrCreateBewirtungsbeleg(action.belegID), action);
@@ -113,6 +114,7 @@ export class BusinessModel {
             if (action.belegTyp === BelegTyp.Umbuchung) this.belegZuordnen(this.getOrCreateUmbuchung(action.belegID), action);
             if (action.belegTyp === BelegTyp.Vertrag) this.belegZuordnen(this.getOrCreateVertrag(action.belegID), action);
         }
+        /*
         if (action.type === Type.AusgabeBuchen) {
             const neueAusgabe = this.createAusgabenRechnung();
             neueAusgabe.setFileId(action.id);
@@ -137,7 +139,7 @@ export class BusinessModel {
             neueGutschrift.setNettoBetrag(action.betrag - action.mwst);
             neueGutschrift.setMehrwertsteuer(action.mwst);
             neueGutschrift.setGegenkonto(action.gegenkonto);
-        }
+        }*/
     }
     public getOffenerBelegBetrag(umbuchung:Umbuchung){
         let offenerBelegBetrag = umbuchung.getBetragMitVorzeichen();
@@ -215,7 +217,7 @@ export class BusinessModel {
         }
         else beleg.setBezahltAm(action.datum);
     }
-   public getBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeTableCache().getRowArray() as Bewirtungsbeleg[] }
+    public getBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeTableCache().getRowArray() as Bewirtungsbeleg[] }
     public createBewirtungsbeleg(): Bewirtungsbeleg { return this.getBewirtungsbelegeTableCache().createNewRow() };
     public getOrCreateBewirtungsbeleg(id: string) { return this.getBewirtungsbelegeTableCache().getOrCreateRowById(id); }
     public getOffeneBewirtungsbelegeArray(): Bewirtungsbeleg[] { return this.getBewirtungsbelegeArray().filter(bewirtung => { return (bewirtung.nichtBezahlt() && bewirtung.getId() !== ""); }) }

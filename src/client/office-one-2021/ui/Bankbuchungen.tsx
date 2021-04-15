@@ -8,6 +8,7 @@ import { IOfficeWindow } from '../framework/OfficeWindow';
 import JahrMonat from './JahrMonat';
 import { ServerButton } from '../framework/ServerButton';
 import { BelegTyp } from "../bm/BusinessModel";
+import RechnungenListen from "./RechnungenListen";
 declare let window: IOfficeWindow;
 
 
@@ -25,6 +26,13 @@ reducerFunctions[Type.BelegZuBankbuchungZuordnen] = function (newState: any, act
   newState.UI.actionBatch=true;
   return newState;
 }
+// tslint:disable-next-line:only-arrow-functions
+reducerFunctions[Type.buchungZurueckstellen] = function (newState: any, action: IBelegZuBankbuchungZuordnen) {
+  window.BM.handleAction(action);
+  newState.UI.actionBatch=true;
+  return newState;
+}
+
 
 class Bankbuchungen extends DriveLeaf {
   private bankbuchungOhneZuordnung: Bankbuchung;
@@ -39,6 +47,7 @@ class Bankbuchungen extends DriveLeaf {
     super(newProps);
     this.leafName = OfficeLeaf.Leafs.Bankbuchungen;
     this.belegZuordnen = this.belegZuordnen.bind(this);
+    this.buchungZurueckstellen = this.buchungZurueckstellen.bind(this);
     this.handleDriveScannen = this.handleDriveScannen.bind(this);
 
   }
@@ -60,7 +69,11 @@ class Bankbuchungen extends DriveLeaf {
   protected renderDriveData() {
     this.bankbuchungOhneZuordnung = this.getBM().getBankbuchungenNichtZugeordnetArray()[0];
     let bankbuchungHTML = <p><strong>Alle Bankbuchungen sind schon zugeordnet. Bei Knopfdruck wird {this.getBM().endOfYear().getFullYear()} <JahrMonat size="BUTTON" /> als Bezahldatum OHNE Zuordnung zu einer Bankbuchung eingetragen.</strong></p>;
-    if (this.bankbuchungOhneZuordnung !== undefined) bankbuchungHTML = <p>{this.formatDate(this.bankbuchungOhneZuordnung.getDatum())} <strong>{this.formatMoney(this.bankbuchungOhneZuordnung.getBetrag())}</strong> {this.bankbuchungOhneZuordnung.getText()}</p>
+    if (this.bankbuchungOhneZuordnung !== undefined) bankbuchungHTML = 
+    <p>
+      {this.formatDate(this.bankbuchungOhneZuordnung.getDatum())} <strong>{this.formatMoney(this.bankbuchungOhneZuordnung.getBetrag())}</strong>
+       {this.bankbuchungOhneZuordnung.getText()} <ServerButton text="zurückstellen" onClick={this.buchungZurueckstellen} />
+    </p>
 
     const offeneAusgaben = this.getBM().getOffeneAusgabenRechnungArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.Ausgabe));
     const offeneBewirtungsbelege = this.getBM().getOffeneBewirtungsbelegeArray().map((rechnung: Umbuchung) => this.renderOffeneRechnung(rechnung, BelegTyp.Bewirtungsbeleg));
@@ -125,6 +138,12 @@ class Bankbuchungen extends DriveLeaf {
       belegID: e.target.id,
       bankbuchungID: bankbuchungId,
       datum: new Date(this.getBM().endOfYear().getFullYear(), parseInt(this.getUIState().buchungsperiode) - 1, 1),
+    }
+    this.updateBMbatch(action);
+  }
+  protected buchungZurueckstellen(e:any){
+    let action: IAction={
+      type: Type.buchungZurueckstellen
     }
     this.updateBMbatch(action);
   }

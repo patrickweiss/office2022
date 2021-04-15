@@ -19,7 +19,7 @@ export function yearly() {
 }
 export function installTrigger() {
     try {
-        // Deletes all triggers in the current project.
+        // Deletes all user triggers in the current project.
         let triggers = ScriptApp.getProjectTriggers();
         for (let i = 0; i < triggers.length; i++) {
             ScriptApp.deleteTrigger(triggers[i]);
@@ -55,6 +55,11 @@ export function daily() {
                 lock.releaseLock();
             } catch (e) {
                 bm2021.saveError(e)
+                // Deletes all user triggers in the current project.
+                let triggers = ScriptApp.getProjectTriggers();
+                for (let i = 0; i < triggers.length; i++) {
+                    ScriptApp.deleteTrigger(triggers[i]);
+                }
             }
         }
     }

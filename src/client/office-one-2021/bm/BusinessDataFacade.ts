@@ -114,8 +114,12 @@ class TableCache<RowType extends TableRow> {
     }
     return tableRow as RowType;
   }
-
- 
+  public putBackFirstRow(){
+    this.dataArray.push(this.dataArray.splice(1,1));  
+    this.backgroundArray.push(this.backgroundArray.splice(1,1)as any  as string[]);
+    this.formulaArray.push(this.formulaArray.splice(1,1)as any as string[]);
+    this.formatsArray.push(this.formatsArray.splice(1,1)as any as string[]);
+  }
   public save() {
     //das wird lustig...
   }

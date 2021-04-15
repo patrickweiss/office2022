@@ -114,6 +114,12 @@ export class TableCache<RowType extends TableRow> {
     }
     return tableRow as RowType;
   }
+  public putBackFirstRow(){
+    this.dataArray.push(this.dataArray.splice(1,1) as any as Array<string | number | Date | boolean>);  
+    this.backgroundArray.push(this.backgroundArray.splice(1,1)as any  as string[]);
+    this.formulaArray.push(this.formulaArray.splice(1,1)as any as string[]);
+    this.formatsArray.push(this.formatsArray.splice(1,1)as any as string[]);
+  }
   public save() {
     DriveConnector.saveNamedRangeData(this.rootId, this.tableName, this.loadRowCount, this.dataArray, this.backgroundArray, this.formulaArray, currentOOversion);
   }
