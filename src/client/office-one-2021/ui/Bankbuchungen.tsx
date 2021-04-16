@@ -13,10 +13,14 @@ declare let window: IOfficeWindow;
 
 
 // tslint:disable:object-literal-sort-keys
-export interface IBelegZuBankbuchungZuordnen extends IAction {
+
+export interface IBankbuchungZurueck extends IAction {
+  bankbuchungID: string;
+}
+
+export interface IBelegZuBankbuchungZuordnen extends IBankbuchungZurueck {
   belegTyp: BelegTyp;
   belegID: string;
-  bankbuchungID: string;
   datum: Date;
 }
 
@@ -142,8 +146,11 @@ class Bankbuchungen extends DriveLeaf {
     this.updateBMbatch(action);
   }
   protected buchungZurueckstellen(e:any){
-    let action: IAction={
-      type: Type.buchungZurueckstellen
+    let bankbuchungId = "";
+    if (this.bankbuchungOhneZuordnung) bankbuchungId = this.bankbuchungOhneZuordnung.getId();
+    let action: IBankbuchungZurueck={
+      type: Type.buchungZurueckstellen,
+      bankbuchungID: bankbuchungId
     }
     this.updateBMbatch(action);
   }

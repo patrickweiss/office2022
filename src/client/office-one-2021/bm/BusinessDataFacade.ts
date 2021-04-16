@@ -27,7 +27,7 @@ class TableCache<RowType extends TableRow> {
     this.backgroundArray = data[1];
     this.formulaArray = data[2];
     //es gibt keine Formate ... hier muss nur was stehen sonst muss ich alle TableCaches clientspezifisch machen ...
-    this.formatsArray = data[1];
+    this.formatsArray = JSON.parse(JSON.stringify(data[0]));//da muss was drin stehen, sonst können keine TableRows bei Aufruf in getRowByIndex erzeugt werden
     this.columnIndex = this.getColumnIndex(this.dataArray[0]);
     //  this.loadRowCount = this.dataArray.length;
     //  this.rootId = rootId;
@@ -115,10 +115,23 @@ class TableCache<RowType extends TableRow> {
     return tableRow as RowType;
   }
   public putBackFirstRow(){
-    this.dataArray.push(this.dataArray.splice(1,1));  
-    this.backgroundArray.push(this.backgroundArray.splice(1,1)as any  as string[]);
-    this.formulaArray.push(this.formulaArray.splice(1,1)as any as string[]);
-    this.formatsArray.push(this.formatsArray.splice(1,1)as any as string[]);
+    this.dataArray.push(this.dataArray.splice(1,1)[0]);  
+    this.backgroundArray.push(this.backgroundArray.splice(1,1)[0]);
+    this.formulaArray.push(this.formulaArray.splice(1,1)[0]);
+    this.formatsArray.push(this.formatsArray.splice(1,1)[0]);
+  }
+  public putBackRowById(id:string){
+    for (let index in this.dataArray){
+      const dataRow = this.dataArray[index];
+      if (dataRow[0]===id){
+        this.dataArray.push(this.dataArray.splice(parseInt(index),1)[0]);  
+        this.backgroundArray.push(this.backgroundArray.splice(parseInt(index),1)[0]);
+        this.formulaArray.push(this.formulaArray.splice(parseInt(index),1)[0]);
+        this.formatsArray.push(this.formatsArray.splice(parseInt(index),1)[0]);
+        delete this.rowArray;
+        return    
+      }
+    }
   }
   public save() {
     //das wird lustig...

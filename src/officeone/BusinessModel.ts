@@ -34,7 +34,7 @@ enum Type {
 interface IAction {
     type: Type;
 }
-interface IBelegZuBankbuchungZuordnen extends IAction {
+export interface IBelegZuBankbuchungZuordnen extends IAction {
     belegTyp: BelegTyp;
     belegID: string;
     bankbuchungID: string;
@@ -112,7 +112,7 @@ export class BusinessModel {
     }
     public beginOfYear() { return new Date(this.endOfYear().getFullYear(), 0, 1) }
     public handleAction(action: IBelegZuBankbuchungZuordnen) {
-        if (action.type === Type.buchungZurueckstellen)this.getBankbuchungenTableCache().putBackFirstRow();
+        if (action.type === Type.buchungZurueckstellen)this.getBankbuchungenTableCache().putBackRowById(action.bankbuchungID);
         if (action.type === Type.BelegZuBankbuchungZuordnen) {
             if (action.belegTyp === BelegTyp.Ausgabe) this.belegZuordnen(this.getOrCreateAusgabenRechnung(action.belegID), action);
             if (action.belegTyp === BelegTyp.Bewirtungsbeleg) this.belegZuordnen(this.getOrCreateBewirtungsbeleg(action.belegID), action);
@@ -211,10 +211,10 @@ export class BusinessModel {
             bankbuchung.setBelegID(beleg.getId());
             bankbuchung.setLink(beleg.getLink());
             bankbuchung.setGegenkonto(beleg.getGegenkonto());
-            this.addLogMessage(`Bank:${bankbuchung.getBetrag()} Beleg:${offnerBelegBetrag}${beleg.getId()}`)
             if ((action.belegTyp != BelegTyp.Vertrag || beleg.getBetrag() !== 0) &&
              (Math.abs(bankbuchung.getBetrag()) >(Math.abs(offnerBelegBetrag)+0.001))
              ) {
+                this.addLogMessage(`Bankbetrag:${bankbuchung.getBetrag()} Belegbetrag:${offnerBelegBetrag} BelegId:${beleg.getId()}`)
                 const splitBuchung = this.getBankbuchungenTableCache().createNewRow();
                 this.addLogMessage("Bankbuchung ist größer als Belegsumme, Restbetrag:"+(bankbuchung.getBetrag()-offnerBelegBetrag));
                 splitBuchung.setKonto(beleg.getGegenkonto());

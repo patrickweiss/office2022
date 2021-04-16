@@ -104,7 +104,7 @@ export class BusinessModel {
         return new Date(parseInt(jahr,10), 11, 31); }
     public beginOfYear() { return new Date(this.endOfYear().getFullYear(), 0, 1) }
     public handleAction(action: IBelegZuBankbuchungZuordnen) {
-        if (action.type === Type.buchungZurueckstellen)this.getBankbuchungenTableCache().putBackFirstRow();
+        if (action.type === Type.buchungZurueckstellen){this.getBankbuchungenTableCache().putBackRowById(action.bankbuchungID);}
         if (action.type === Type.BelegZuBankbuchungZuordnen) {
             if (action.belegTyp === BelegTyp.Ausgabe) this.belegZuordnen(this.getOrCreateAusgabenRechnung(action.belegID), action);
             if (action.belegTyp === BelegTyp.Bewirtungsbeleg) this.belegZuordnen(this.getOrCreateBewirtungsbeleg(action.belegID), action);
