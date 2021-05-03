@@ -89,7 +89,7 @@ class Bankbuchungen extends DriveLeaf {
     return (
       <div>
         <h1>Bankkonten und Bestände</h1>
-        <p className="MITTIG">Bank1: {this.formatMoney(this.getBM().getBankbestand("Bank1"))}, Bank2: {this.formatMoney(this.getBM().getBankbestand("Bank2"))}
+        <p className="MITTIG">{this.renderBankkonten()}
           <ServerButton text="Drive scannen" onClick={this.handleDriveScannen} />
         </p>
         {bankbuchungHTML}
@@ -115,6 +115,9 @@ class Bankbuchungen extends DriveLeaf {
         </div>
       </div>
     );
+  }
+  protected renderBankkonten(){
+    return this.getBM().getBankontenArray().map(konto => <React.Fragment>{konto}:{this.formatMoney(this.getBM().getBankbestand(konto))}  </React.Fragment>)
   }
   protected renderOffeneRechnung(umbuchung: Umbuchung, belegtyp: BelegTyp) {
     let offenerBelegBetrag = umbuchung.getBetragMitVorzeichen();
