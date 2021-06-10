@@ -1,15 +1,14 @@
-export const systemMasterId = "1LFVtqthrB3g1sWVBBeAliirFuB5zMHKdwrm7UppEsqg";
-export const clientSystemMasterId = "1rWlWWpBnanSBP2oEHSLCIY6IBBiCrTKNjSN1_74lMx4"
-
-
-export const adminUser = "eins.stein@officeone.team";
+export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU"
 export enum ooVersions {
-    oo55 = "0055",
     oo56 = "0056",
     oo57 = "0057"
 }
-
 export const currentOOversion = ooVersions.oo57;
+export enum systemMasterProperty {
+    officeOne2022_TemplateFolderId = "1oKZm25-n3sZ-VjhZ1DfiFLF1DCU1syx3",
+    webApp_URL = "https://script.google.com/macros/s/AKfycbxYH38I_OCopkN034ICBOsA2NsKddOLIxYAvIgikEf2yYxTqZY/exec"
+}
+export const adminUser = "eins.stein@officeone.team";
 
 export enum belegNr {
     mwstFinanzamtOP = "mwstFinanzamtOP",
@@ -22,10 +21,6 @@ export enum belegNr {
 }
 
 
-export enum systemMasterProperty {
-    officeOne2022_TemplateFolderId = "1oKZm25-n3sZ-VjhZ1DfiFLF1DCU1syx3",
-    webApp_URL = "https://script.google.com/macros/s/AKfycbxYH38I_OCopkN034ICBOsA2NsKddOLIxYAvIgikEf2yYxTqZY/exec"
-}
 
 export enum ooFolders {
     system = "00 System",
@@ -41,6 +36,9 @@ export enum systemObject {
     officeArray = "officeArray"
 }
 
+export enum logLevel{
+    debug="debug"
+} 
 export enum office {
     fehlerEmail = "fehlerEmail",
     geschaeftsjahr = "zeitraumJahr",
@@ -62,7 +60,8 @@ export enum office {
     importFrom2021_FolderId = "importFrom2021_FolderId",
     triggerMode = "triggerMode",
     officeRootID_FolderId = "officeRootID_FolderId",
-    vorjahrOfficeRootID_FolderId = "vorjahrOfficeRootID_FolderId"
+    vorjahrOfficeRootID_FolderId = "vorjahrOfficeRootID_FolderId",
+    logLevel="logLevel"
 }
 
 export enum triggerModes {

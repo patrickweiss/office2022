@@ -7,22 +7,6 @@ export const newOfficeOneVersion = () => {
     const nextVersion = getNextVersion() as ooVersions;
 
     copyFolder(getDevOpsFolder().getFoldersByName(currentOOversion).next().getId(),getDevOpsFolder().getId(),currentOOversion,nextVersion)
-    /*
-    const nextVersionFolder = getDevOpsFolder().createFolder(nextVersion);
-    // make a copy of all Spreadsheets
-    //read from all Tables from new version to make sure all new Spreadsheets get copied
-    for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooVersion])) {
-        DriveConnector.getNamedRangeData(nextVersionFolder.getId(), rangeName as ooTables, oooVersion);
-    }
-    //rename all Spreadsheets, so they have the new version number
-    const nextVersionSpreadsheetIterator = nextVersionFolder.getFiles();
-    while (nextVersionSpreadsheetIterator.hasNext()) {
-        const currentSpreadsheet = nextVersionSpreadsheetIterator.next();
-        currentSpreadsheet.setName(currentSpreadsheet.getName().slice(0, -4) + nextVersion);
-    }
-    createNewOfficOneFolders(nextVersionFolder.getId());
-    copyTemplates(getDevOpsFolder().getFoldersByName(oooVersion).next().getId(), nextVersionFolder.getId());
-    */
 }
 
 export const copyTemplates = (sourceFolderId: string, destinationFolderId: string) => {

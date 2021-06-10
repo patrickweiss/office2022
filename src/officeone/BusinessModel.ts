@@ -1,5 +1,5 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
-import { belegNr, currentOOversion, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
+import { belegNr, currentOOversion, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -71,6 +71,9 @@ export class BusinessModel {
 
     public addLogMessage(message: string) {
         this.logMessage += "\n" + message;
+    }
+    public addDebugMessage(message:string){
+        if (this.getConfigurationCache().getValueByName(office.logLevel)===logLevel.debug)this.addLogMessage(message);
     }
     public saveError(error: Error) {
         this.addLogMessage(error.message)

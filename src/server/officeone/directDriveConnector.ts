@@ -1,5 +1,5 @@
 import { copyFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ServerFunction, systemMasterProperty } from "../oo21lib/systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ServerFunction, systemMasterProperty } from "../oo21lib/systemEnums";
 import { installTrigger } from "../oo21lib/systemFunction";
 import { DriveConnector } from "./driveconnector";
 

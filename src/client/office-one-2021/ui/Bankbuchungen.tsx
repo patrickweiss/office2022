@@ -122,7 +122,6 @@ class Bankbuchungen extends DriveLeaf {
   protected renderOffeneRechnung(umbuchung: Umbuchung, belegtyp: BelegTyp) {
     let offenerBelegBetrag = umbuchung.getBetragMitVorzeichen();
     if (belegtyp!==BelegTyp.Vertrag)offenerBelegBetrag=this.getBM().getOffenerBelegBetrag(umbuchung);
-    console.log(offenerBelegBetrag);
     return (
       <tr key={umbuchung.getId()}>
         <td><ServerButton

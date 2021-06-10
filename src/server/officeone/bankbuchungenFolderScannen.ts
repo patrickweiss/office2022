@@ -147,13 +147,17 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                 betrag = transaction.Betrag;
                 //Wenn der Bestand nach der vorigen Buchung stimmt und die aktuelle Buchung identisch zur letzten gespeicherten Buchung ist, dann gehe ich davon aus,
                 //dass die aktuelle Buchung und die zuletzt gespeicherte identisch sind
-                console.log(index + " " + "Datum:" + formatDate(datumNeu) + " Betrag:" + betrag + " Saldendifferenz:" + (aktuellerBankbestand - neuerBankbestand));
-
                 console.log(
-                    index + " " + (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001).toString() +
-                    "&&" + (datumNeu.toString() === letzteBuchung.getDatum().toString()) +
-                    "&&" + (betrag === letzteBuchung.getBetrag()).toString() +
-                    "&&" + (buchungsText === letzteBuchung.getText()).toString()
+                    index + 
+                    " Datum:" + formatDate(datumNeu) +
+                    " Betrag:" + betrag +
+                    " Saldendifferenz:" + (aktuellerBankbestand - neuerBankbestand));
+                console.log(
+                    index + " " +
+                    " Datum:" + (datumNeu.toString() === letzteBuchung.getDatum().toString()) +
+                    " Betrag:" + (betrag === letzteBuchung.getBetrag()).toString() +
+                    " Saldendifferenz:" + (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001).toString() +
+                    " Text:" + (buchungsText === letzteBuchung.getText()).toString() 
                 );
                 if (
                     (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001)
