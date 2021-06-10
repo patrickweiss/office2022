@@ -9,7 +9,7 @@ export enum systemMasterProperty {
     webApp_URL = "https://script.google.com/macros/s/AKfycbxYH38I_OCopkN034ICBOsA2NsKddOLIxYAvIgikEf2yYxTqZY/exec"
 }
 export const adminUser = "eins.stein@officeone.team";
-
+export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbzeBsJ_exOfJjhUtbHeCLEbTFoLspd5GfTrKTGqi6CzDF_9lKJr/exec";
 export enum belegNr {
     mwstFinanzamtOP = "mwstFinanzamtOP",
     mwstUStVAAufVMwSt = "mwstUStVAAufVMwSt",

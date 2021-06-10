@@ -1,5 +1,5 @@
 import { copyFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ServerFunction, systemMasterProperty } from "../oo21lib/systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
 import { installTrigger } from "../oo21lib/systemFunction";
 import { DriveConnector } from "./driveconnector";
 
@@ -44,7 +44,6 @@ export function getSystemFolderIds(): Array<string> {
   const ooSystemFolderIterator = DriveApp.getRootFolder().getFoldersByName(ooFolders.system)
   if (ooSystemFolderIterator.hasNext()) {
     const ooSystemFolder = ooSystemFolderIterator.next();
-    const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
     const ssIterator = ooSystemFolder.getFiles();
     if (ssIterator.hasNext()) {
       //System ist schon installiert, Rootfolder Ids zurückgeben
@@ -97,6 +96,10 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
     name: DriveApp.getFolderById(officeRootId).getName()
   }
   installTrigger();
+  let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
+  "&email=" + Session.getActiveUser().getEmail() +
+  "&product=OfficeOne");
+
   return JSON.stringify(result);
 }
 
