@@ -4,7 +4,6 @@ import * as ReactDOM from 'react-dom';
 import Logger from './framework/Logger';
 import { leafClasses } from './framework/OfficeLeaf';
 import { IOfficeWindow } from './framework/OfficeWindow';
-import * as Action from './framework/Action';
 import { ServerProxy } from './framework/ServerProxy';
 
 //import registerServiceWorker from './registerServiceWorker';
@@ -51,7 +50,7 @@ window.logger = new Logger("debug");
 
 //handleClientLoad();
 
-window.logger.debug("index.tsx 56");
+window.logger.debug("index.tsx 57");
 window.store = createStore(
   reducer,
   reduxMiddleware

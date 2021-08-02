@@ -1,5 +1,5 @@
 import { copyFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ooVersions, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
 import { installTrigger } from "../oo21lib/systemFunction";
 import { DriveConnector } from "./driveconnector";
 
@@ -98,7 +98,7 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
   installTrigger();
   let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
   "&email=" + Session.getActiveUser().getEmail() +
-  "&product=OfficeOne");
+  "&product=OfficeOne&version="+currentOOversion);
 
   return JSON.stringify(result);
 }

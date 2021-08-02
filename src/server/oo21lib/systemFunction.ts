@@ -1,9 +1,7 @@
-import { alleAusgabenFolderScannen, ausgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
+import { alleAusgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
-import { currentOOversion, office, ooTables, ooVersions, systemMasterProperty, triggerModes } from "./systemEnums";
 import * as OO2021 from "../../officeone/BusinessModel";
-import { DriveConnector } from "../officeone/driveconnector";
 import { getSystemFolderIds } from "../officeone/directDriveConnector";
 
 

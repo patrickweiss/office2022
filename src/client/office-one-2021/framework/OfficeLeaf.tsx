@@ -7,10 +7,6 @@ import * as Action from './Action';
 declare let window: IOfficeWindow;
 
 
-
-
-
-
 export enum Leafs {
 	OfficeLeaf = "OfficeLeaf",
 	DriveLeaf = "DriveLeaf",
