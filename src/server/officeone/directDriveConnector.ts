@@ -12,12 +12,12 @@ export function getOrCreateOfficeOneFolders() {
   var foldersHash = {};
   let result = {
     serverFunction: ServerFunction.getOrCreateOfficeOneFolders,
-    foldersArray: foldersHash
+    foldersHash: foldersHash
   };
   //is funktion invoked from within an office one spreadheet?
 
   try {
-    //Look for folders in GDrive root if function is invoked by Spreadsheet
+    //Look for root folderif invoked by Spreadsheet
     const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
     const ooFolderId = location[0][0]
     const leaf = location[0][1];
@@ -25,6 +25,7 @@ export function getOrCreateOfficeOneFolders() {
     const version = folder.getName().slice(-4);
     foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: leaf };
   } catch (e) {
+    //look for FolderIds in 00 System folder configuration spreadsheet
     const folderIds = getSystemFolderIds();
     console.log(folderIds)
     if (folderIds) {
@@ -55,9 +56,15 @@ export function getSystemFolderIds(): Array<string> {
   }
 }
 
+//Funktionsname passt nicht mehr. Hier wird immer eine neue Instanz installiert.
 export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVersion: string) {
   console.log("System installieren")
   // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
+  var foldersHash = {};
+  let result = {
+    serverFunction: ServerFunction.getOrCreateRootFolder,
+    foldersHash: foldersHash
+  };
 
   const officeFolder = copyFolder(
     systemMasterProperty.officeOne2022_TemplateFolderId,
@@ -90,11 +97,11 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
     systemSpreadsheet.getActiveSheet().getRange("B2").setValue(JSON.stringify([officeRootId]));
   }
 
-  var result = {
-    serverFunction: ServerFunction.getOrCreateRootFolder,
-    id: officeRootId,
-    name: DriveApp.getFolderById(officeRootId).getName()
-  }
+
+  const folder = officeFolder;
+  const version = folder.getName().slice(-4);
+  foldersHash[officeRootId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
+ 
   installTrigger();
   let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
   "&email=" + Session.getActiveUser().getEmail() +

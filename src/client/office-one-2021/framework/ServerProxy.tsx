@@ -10,9 +10,6 @@ import { UStVA } from '../bm/BusinessDataFacade';
 import { Leafs } from './OfficeLeaf';
 import { createVorjahrInstanceNameFromFolderName } from './DriveLeaf';
 import { ServerFunction } from '../../../server/oo21lib/systemEnums';
-
-
-
 export const reducerFunctions = {};
 
 reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, serverResponse: any) {
@@ -22,16 +19,26 @@ reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, 
         return;
     }
 }
-
 reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newState: any, serverResponse: any) {
     if (serverResponse.error){
         newState.BM.serverError = serverResponse.error;
         newState.UI.leaf = Leafs.SAWAG;
         return;
     }
-    newState.BM.OfficeOneFolders = serverResponse.foldersArray as Object;
+    newState.BM.OfficeOneFolders = serverResponse.foldersHash as Object;
+    setRootFolderIfOnlyOne(newState);
+ }
+reducerFunctions[ServerFunction.getOrCreateRootFolder] = function (newState: any, serverResponse: any) {
+    if (serverResponse.error){
+        newState.BM.serverError = serverResponse.error;
+        newState.UI.leaf = Leafs.SAWAG;
+        return;
+    }
+    newState.BM.OfficeOneFolders = serverResponse.foldersHash as Object;
+    setRootFolderIfOnlyOne(newState);
+}
+function setRootFolderIfOnlyOne(newState){
     const folderIds: string[] = Object.keys(newState.BM.OfficeOneFolders);
-    
     if (folderIds.length === 1) {
         const rootFolder = newState.BM.OfficeOneFolders[folderIds[0]]
         newState.BM.instanceName = rootFolder.name;
@@ -52,13 +59,7 @@ reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newStat
         newState.UI.leaf = Leafs.C2021OfficeOnePocket;
     }
 }
-reducerFunctions[ServerFunction.getOrCreateRootFolder] = function (newState: any, serverResponse: any) {
-    newState.BM.rootFolder.id = serverResponse.id;
-    newState.BM.rootFolder.name = serverResponse.name;
-    //    newState.BM[serverResponse.id]=serverResponse.data;
-    newState.BM[serverResponse.id] = {};
-    window.BM = new BusinessModel();
-}
+
 
 reducerFunctions[ServerFunction.getOrCreateAusgabenFolder] = function (newState: any, serverResponse: any) {
     newState.BM[newState.BM.rootFolder.id].ausgabenFolder = serverResponse.ausgabenFolder;
