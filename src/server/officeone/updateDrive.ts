@@ -1,5 +1,5 @@
 import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
-import { currentOOversion, ooTables } from "../oo21lib/systemEnums";
+import { currentOOversion, ooTables, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
 import { ServerFunction } from "../oo21lib/systemEnums";
@@ -148,6 +148,11 @@ export function updateDrive(rootFolderId: string) {
   }
 
   installTrigger();
+
+  let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
+  "&email=" + Session.getActiveUser().getEmail() +
+  "&product=OfficeOne&version="+currentOOversion);
+
   return getOrCreateOfficeOneFolders();
 
 }

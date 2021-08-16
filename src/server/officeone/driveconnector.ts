@@ -9,6 +9,31 @@ export class DriveConnector {
   static rangeValues = {};
   static konfiguration: Object;
   static oooVersionsRangeFileMap = {
+    "0058": {
+      RechnungSchreibenD: "1 Rechnung schreiben",
+      GutschriftenD: "1 Rechnung schreiben",
+      EURechnungenD: "1 Rechnung schreiben",
+      KundenD: "1 Rechnung schreiben",
+      PositionenarchivD: "1 Rechnung schreiben",
+      ProdukteD: "1 Rechnung schreiben",
+      RechnungenD: "1 Rechnung schreiben",
+      AbschreibungenD: "2 Ausgaben erfassen",
+      AusgabenD: "2 Ausgaben erfassen",
+      BewirtungsbelegeD: "2 Ausgaben erfassen",
+      VerpflegungsmehraufwendungenD: "2 Ausgaben erfassen",
+      "VerträgeD": "2 Ausgaben erfassen",
+      BankbuchungenD: "3 Bankbuchungen zuordnen",
+      UmbuchungenD: "3 Bankbuchungen zuordnen",
+      BuchungenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      EÜRD: "4 Bilanz, Gewinn und Steuererklärungen",
+      KontenD: "4 Bilanz, Gewinn und Steuererklärungen",
+      UStVAD: "4 Bilanz, Gewinn und Steuererklärungen",
+      CSVExportD: "4 Bilanz, Gewinn und Steuererklärungen",
+      GdpduD: "7 Datenschlürfer",
+      DataFileD: "7 Datenschlürfer",
+      Konfiguration: "00 Office",
+      log:"00 Office"
+    },
     "0057": {
       RechnungSchreibenD: "1 Rechnung schreiben",
       GutschriftenD: "1 Rechnung schreiben",
@@ -61,6 +86,14 @@ export class DriveConnector {
     }
   }
   static oooVersionValueFileMap = {
+    "0058": {
+      GutschriftenDatei: "1 Rechnung schreiben",
+      HilfeRechnungFertigstellen: "1 Rechnung schreiben",
+      HilfeRechnungSchreiben: "1 Rechnung schreiben",
+      KundenEMailVorlageDoc: "1 Rechnung schreiben",
+      Rechnungsnummer: "1 Rechnung schreiben",
+      Rechnungsvorlagelink: "1 Rechnung schreiben"
+    },
     "0057": {
       GutschriftenDatei: "1 Rechnung schreiben",
       HilfeRechnungFertigstellen: "1 Rechnung schreiben",
