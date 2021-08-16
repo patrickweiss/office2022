@@ -1,12 +1,12 @@
 export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU"
 export enum ooVersions {
-    oo56 = "0056",
-    oo57 = "0057"
+    oo57 = "0057",
+    oo58 = "0058"
 }
-export const currentOOversion = ooVersions.oo57;
+export const currentOOversion = ooVersions.oo58;
 export enum systemMasterProperty {
-    officeOne2022_TemplateFolderId = "1oKZm25-n3sZ-VjhZ1DfiFLF1DCU1syx3",
-    webApp_URL = "https://script.google.com/macros/s/AKfycbxYH38I_OCopkN034ICBOsA2NsKddOLIxYAvIgikEf2yYxTqZY/exec"
+    officeOne2022_TemplateFolderId = "1rsDPOk33OEa8x6y-jLNmjv9TL1kTwxxb",
+    webApp_URL = "https://script.google.com/a/officeone.team/macros/s/AKfycbzpkJZ4r-NHt3ed4ueMK2LlxMNqNGFSsE_XNIdR/exec"
 }
 export const adminUser = "eins.stein@officeone.team";
 export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbzeBsJ_exOfJjhUtbHeCLEbTFoLspd5GfTrKTGqi6CzDF_9lKJr/exec";
