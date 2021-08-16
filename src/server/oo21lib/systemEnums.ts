@@ -6,7 +6,7 @@ export enum ooVersions {
 export const currentOOversion = ooVersions.oo58;
 export enum systemMasterProperty {
     officeOne2022_TemplateFolderId = "1rsDPOk33OEa8x6y-jLNmjv9TL1kTwxxb",
-    webApp_URL = "https://script.google.com/a/officeone.team/macros/s/AKfycbzpkJZ4r-NHt3ed4ueMK2LlxMNqNGFSsE_XNIdR/exec"
+    webApp_URL = "https://script.google.com/macros/s/AKfycbyC206ZJWY2Zv5NUhpqMQ_jgzWk2VAt9U3VnwVNhRRlHzQKG5Q/exec"
 }
 export const adminUser = "eins.stein@officeone.team";
 export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbzeBsJ_exOfJjhUtbHeCLEbTFoLspd5GfTrKTGqi6CzDF_9lKJr/exec";
