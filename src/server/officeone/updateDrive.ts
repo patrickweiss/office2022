@@ -148,10 +148,15 @@ export function updateDrive(rootFolderId: string) {
   }
 
   installTrigger();
+  try {
+    let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
+      "&email=" + Session.getActiveUser().getEmail() +
+      "&product=OfficeOne&version=" + currentOOversion);
 
-  let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
-  "&email=" + Session.getActiveUser().getEmail() +
-  "&product=OfficeOne&version="+currentOOversion);
+    console.log(response)
+  } catch (e) {
+    console.log(e)
+  }
 
   return getOrCreateOfficeOneFolders();
 
