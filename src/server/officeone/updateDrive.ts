@@ -37,6 +37,16 @@ export function updateDriveMaster(rootFolderId: string) {
 }
 
 export function updateDrive(rootFolderId: string) {
+  console.log("update von :" + rootFolderId);
+  try {
+    let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
+      "&email=" + Session.getActiveUser().getEmail() +
+      "&product=OfficeOne&version=Beginn_" + currentOOversion);
+    console.log(response)
+  } catch (e) {
+    console.log(e)
+  }
+
 
   let oooPreviousVersion = getPreviousVersion();
 
@@ -45,7 +55,7 @@ export function updateDrive(rootFolderId: string) {
     if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD) {
       const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, oooPreviousVersion);
       const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, currentOOversion);
-      //Wenn die neue Tabelle mehr Spalten hat, dann werden die Daten spaltenweise kopiert
+      //Wenn die neue Tabelle mehr oder weniger Spalten hat, dann werden die Daten spaltenweise kopiert
       if (dataOldVersion[0][0].length === dataNewVersion[0][0].length) DriveConnector.saveNamedRangeData(rootFolderId, rangeName as ooTables, dataNewVersion[0].length, dataOldVersion[0], dataOldVersion[1], dataOldVersion[2], currentOOversion);
       else importToBiggerTable(dataOldVersion, rootFolderId, rangeName as ooTables);
     }
@@ -136,6 +146,7 @@ export function updateDrive(rootFolderId: string) {
     let sharedOfficeShortcut = shortcutIterator.next();
     if (sharedOfficeShortcut.getName().toString() === oldOfficeRootFolderName) {
       sharedOfficeShortcut.setName(newOfficeRootFolderName);
+      /*
       var foldersHash = {};
       const version = newOfficeRootFolderName.slice(-4);
       foldersHash[rootFolder.getId()] = { name: newOfficeRootFolderName.slice(0, -5), version: version };
@@ -144,22 +155,19 @@ export function updateDrive(rootFolderId: string) {
         foldersArray: foldersHash
       }
       return JSON.stringify(result);
+      */
     }
   }
 
-  installTrigger();
   try {
     let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
       "&email=" + Session.getActiveUser().getEmail() +
       "&product=OfficeOne&version=" + currentOOversion);
-
     console.log(response)
   } catch (e) {
     console.log(e)
   }
-
   return getOrCreateOfficeOneFolders();
-
 }
 
 
