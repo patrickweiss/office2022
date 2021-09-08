@@ -709,7 +709,7 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
       //      kontoString.substr(0, 1)
       let konto: Konto = kontenTableCache.getRowHashTable()[kontoString] as Konto;
       if (!konto) {
-        if (buchung.getKonto() === "") console.log(buchung.getFileId() + buchung.getText() + buchung.getQuelltabelle() + buchung.getLink());
+        if (buchung.getKonto() === "") throw new Error(buchung.getFileId() + buchung.getText() + buchung.getQuelltabelle() + buchung.getLink());
         konto = kontenTableCache.getOrCreateRowById(buchung.getKonto());
         if (konto.isDatenschluerferKonto()) {
           let skrKonto: Konto = kontenTableCache.getOrCreateHashTable("SKR03")[kontoString.substring(1)] as Konto;
