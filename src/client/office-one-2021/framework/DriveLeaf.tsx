@@ -58,7 +58,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         this.handleFolderSelect = this.handleFolderSelect.bind(this);
         this.handleFolderDisconnect = this.handleFolderDisconnect.bind(this);
         this.handleFolderCreate = this.handleFolderCreate.bind(this);
-        this.renderSaveButton = this.renderSaveButton.bind(this);
+        this.renderLeftStatusButton = this.renderLeftStatusButton.bind(this);
     }
     protected renderDriveData() {
         return <div className="LIST_ITEM"><button className="linkButton" type="button" onClick={this.handleClick}>{this.sentence}</button></div>;
@@ -137,7 +137,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
                     {this.renderPath()}
                     {this.renderMobile()}
                     {this.renderDisconnectButton()}
-                    {this.renderSaveButton()}
+                    {this.renderLeftStatusButton()}
                 </div>;
             default:
                 return <h1>Component has no valid size</h1>;
@@ -233,12 +233,13 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         }
         else return "";
     }
-    protected renderSaveButton() {
+    protected renderLeftStatusButton() {
         if (this.getUIState().actionBatch) {
             console.log("ActionBatch cached");
             return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>Zuordnungen in Google Drive speichern</button> </div>);
         }
-        return ""
+        return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>KI ist AUS</button> </div>);
+    
     }
     protected handleSaveActionBatch() {
         window.store.dispatch(businessModelBatchUpdateCreator());
