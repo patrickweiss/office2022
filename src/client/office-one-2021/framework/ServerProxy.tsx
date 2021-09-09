@@ -13,31 +13,42 @@ import { ServerFunction } from '../../../server/oo21lib/systemEnums';
 export const reducerFunctions = {};
 
 reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, serverResponse: any) {
-    if (serverResponse.error){
+    if (serverResponse.error) {
         newState.UI.error = serverResponse.error;
         newState.UI.leaf = Leafs.ServerError;
         return;
     }
 }
-reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newState: any, serverResponse: any) {
-    if (serverResponse.error){
+
+reducerFunctions[ServerFunction.kiSwitch] = function (newState: any, serverResponse: any) {
+    if (serverResponse.error) {
         newState.BM.serverError = serverResponse.error;
-        newState.UI.leaf = Leafs.SAWAG;
+        newState.UI.leaf = Leafs.ServerError;
+        return;
+    }
+    newState.UI.triggers = serverResponse.triggers as String;
+}
+
+reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newState: any, serverResponse: any) {
+    if (serverResponse.error) {
+        newState.BM.serverError = serverResponse.error;
+        newState.UI.leaf = Leafs.ServerError;
         return;
     }
     newState.BM.OfficeOneFolders = serverResponse.foldersHash as Object;
+    newState.UI.triggers = serverResponse.triggers as String;
     setRootFolderIfOnlyOne(newState);
- }
+}
 reducerFunctions[ServerFunction.getOrCreateRootFolder] = function (newState: any, serverResponse: any) {
-    if (serverResponse.error){
+    if (serverResponse.error) {
         newState.BM.serverError = serverResponse.error;
-        newState.UI.leaf = Leafs.SAWAG;
+        newState.UI.leaf = Leafs.ServerError;
         return;
     }
     newState.BM.OfficeOneFolders = serverResponse.foldersHash as Object;
     setRootFolderIfOnlyOne(newState);
 }
-function setRootFolderIfOnlyOne(newState){
+function setRootFolderIfOnlyOne(newState) {
     const folderIds: string[] = Object.keys(newState.BM.OfficeOneFolders);
     if (folderIds.length === 1) {
         const rootFolder = newState.BM.OfficeOneFolders[folderIds[0]]
@@ -45,7 +56,7 @@ function setRootFolderIfOnlyOne(newState){
         newState.BM.rootFolder = {};
         newState.BM.rootFolder.id = folderIds[0];
         newState.BM.rootFolder.name = rootFolder.name;
-        newState.BM.vorjahrInstanceName= createVorjahrInstanceNameFromFolderName(rootFolder.name);
+        newState.BM.vorjahrInstanceName = createVorjahrInstanceNameFromFolderName(rootFolder.name);
         newState.BM.rootFolder.version = rootFolder.version;
         newState.BM[folderIds[0]] = {};
         window.BM = new BusinessModel();
@@ -108,7 +119,7 @@ reducerFunctions[ServerFunction.BuchungenFuerUmsatzsteuerBerechnenUndEintragen] 
 reducerFunctions[ServerFunction.businessModelUpdate] = function (newState: any, serverResponse: any) {
 }
 reducerFunctions[ServerFunction.businessModelBatchUpdate] = function (newState: any, serverResponse: any) {
-    ServerProxy.actionBatch=[];
+    ServerProxy.actionBatch = [];
     newState.UI.leaf = Leafs.C2021OfficeOnePocket;
     newState.UI.actionBatch = false;
 }
@@ -120,6 +131,17 @@ reducerFunctions[ServerFunction.SimbaExportErstellen] = function (newState: any,
 
 export class ServerProxy {
     static actionBatch: IAction[] = [];
+    public kiSwitch(triggerCount: string) {
+        window.store.dispatch(
+            serverCall(
+                {
+                    functionName: ServerFunction.kiSwitch,
+                    parametersArray: [triggerCount]
+                }
+            )
+        )
+    }
+
     public EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderNameVorjahr: string) {
         window.store.dispatch(
             serverCall(

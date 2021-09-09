@@ -23,7 +23,7 @@ const PORT = envVars.PORT || 3000;
 envVars.NODE_ENV = process.env.NODE_ENV;
 envVars.PORT = PORT;
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = true;
 
 /*********************************
  *    define entrypoints

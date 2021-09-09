@@ -24,6 +24,8 @@ enum Type {
   PDFgewaehlt = "PDFgewaehlt",
   GutschriftBuchen = "GutschriftBuchen",
   StartBatchUpdate = "StartBatchUpdate",
+  KISwitch = "KISwitch",
+  
   buchungZurueckstellen = "buchungZurueckstellen"
 }
 const reducerFunctions = {};

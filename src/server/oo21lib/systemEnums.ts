@@ -126,6 +126,7 @@ export const months = {
 }
 
 export enum ServerFunction {
+    kiSwitch="kiSwitch",
     getOrCreateRootFolder = "getOrCreateRootFolder",
     getOrCreateAusgabenFolder = "getOrCreateAusgabenFolder",
     getNamedRangeData = "getNamedRangeData",

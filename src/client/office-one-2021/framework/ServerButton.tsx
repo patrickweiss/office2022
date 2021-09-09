@@ -32,6 +32,7 @@ class ServerButton extends React.Component<IServerButton, object> {
             return <button onClick={this.handleClick} disabled={disabled} id={this.props.id} data-a={this.props.a}>{this.props.text}</button>
     }
     handleClick(e:any){
+        console.log("Serverbutton geklickt:"+this.props.text);
         this.onClick(e);
     }
   }

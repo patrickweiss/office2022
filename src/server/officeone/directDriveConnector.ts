@@ -1,6 +1,5 @@
 import { copyFolder } from "../oo21lib/driveConnector";
 import { adminUser, clientSystemMasterId, currentOOversion,ooFolders, ooTables, ooVersions, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
-import { installTrigger } from "../oo21lib/systemFunction";
 import { DriveConnector } from "./driveconnector";
 
 //oo21lib stuff
@@ -12,12 +11,13 @@ export function getOrCreateOfficeOneFolders() {
   var foldersHash = {};
   let result = {
     serverFunction: ServerFunction.getOrCreateOfficeOneFolders,
-    foldersHash: foldersHash
+    foldersHash: foldersHash,
+    triggers:"kein Status"
   };
   //is funktion invoked from within an office one spreadheet?
 
   try {
-    //Look for root folderif invoked by Spreadsheet
+    //Look for root folder if invoked by Spreadsheet
     const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
     const ooFolderId = location[0][0]
     const leaf = location[0][1];
@@ -37,7 +37,9 @@ export function getOrCreateOfficeOneFolders() {
       }
     }
   }
-  console.log(JSON.stringify(result));
+  //Read Trigger Status for eins.stein@officeone.team KIBAR Status
+  result.triggers = ScriptApp.getProjectTriggers().length.toString();
+ 
   return JSON.stringify(result);
 }
 
@@ -102,7 +104,6 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
   const version = folder.getName().slice(-4);
   foldersHash[officeRootId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
  
-  installTrigger();
   let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
   "&email=" + Session.getActiveUser().getEmail() +
   "&product=OfficeOne&version="+currentOOversion);

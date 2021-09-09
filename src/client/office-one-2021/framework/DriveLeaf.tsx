@@ -38,6 +38,10 @@ Action.reducerFunctions[Action.Type.StartBatchUpdate] =  function (newState: any
     return newState;
 }
 
+Action.reducerFunctions[Action.Type.StartBatchUpdate] =  function (newState: any, action) {
+    newState.UI.leaf=OfficeLeaf.Leafs.WaitingForBMUpdate;
+    return newState;
+}
 Action.reducerFunctions[Action.Type.OOFolderDisconnected] = function (newState: any, action: IOOFolderDisconnected) {
     newState.BM.instanceName = "";
     delete newState.BM[newState.BM.rootFolder.id];
@@ -58,7 +62,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         this.handleFolderSelect = this.handleFolderSelect.bind(this);
         this.handleFolderDisconnect = this.handleFolderDisconnect.bind(this);
         this.handleFolderCreate = this.handleFolderCreate.bind(this);
-        this.renderLeftStatusButton = this.renderLeftStatusButton.bind(this);
+        this.handleKiSwitch = this.handleKiSwitch.bind(this);
     }
     protected renderDriveData() {
         return <div className="LIST_ITEM"><button className="linkButton" type="button" onClick={this.handleClick}>{this.sentence}</button></div>;
@@ -238,11 +242,13 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
             console.log("ActionBatch cached");
             return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>Zuordnungen in Google Drive speichern</button> </div>);
         }
-        return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>KI ist AUS</button> </div>);
-    
+        return (<div className="KIBAR"><ServerButton text={`eins.stein@officeone.team: ${this.getUIState().triggers}`} onClick={this.handleKiSwitch}></ServerButton> </div>);
     }
     protected handleSaveActionBatch() {
         window.store.dispatch(businessModelBatchUpdateCreator());
+    }
+    protected handleKiSwitch() {
+        window.serverProxy.kiSwitch(window.store.getState().UI.triggers);
     }
     protected handleFolderCreate(e: any) {
         window.serverProxy.getOrCreateRootFolder("2019 OfficeOne.Office")

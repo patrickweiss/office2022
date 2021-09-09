@@ -2,8 +2,6 @@ import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
 import { currentOOversion, ooTables, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
-import { ServerFunction } from "../oo21lib/systemEnums";
-import { installTrigger } from "../oo21lib/systemFunction";
 
 export function getPreviousVersion() {
   let oooPreviousVersion = (parseInt(currentOOversion, 10) - 1).toString();

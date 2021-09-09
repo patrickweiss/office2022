@@ -29,7 +29,8 @@ export const initial = {
 		umbuchung:{},
 		vertrag:{},
 		error:"keiner",
-		actionBatch:false
+		actionBatch:false,
+		triggers:"unbekannt"
 	},
 	BM: {
 		vorjahrInstanceName:"",
