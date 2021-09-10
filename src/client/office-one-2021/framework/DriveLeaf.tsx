@@ -128,7 +128,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         window.store.dispatch(businessModelAddToActionBatch(action));
     }
     public render() {
-        window.logger.debug("render:" + this.leafName + " " + this.size);
+        window.logger.debug("DriveLeaf.tsx --> render:" + this.leafName + " " + this.size);
         switch (this.size) {
             case 'ICON':
                 return this.renderIcon();
@@ -148,6 +148,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         }
     }
     protected renderMobile() {
+        window.logger.debug("DriveLeaf.tsx --> renderMobile");
         return (
             <div>
                 <h1>{this.title}</h1>
@@ -231,23 +232,25 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         )
     }
     protected renderDisconnectButton() {
+        window.logger.debug("DriveLeaf.tsx --> renderDisconnectButton");
         if (this.getUIState().loggedIn) {
             if (window.store.getState().BM.rootFolder.id) return (<div className="LOGOUTBAR"><button id="signout-button" onClick={this.handleFolderDisconnect}>{window.store.getState().BM.rootFolder.name} trennen</button> </div>);
-            return <div className="LOGOUTBAR"> <button id="signout-button" >{this.getUIState().email} abmelden</button> </div>
         }
-        else return "";
+        return "";
     }
     protected renderLeftStatusButton() {
+        window.logger.debug("DriveLeaf.tsx --> renderLeftStatusButton"+this.getUIState().actionBatch);
         if (this.getUIState().actionBatch) {
             console.log("ActionBatch cached");
             return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>Zuordnungen in Google Drive speichern</button> </div>);
         }
-        return (<div className="KIBAR"><ServerButton text={`eins.stein@officeone.team: ${this.getUIState().triggers}`} onClick={this.handleKiSwitch}></ServerButton> </div>);
+        return (<div className="KIBAR"><ServerButton text={`eins.stein@officeone.team: ${this.getUIState().triggers==="0" ? "Aus":"An"}`} onClick={this.handleKiSwitch}></ServerButton> </div>);
     }
     protected handleSaveActionBatch() {
         window.store.dispatch(businessModelBatchUpdateCreator());
     }
     protected handleKiSwitch() {
+        console.log("DL.handleKiSwitch");
         window.serverProxy.kiSwitch(window.store.getState().UI.triggers);
     }
     protected handleFolderCreate(e: any) {

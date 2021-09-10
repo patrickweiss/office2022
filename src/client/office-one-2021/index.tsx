@@ -72,9 +72,9 @@ class App extends React.Component {
 
 ReactDOM.render(<App />, document.getElementById('index'));
 window.store.subscribe(() => {
-  window.logger.debug("3. before render ---------------------------------------------");
+  window.logger.debug("index.tsx --> 3. before render ---------------------------------------------");
   console.log(window.store.getState())
   ReactDOM.render(<App />, document.getElementById('index'));
   console.log(window.store.getState())
-  window.logger.debug("3. after render ---------------------------------------------");
+  window.logger.debug("index.tsx --> 3. after render ---------------------------------------------");
 });

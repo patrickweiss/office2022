@@ -21,6 +21,7 @@ reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, 
 }
 
 reducerFunctions[ServerFunction.kiSwitch] = function (newState: any, serverResponse: any) {
+    window.logger.debug("ServerProxy.tsx --> reducerFunctions[ServerFunction.kiSwitch]"+serverResponse);
     if (serverResponse.error) {
         newState.BM.serverError = serverResponse.error;
         newState.UI.leaf = Leafs.ServerError;
@@ -132,6 +133,7 @@ reducerFunctions[ServerFunction.SimbaExportErstellen] = function (newState: any,
 export class ServerProxy {
     static actionBatch: IAction[] = [];
     public kiSwitch(triggerCount: string) {
+        console.log("ServerProxy.kiSwitch, dispatch(serverCall())"+triggerCount);
         window.store.dispatch(
             serverCall(
                 {

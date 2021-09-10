@@ -94,7 +94,7 @@ class OfficeLeaf extends React.Component<ILeaf, object> {
         this.handleClick = this.handleClick.bind(this);
     }
     public render() {
-        window.logger.debug("render:" + this.leafName + " " + this.size);
+        window.logger.debug("OfficeLeaf.tsx --> render:" + this.leafName + " " + this.size);
         switch (this.size) {
             case 'ICON':
                 return this.renderIcon();
@@ -159,6 +159,7 @@ class OfficeLeaf extends React.Component<ILeaf, object> {
         );
     }
     protected renderPath() {
+        window.logger.debug("OfficeLeaf.tsx --> renderPath");
         let CurrentLeaf;
         const pathHTML:JSX.Element[] = [];
          for (let i = 0; i < this.path.length; i++) {

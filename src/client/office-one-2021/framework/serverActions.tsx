@@ -21,7 +21,7 @@ export interface IserverResponse extends Action.IAction {
 
 Action.reducerFunctions[Action.Type.ServerCall] = function (newState: any, action: IserverAction) {
     // tslint:disable:curly
-    window.logger.debug("2. ACTION.functionName: " + action.functionName);
+    window.logger.debug("serverActions.tsx --> 2.Action.reducerFunctions[Action.Type.ServerCall]: " + action.functionName);
     newState.UI.waitingForResponse = action.functionName;
     switch (action.functionName) {
         case ServerFunction.getOrCreateOfficeOneFolders:
@@ -63,7 +63,8 @@ Action.reducerFunctions[Action.Type.ServerResponse] = function (newState: any, a
 export function serverCall(callParameter: any) {
 
     return function (dispatch: Function) {
-        window.logger.debug("1. serverCall --> Action vor dem Serveraufruf");
+        window.logger.debug("1. serverCall --> callParameter.functionName:"+callParameter.functionName);
+        window.logger.debug("1. serverCall --> callParameter.parametersArray:"+callParameter.parametersArray);
         dispatch({
             type: Action.Type.ServerCall,
             functionName: callParameter.functionName,
@@ -77,6 +78,7 @@ export function serverCall(callParameter: any) {
             }
             ).catch(
                 (error) => {
+                    window.logger.debug("1. serverCall --> error -->"+error);
                     dispatch(
                         { type: Action.Type.ServerError, response: JSON.stringify(error) }
                     )
