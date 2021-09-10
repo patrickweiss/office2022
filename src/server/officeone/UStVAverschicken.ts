@@ -12,7 +12,7 @@ export function UStVAverschickenFromBackend(BM: BusinessModel, ustvaID: string):
   let ustvaElster = {};
   const ustvaRangeData: Object[][] = DriveConnector.getNamedRangeData(BM.getRootFolderId(), ooTables.Konfiguration, currentOOversion)[0];
   for (let zeile of ustvaRangeData) {
-    ustvaElster[zeile[0].toString()] = zeile[1];
+    ustvaElster[zeile[0].toString()] = zeile[1].toString();
   }
 
   const zeitraumMap = {
