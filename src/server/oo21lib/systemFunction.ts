@@ -31,8 +31,8 @@ export function kiSwitch(triggerCount) {
             result.triggers = "0";
         }
         else {
-            daily();
             installTrigger();
+            daily();
             result.triggers = "1";
         }
     } catch (e) {
@@ -103,13 +103,14 @@ export function daily() {
 function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     const folder = DriveApp.getFolderById(folderId);
     const driveVersion = folder.getName().substr(-4);
+    const folderOwnerUser = folder.getOwner();
+    console.log(folderId+" "+driveVersion+" "+Session.getEffectiveUser().getEmail()+" "+folderOwnerUser.getEmail())
     if (getPreviousVersion()===driveVersion){
         //folder has to be updated first
         updateDrive(folderId);
     }
     //throw error if version is still wrong
     if (currentOOversion!==driveVersion)throw new Error("OO Instance with ID"+folderId+" could not be updated to version "+currentOOversion);
-    const user = folder.getOwner();
-    return Session.getEffectiveUser().getEmail() === user.getEmail();
+    return Session.getEffectiveUser().getEmail() === folderOwnerUser.getEmail();
 }
 
