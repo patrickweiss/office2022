@@ -3,7 +3,8 @@ import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderSc
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
 import * as OO2021 from "../../officeone/BusinessModel";
 import { getSystemFolderIds } from "../officeone/directDriveConnector";
-import { ServerFunction } from "./systemEnums";
+import { currentOOversion, ServerFunction } from "./systemEnums";
+import { getPreviousVersion, updateDrive } from "../officeone/updateDrive";
 
 
 
@@ -30,6 +31,7 @@ export function kiSwitch(triggerCount) {
             result.triggers = "0";
         }
         else {
+            daily();
             installTrigger();
             result.triggers = "1";
         }
@@ -63,8 +65,8 @@ export function daily() {
     const folderIds = getSystemFolderIds();
     try {
         for (let rootId of folderIds) {
-            if (folderIsOwnedCurrentByUser(rootId)) {
-                const bm2021 = new OO2021.BusinessModel(rootId, "daily");
+            if (folderIsOwnedCurrentByUserAndCurrentVersion(rootId)) {
+                const bm2021 = new OO2021.BusinessModel(rootId, "daily von id:"+rootId);
                 try {
                     alleAusgabenFolderScannen(bm2021);
                     alleGutschriftenFolderScannen(bm2021);
@@ -98,8 +100,15 @@ export function daily() {
     }
 }
 
-function folderIsOwnedCurrentByUser(folderId: string) {
+function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     const folder = DriveApp.getFolderById(folderId);
+    const driveVersion = folder.getName().substr(-4);
+    if (getPreviousVersion()===driveVersion){
+        //folder has to be updated first
+        updateDrive(folderId);
+    }
+    //throw error if version is still wrong
+    if (currentOOversion!==driveVersion)throw new Error("OO Instance with ID"+folderId+" could not be updated to version "+currentOOversion);
     const user = folder.getOwner();
     return Session.getEffectiveUser().getEmail() === user.getEmail();
 }

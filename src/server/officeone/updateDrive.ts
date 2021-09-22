@@ -44,10 +44,7 @@ export function updateDrive(rootFolderId: string) {
   } catch (e) {
     console.log(e)
   }
-
-
   let oooPreviousVersion = getPreviousVersion();
-
   //copy DataTable Data
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
     if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD) {
