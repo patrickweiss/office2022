@@ -3,6 +3,29 @@ import { CSVToArray } from "../officeone/O1";
 import { getOrCreateFolder } from "../oo21lib/driveConnector";
 import { ooFolders } from "../oo21lib/systemEnums";
 
+
+export function slurpGDPDU(){
+    const activeSpreadsheet = SpreadsheetApp.getActive();
+    const dataSheet = activeSpreadsheet.getSheetByName("Data");
+    try {
+        const rootFolderId = activeSpreadsheet.getRangeByName("OfficeRootID").getValue().toString()
+        const dataFolder = getOrCreateFolder(DriveApp.getFolderById(rootFolderId),ooFolders.daten);
+        const fileTableCache = new TableCache(activeSpreadsheet.getId(), "Files");
+        const dataFileIterator = dataFolder.getFiles();
+        while (dataFileIterator.hasNext()) {
+            const newDataRow = fileTableCache.createNewRow();
+            const file = dataFileIterator.next();
+            newDataRow.setValue("File Name", file.getName());
+            slurpGDPDUCSVFile(file, dataSheet);
+            console.log(file.getName());
+        }
+        fileTableCache.save();
+    } catch (e) {
+        SpreadsheetApp.getUi().prompt(e.toString());
+        console.log(e.stack);
+    }
+}
+
 export function slurpData() {
     const activeSpreadsheet = SpreadsheetApp.getActive();
     try {
@@ -46,6 +69,35 @@ export function slurpCSVData() {
         console.log(e.stack);
     }
 }
+
+function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript.Spreadsheet.Sheet) {
+
+    let datenString = file.getBlob().getDataAsString("UTF-8");
+    let buchungenArray = CSVToArray(datenString, ";");
+    console.log(buchungenArray);
+    let tableCache: TableCache<TableRow> = new TableCache(sheet.getParent().getId(), sheet.getName());
+
+    for (let row in buchungenArray) {
+        const dataArray = buchungenArray[row];
+        if (row !== "0") {
+            if (dataArray[1] !== "" && dataArray[0] !== "") {
+                const dataRow = tableCache.createNewRow();
+                dataRow.setValue("Filename", file.getName());
+                dataRow.setValue("Betrag", dataArray[0]);
+                dataRow.setValue("Gegenkonto", dataArray[2]);
+                dataRow.setValue("Bg-Datum", dataArray[6]);
+
+                dataRow.setValue("Konto-Nr", dataArray[7]);
+                dataRow.setValue("Buchungstext", dataArray[11]);
+                dataRow.setValue("Beleg-Nr", dataArray[4]);
+                dataRow.setValue("BchgNr", dataArray[15]);
+                dataRow.setValue("USt-IDNr", dataArray[12]);
+            }
+        }
+    }
+    tableCache.save();
+}
+
 
 function slurpCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript.Spreadsheet.Sheet) {
 

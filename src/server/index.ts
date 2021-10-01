@@ -17,7 +17,7 @@ import { BuchungenFuerUmsatzsteuerBerechnenUndEintragen } from './officeone/Buch
 import { SimbaExportErstellen } from './officeone/SimbaExportErstellen';
 import { EroeffnungsbilanzAusVorjahrAktualisieren } from './officeone/EroeffnungsbilanzAusVorjahrAktualisieren';
 import { gutschriftenFolderScannen } from './officeone/gutschriftenFolderScannen';
-import { slurpData, slurpCSVData } from './slurpData/slurpData';
+import { slurpData, slurpCSVData, slurpGDPDU } from './slurpData/slurpData';
 import createLastschriften from '../officetwo/sepa/createLastschriften';
 import createInvoicesAndSepaXml from '../officetwo/sepa/createInvoicesAndSepaXml';
 import { deleteData } from './slurpData/deleteData';
@@ -75,6 +75,7 @@ interface IOfficeGlobal {
     gutschriftenFolderScannen: any;
     slurpData: any;
     slurpCSVData: any;
+    slurpGDPDU:any;
     createLastschriften: any;
     createInvoicesAndSepaXml: any;
     deleteData: any;
@@ -107,6 +108,7 @@ global.EroeffnungsbilanzAusVorjahrAktualisieren = EroeffnungsbilanzAusVorjahrAkt
 global.gutschriftenFolderScannen = gutschriftenFolderScannen;
 global.slurpData = slurpData;
 global.slurpCSVData = slurpCSVData;
+global.slurpGDPDU = slurpGDPDU;
 global.createLastschriften = createLastschriften;
 global.createInvoicesAndSepaXml = createInvoicesAndSepaXml;
 global.deleteData = deleteData;
