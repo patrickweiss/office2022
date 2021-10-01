@@ -77,6 +77,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
     console.log(buchungenArray);
     let tableCache: TableCache<TableRow> = new TableCache(sheet.getParent().getId(), sheet.getName());
 
+    let neueBelegnummer = 0;
     for (let row in buchungenArray) {
         const dataArray = buchungenArray[row];
         if (row !== "0") {
@@ -84,12 +85,14 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 const dataRow = tableCache.createNewRow();
                 dataRow.setValue("Filename", file.getName());
                 dataRow.setValue("Betrag", dataArray[0]);
-                dataRow.setValue("Gegenkonto", dataArray[2]);
-                dataRow.setValue("Bg-Datum", dataArray[6]);
+                dataRow.setValue("Gegenkonto", dataArray[3]);
+                const datum = new Date(parseInt(dataArray[6].toString().substr(-4)),parseInt(dataArray[6].toString().substring(2,4))-1,parseInt(dataArray[6].toString().substring(0,2)))
+                dataRow.setValue("Bg-Datum", datum);
 
                 dataRow.setValue("Konto-Nr", dataArray[7]);
                 dataRow.setValue("Buchungstext", dataArray[11]);
                 dataRow.setValue("Beleg-Nr", dataArray[4]);
+                if (!dataRow.getValue("Beleg-Nr")) dataRow.setValue("Beleg-Nr","JA"+neueBelegnummer++);
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
             }

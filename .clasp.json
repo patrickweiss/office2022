@@ -1,5 +1,6 @@
 {
-    "scriptId": "1GGhcqRptPA-83tRd2ZEbPF4yaLr32QW4aUaEhw_5ChCcv7qGfk2Igi4o",
+    "scriptId": "1pMPpIgIftXleJuretUD1lnDqoVwPZM7kirQ8OUTeCYR5zZ7-7QTtvJta",
+    "pwa0058":"1GGhcqRptPA-83tRd2ZEbPF4yaLr32QW4aUaEhw_5ChCcv7qGfk2Igi4o",
     "00systemId 0056": "13WDzyVneOPYnuf2Fo_1HtDaw2wEKV38lu6JNP0rIgeiSV0Ek24QWI-Mr",
     "1 rechnung 0056":"1ehxIvJk9_B8l8xI2V8aJDFmVhfRvc9NyBcdXimIg02JVH7CG2O-glaBa",
     "2 0056":"19KgdYYbC7viR3ofRpaLyQnKLMWhwvFi6oljfull7US09LxYPcn3HrL_K",
@@ -13,5 +14,6 @@
     "1rech0057":"12GjW0mslhCmmq99ivfnCkzWjvCnpm-4myTfkgCDV3clz-0XqjdU1KvWI",
     "2ausg0057":"1TkZjpZXvp0JgGzMJQf0rAp_eHSXFMm6WIv_F_fETbuD9Bh30trJjd3U5",
     "7daten0057":"1CRrPSuJxFlsuAqqqEApZ68GEhtu0a_7YgM27uXS4yn7z_r5OqmjROAj8",
+    "20197daten0058":"1pMPpIgIftXleJuretUD1lnDqoVwPZM7kirQ8OUTeCYR5zZ7-7QTtvJta",
     "rootDir": "./dist"
 }
