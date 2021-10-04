@@ -23,6 +23,7 @@ export function slurpGDPDU(){
             console.log(file.getName());
         }
         fileTableCache.save();
+        bm.save();
         bm.saveLog("slurpGDPDU Ende");
     } catch (e) {
         bm.saveError(e);
@@ -105,6 +106,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
                 //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren
+//                if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
                 if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
                 {
                     const jaUmbuchung = umbuchungenTableCache.getOrCreateRowById(dataRow.getValue("Beleg-Nr").toString());
