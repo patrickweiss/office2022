@@ -1,3 +1,4 @@
+import { BusinessModel } from "../../officeone/BusinessModel";
 import { TableCache, TableRow } from "../../officetwo/BusinessDataFacade";
 import { CSVToArray } from "../officeone/O1";
 import { getOrCreateFolder } from "../oo21lib/driveConnector";
@@ -7,8 +8,10 @@ import { ooFolders } from "../oo21lib/systemEnums";
 export function slurpGDPDU(){
     const activeSpreadsheet = SpreadsheetApp.getActive();
     const dataSheet = activeSpreadsheet.getSheetByName("Data");
+    const rootFolderId = activeSpreadsheet.getRangeByName("OfficeRootID").getValue().toString();
+    const bm = new BusinessModel(rootFolderId,"slurpGDPDU");
     try {
-        const rootFolderId = activeSpreadsheet.getRangeByName("OfficeRootID").getValue().toString()
+        
         const dataFolder = getOrCreateFolder(DriveApp.getFolderById(rootFolderId),ooFolders.daten);
         const fileTableCache = new TableCache(activeSpreadsheet.getId(), "Files");
         const dataFileIterator = dataFolder.getFiles();
@@ -16,11 +19,13 @@ export function slurpGDPDU(){
             const newDataRow = fileTableCache.createNewRow();
             const file = dataFileIterator.next();
             newDataRow.setValue("File Name", file.getName());
-            slurpGDPDUCSVFile(file, dataSheet);
+            slurpGDPDUCSVFile(file, dataSheet,bm);
             console.log(file.getName());
         }
         fileTableCache.save();
+        bm.saveLog("slurpGDPDU Ende");
     } catch (e) {
+        bm.saveError(e);
         SpreadsheetApp.getUi().prompt(e.toString());
         console.log(e.stack);
     }
@@ -70,18 +75,22 @@ export function slurpCSVData() {
     }
 }
 
-function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript.Spreadsheet.Sheet) {
+function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript.Spreadsheet.Sheet,bm: BusinessModel) {
 
     let datenString = file.getBlob().getDataAsString("UTF-8");
     let buchungenArray = CSVToArray(datenString, ";");
     console.log(buchungenArray);
     let tableCache: TableCache<TableRow> = new TableCache(sheet.getParent().getId(), sheet.getName());
+    const umbuchungenTableCache=bm.getUmbuchungenTableCache();
 
     let neueBelegnummer = 0;
-    for (let row in buchungenArray) {
+    for (let row in buchungenArray)
+    {
         const dataArray = buchungenArray[row];
-        if (row !== "0") {
-            if (dataArray[1] !== "" && dataArray[0] !== "") {
+        if (row !== "0")
+        {
+            if (dataArray[1] !== "" && dataArray[0] !== "")
+            {
                 const dataRow = tableCache.createNewRow();
                 dataRow.setValue("Filename", file.getName());
                 dataRow.setValue("Betrag", dataArray[0]);
@@ -95,6 +104,18 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 if (!dataRow.getValue("Beleg-Nr")) dataRow.setValue("Beleg-Nr","JA"+neueBelegnummer++);
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
+                //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren
+                if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
+                {
+                    const jaUmbuchung = umbuchungenTableCache.getOrCreateRowById(dataRow.getValue("Beleg-Nr").toString());
+                    jaUmbuchung.setFileId(jaUmbuchung.getId());
+                    jaUmbuchung.setDatum(dataRow.getValue("Bg-Datum"));
+                    jaUmbuchung.setKonto(dataRow.getValue("Konto-Nr"));
+                    jaUmbuchung.setBetrag(dataRow.getValue("Betrag"));
+                    jaUmbuchung.setGegenkonto(dataRow.getValue("Gegenkonto"));
+                    jaUmbuchung.setBezahltAm(dataRow.getValue("Bg-Datum"));
+                    jaUmbuchung.setText(dataRow.getValue("Buchungstext"));
+                }
             }
         }
     }

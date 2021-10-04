@@ -502,7 +502,7 @@ export class BusinessModel {
         if (this.bankbuchungenTableCache === undefined) this.bankbuchungenTableCache = new BankbuchungenTableCache(this.getRootFolderId());
         return this.bankbuchungenTableCache;
     }
-    private getUmbuchungenTableCache(): UmbuchungenTableCache {
+    public getUmbuchungenTableCache(): UmbuchungenTableCache {
         if (this.umbuchungenTableCache === undefined) this.umbuchungenTableCache = new UmbuchungenTableCache(this.getRootFolderId());
         return this.umbuchungenTableCache;
     }

@@ -22,7 +22,7 @@ export const onOpen = () => {
       const menu = SpreadsheetApp.getUi()
         .createMenu('OfficeOne Datenschlürfer') // edit me!
         .addItem("GDPdU BB schlürfen","slurpGDPDU")
-        .addItem("Simba Excel Reimport Daten schlürfen", "slurpData")
+    //    .addItem("Simba Excel Reimport Daten schlürfen", "slurpData")
         .addItem("Simba CSV Export Daten schlürfen", "slurpCSVData")
         .addItem("kotzen", "deleteData")
       menu.addToUi();
