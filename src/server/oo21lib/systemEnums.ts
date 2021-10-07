@@ -148,3 +148,7 @@ export enum ServerFunction {
     vertraegeFolderScannen = "vertraegeFolderScannen",
     unbehandelterFehler = "unbehandelterFehler"
 }
+
+export enum ooFields{
+    SKR03 = "SKR03"
+}
