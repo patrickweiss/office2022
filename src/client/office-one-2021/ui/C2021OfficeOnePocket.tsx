@@ -1,4 +1,5 @@
 import * as React from "react";
+import { currentOOversion } from "../../../server/oo21lib/systemEnums";
 import { DriveLeaf } from "../framework/DriveLeaf";
 import * as OfficeLeaf from "../framework/OfficeLeaf";
 import { IOfficeWindow } from "../framework/OfficeWindow";
@@ -27,6 +28,9 @@ class C2021OfficeOnePocket extends DriveLeaf {
     this.leafName = OfficeLeaf.Leafs.C2021OfficeOnePocket;
   }
 
+  protected renderButton() {
+    return <button className="linkButton" type="button" onClick={this.handleClick}>{this.title} {currentOOversion} {this.getUIState().UIversion}</button>;
+}
 
   protected renderMobile() {
     return (

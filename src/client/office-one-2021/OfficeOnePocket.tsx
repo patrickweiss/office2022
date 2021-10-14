@@ -38,7 +38,7 @@ export const initial = {
 		rootFolder:{}
 	}
 };
-console.log("OfficeOnePocket.tsx:Z57:"+initial.UI.status);
+console.log("OfficeOnePocket.tsx:Z41:"+initial.UI.status);
 
 
 export const reducer = (state = initial, action: Action.IAction) => {
