@@ -110,6 +110,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 dataRow.setValue("USt-IDNr", dataArray[12]);
                 //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren
 //                if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
+                if (!dataRow.getValue("Buchungstext"))dataRow.setValue("Buchungstext","-");
                 if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
                 {
                     const jaUmbuchung = umbuchungenTableCache.getOrCreateRowById(dataRow.getValue("Beleg-Nr").toString());

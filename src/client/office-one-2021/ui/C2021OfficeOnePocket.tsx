@@ -29,7 +29,7 @@ class C2021OfficeOnePocket extends DriveLeaf {
   }
 
   protected renderButton() {
-    return <button className="linkButton" type="button" onClick={this.handleClick}>{this.title} {currentOOversion} {this.getUIState().UIversion}</button>;
+    return <button className="linkButton" type="button" onClick={this.handleClick}>{this.title} {currentOOversion}.{this.getUIState().UIversion}</button>;
 }
 
   protected renderMobile() {
