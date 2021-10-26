@@ -127,7 +127,9 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let letzteBuchung = BM.getBankbuchungLatest(konto);
     //durch das Array iterieren:
     let index: string = "";
+    
     if (letzteBuchung !== undefined) {
+        //Wenn bereits Bankbuchungen importiert wurden ... erster Import im else Zweig, dort wird Anfangsbestand errechnet und ergänzt
         BM.addLogMessage("letzte Buchung Id:" + letzteBuchung.getId());
         let foundFlag = false;
         for (index in transactionArray) {
@@ -211,7 +213,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     }
 
     //jetzt werden die neuen Buchungen rueckwaerts hinzugefuegt, damit die neueste Buchung am Ende oben steht
-    let elementIndex = parseInt(index) - 1;
+    let elementIndex = parseInt(index);
     while (elementIndex >= 0) {
         let transaction: CSVTransaction = transactionArray[elementIndex];
         if (transaction.isValid) {
