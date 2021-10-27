@@ -1,5 +1,5 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
-import { belegNr, currentOOversion, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
+import { belegNr, currentOOversion, konto, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -364,34 +364,34 @@ export class BusinessModel {
         //Alle Buchungen für 19% Umsatzsteuer
         let istUmsatzBuchung19 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz19);
         istUmsatzBuchung19.setDatum(this.endOfYear());
-        istUmsatzBuchung19.setKonto("Umsatz9310");
+        istUmsatzBuchung19.setKonto(konto.Umsatz9310);
         istUmsatzBuchung19.setBetrag(umsatzMit19);
-        istUmsatzBuchung19.setGegenkonto("Umsatz9313");
+        istUmsatzBuchung19.setGegenkonto(konto.Umsatz9313);
         istUmsatzBuchung19.setBezahltAm(this.endOfYear());
         istUmsatzBuchung19.setText("bezahlter Umsatz im Geschaeftsjahr mit 19% Umsatzsteuer");
 
         let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt19);
         faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
-        faelligeMehrwertsteuerUmsatzsteuer19.setKonto("USt. in Rechnung gestellt");
+        faelligeMehrwertsteuerUmsatzsteuer19.setKonto(konto.USt_in_Rechnunggestellt);
         faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(fealligeUmsatzsteuer19);
-        faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto("Umsatzsteuer19");
+        faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto(konto.Umsatzsteuer19);
         faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
         faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
 
         let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
         umsatzsteuer19VMwSt.setDatum(this.endOfYear());
-        umsatzsteuer19VMwSt.setKonto("Umsatzsteuer19");
+        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer19);
         umsatzsteuer19VMwSt.setBetrag(fealligeUmsatzsteuer19);
-        umsatzsteuer19VMwSt.setGegenkonto("Umsatzsteuer Vorjahr");
+        umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
         umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
-        umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1790");
+        umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1789");
 
         //Alle Buchungen für 0% Umsatzsteuer
         let istUmsatzBuchung0 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz0);
         istUmsatzBuchung0.setDatum(this.endOfYear());
-        istUmsatzBuchung0.setKonto("Umsatz9310");
+        istUmsatzBuchung0.setKonto(konto.Umsatz9310);
         istUmsatzBuchung0.setBetrag(umsatzMit0);
-        istUmsatzBuchung0.setGegenkonto("Umsatz9300");
+        istUmsatzBuchung0.setGegenkonto(konto.Umsatz9300);
         istUmsatzBuchung0.setBezahltAm(this.endOfYear());
         istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
 
@@ -403,11 +403,11 @@ export class BusinessModel {
 
         let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
         faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
-        faelligeMehrwertsteuerVorsteuer.setKonto("Vorsteuer");
+        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Vorsteuer);
         faelligeMehrwertsteuerVorsteuer.setBetrag(-vorsteuer);
-        faelligeMehrwertsteuerVorsteuer.setGegenkonto("Umsatzsteuer Vorjahr");
+        faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
         faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
-        faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1790");
+        faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1789");
 
         //UStVA auf Verbindlichkeiten Umsatzsteuer buchen
 
@@ -415,34 +415,34 @@ export class BusinessModel {
         this.getAusgabenRechnungArray().forEach(ausgabe => {
             if (
                 ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
-                ausgabe.getKonto() === "UStVA") ustva += ausgabe.getBetrag();
+                ausgabe.getKonto() === konto.UStVA) ustva += ausgabe.getBetrag();
         })
         this.getUmbuchungenArray().forEach(ausgabe => {
             if (
                 ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
-                ausgabe.getKonto() === "UStVA" &&
+                ausgabe.getKonto() === konto.UStVA &&
                 (ausgabe.getId() as string).substr(0, 4) !== "mwst") ustva += ausgabe.getBetrag();
         })
         let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
         mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
-        mwstUStVAaufVerbindlichkeiten.setKonto("UStVA");
+        mwstUStVAaufVerbindlichkeiten.setKonto(konto.UStVA);
         mwstUStVAaufVerbindlichkeiten.setBetrag(-ustva);
-        mwstUStVAaufVerbindlichkeiten.setGegenkonto("Umsatzsteuer Vorjahr");
+        mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
         mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
-        mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1790");
+        mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1789");
 
         //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
         let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstFinanzamtOP);
         mwstFinanzamtOP.setDatum(this.endOfYear());
-        mwstFinanzamtOP.setKonto("Umsatzsteuer Vorjahr");
+        mwstFinanzamtOP.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
         mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 - vorsteuer - ustva);
-        mwstFinanzamtOP.setGegenkonto("Umsatzsteuer Vorjahr");
+        mwstFinanzamtOP.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
         //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
         mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
     }
     public getUStVAVorjahr(): AusgabenRechnung[] {
         return this.getAusgabenRechnungArray().filter(ausgabe => {
-            return (ausgabe.getKonto() === "UStVA" && ausgabe.getDatum().getFullYear() === (this.endOfYear().getFullYear() - 1))
+            return (ausgabe.getKonto() === konto.UStVA && ausgabe.getDatum().getFullYear() === (this.endOfYear().getFullYear() - 1))
         })
     }
     public save() {

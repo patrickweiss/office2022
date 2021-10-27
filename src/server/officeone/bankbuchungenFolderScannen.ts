@@ -1,15 +1,9 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { months, ServerFunction } from "../oo21lib/systemEnums";
+import { csvTypes, months, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { CSVToArray } from "./O1";
 import { formatDate } from "./rechnungSchreiben";
 
-enum csvTypes {
-    Commerzbank = "Commerzbank",
-    BWVisa = "BWVisa",
-    KSK = "KSK",
-    Voba = "Voba"
-}
 
 export function bankbuchungenFolderScannen(rootFolderId: string, month: string) {
     const bm = new BusinessModel(rootFolderId,"bankbuchungenFolderScannen");

@@ -20,7 +20,24 @@ export enum belegNr {
     mwstIstUmsatz19 = "mwstIstUmsatz19"
 }
 
+export enum csvTypes {
+    Commerzbank = "Commerzbank",
+    BWVisa = "BWVisa",
+    KSK = "KSK",
+    Voba = "Voba"
+}
 
+export enum konto{
+    Umsatz9310="Umsatz9310",
+    Umsatz9313="Umsatz9313",
+    USt_in_Rechnunggestellt="USt. in Rechnung gestellt",
+    Umsatzsteuer19="Umsatzsteuer19",
+    Umsatzsteuer_laufendes_Jahr="Umsatzsteuer laufendes Jahr",
+    Umsatz9300="Umsatz9300",
+    Vorsteuer="Vorsteuer",
+    UStVA="UStVA"
+
+}
 
 export enum ooFolders {
     system = "00 System",
