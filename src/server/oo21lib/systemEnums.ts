@@ -1,61 +1,23 @@
-export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU"
+//Aktuelle version (die mit der höheren Nummer) und Vorgängerversion. Die Vorgängerversion wird benötigt, um daraus die Daten zu kopieren
 export enum ooVersions {
-    oo57 = "0057",
-    oo58 = "0058"
+    oo58 = "0058",
+    oo59 = "0059"
 }
-export const currentOOversion = ooVersions.oo58;
+//Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
+export const currentOOversion = ooVersions.oo59;
+
+//Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
+//https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
+export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU"
+
 export enum systemMasterProperty {
-    officeOne2022_TemplateFolderId = "1rsDPOk33OEa8x6y-jLNmjv9TL1kTwxxb",
+    //Muss bei jedem Update aktualisiert werden. Folder der alle Spreadsheet Templates enthält, die von Clients kopiert werden: 2021 My Business.Office 0059
+    officeOne2022_TemplateFolderId = "1AQK558OVPvZRqbcB1c-WpbHvXVah2lr3",
+    //Bleibt ab Version 0059 für alle Produktivsystem gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht.
     webApp_URL = "https://script.google.com/macros/s/AKfycbyC206ZJWY2Zv5NUhpqMQ_jgzWk2VAt9U3VnwVNhRRlHzQKG5Q/exec"
 }
-export const adminUser = "eins.stein@officeone.team";
-export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbzeBsJ_exOfJjhUtbHeCLEbTFoLspd5GfTrKTGqi6CzDF_9lKJr/exec";
-export enum belegNr {
-    mwstFinanzamtOP = "mwstFinanzamtOP",
-    mwstUStVAAufVMwSt = "mwstUStVAAufVMwSt",
-    mwstVorsteuerAufVMwSt = "mwstVorsteuerAufVMwSt",
-    mwstIstUmsatz0 = "mwstIstUmsatz0",
-    mwstUmsatzsteuer19AufVMwSt = "mwstUmsatzsteuer19AufVMwSt",
-    mwstUStRechnungUSt19 = "mwstUStRechnungUSt19",
-    mwstIstUmsatz19 = "mwstIstUmsatz19"
-}
 
-export enum csvTypes {
-    Commerzbank = "Commerzbank",
-    BWVisa = "BWVisa",
-    KSK = "KSK",
-    Voba = "Voba"
-}
-
-export enum konto{
-    Umsatz9310="Umsatz9310",
-    Umsatz9313="Umsatz9313",
-    USt_in_Rechnunggestellt="USt. in Rechnung gestellt",
-    Umsatzsteuer19="Umsatzsteuer19",
-    Umsatzsteuer_laufendes_Jahr="Umsatzsteuer laufendes Jahr",
-    Umsatz9300="Umsatz9300",
-    Vorsteuer="Vorsteuer",
-    UStVA="UStVA"
-
-}
-
-export enum ooFolders {
-    system = "00 System",
-    office = "2021 My Business.Office",
-    vorlagen = "0 Vorlagen",
-    daten = "7 Daten",
-    archive = "9 Archiv",
-    version = "Version:",
-    rechnung = "Rechnungsvorlage leer"
-}
-
-export enum systemObject {
-    officeArray = "officeArray"
-}
-
-export enum logLevel{
-    debug="debug"
-} 
+//Konfigurationsvariablen die in "00 Office" definiert sein müssen
 export enum office {
     fehlerEmail = "fehlerEmail",
     geschaeftsjahr = "zeitraumJahr",
@@ -81,11 +43,59 @@ export enum office {
     logLevel="logLevel"
 }
 
-export enum triggerModes {
-    production = "Produktion",
-    test = "Test",
-    stop = "Stop"
+export const adminUser = "eins.stein@officeone.team";
+export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbzeBsJ_exOfJjhUtbHeCLEbTFoLspd5GfTrKTGqi6CzDF_9lKJr/exec";
+
+
+// MWSt, Konstanten für Konten und Belegnummern von definierten Abschlussbuchungen
+export enum konto{
+    Umsatz9310="Umsatz9310",
+    Umsatz9313="Umsatz9313",
+    USt_in_Rechnunggestellt="USt. in Rechnung gestellt",
+    Umsatzsteuer19="Umsatzsteuer19",
+    Umsatzsteuer_laufendes_Jahr="Umsatzsteuer laufendes Jahr",
+    Umsatz9300="Umsatz9300",
+    Vorsteuer="Vorsteuer",
+    UStVA="UStVA"
+
 }
+export enum belegNr {
+    mwstFinanzamtOP = "mwstFinanzamtOP",
+    mwstUStVAAufVMwSt = "mwstUStVAAufVMwSt",
+    mwstVorsteuerAufVMwSt = "mwstVorsteuerAufVMwSt",
+    mwstIstUmsatz0 = "mwstIstUmsatz0",
+    mwstUmsatzsteuer19AufVMwSt = "mwstUmsatzsteuer19AufVMwSt",
+    mwstUStRechnungUSt19 = "mwstUStRechnungUSt19",
+    mwstIstUmsatz19 = "mwstIstUmsatz19"
+}
+
+//Banktypen
+export enum csvTypes {
+    Commerzbank = "Commerzbank",
+    BWVisa = "BWVisa",
+    KSK = "KSK",
+    Voba = "Voba"
+}
+
+//Google Drive Ordner Namen
+export enum ooFolders {
+    system = "00 System",
+    office = "2021 My Business.Office",
+    vorlagen = "0 Vorlagen",
+    daten = "7 Daten",
+    archive = "9 Archiv",
+    version = "Version:",
+    rechnung = "Rechnungsvorlage leer"
+}
+
+export enum systemObject {
+    officeArray = "officeArray"
+}
+
+export enum logLevel{
+    debug="debug"
+} 
+
 export enum ooTables {
     systemMasterConfiguration = "systemMasterConfiguration",
     officeConfiguration = "officeConfiguration",
