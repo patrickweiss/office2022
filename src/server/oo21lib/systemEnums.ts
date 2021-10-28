@@ -12,7 +12,7 @@ export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmir
 
 export enum systemMasterProperty {
     //Muss bei jedem Update aktualisiert werden. Folder der alle Spreadsheet Templates enthält, die von Clients kopiert werden: 2021 My Business.Office 0059
-    officeOne2022_TemplateFolderId = "1AQK558OVPvZRqbcB1c-WpbHvXVah2lr3",
+    officeOne2022_TemplateFolderId = "1A2sq-EtAs-vrwPG026iKpanMfz9QAjha",
     //Bleibt ab Version 0059 für alle Produktivsystem gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht.
     webApp_URL = "https://script.google.com/macros/s/AKfycbxiMhdxDyK0IZFV2ZfRbL4bAlF0fOELD0Da2QlvCmuVtYrT-5M/exec"
 }
