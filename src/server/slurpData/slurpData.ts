@@ -106,6 +106,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 dataRow.setValue("Buchungstext", dataArray[11]);
                 dataRow.setValue("Beleg-Nr", dataArray[4]);
                 if (!dataRow.getValue("Beleg-Nr")) dataRow.setValue("Beleg-Nr","JA"+neueBelegnummer++);
+                console.log(dataRow.getValue("Beleg-Nr"));
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
                 //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren

@@ -380,9 +380,9 @@ export class BusinessModel {
 
         let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
         umsatzsteuer19VMwSt.setDatum(this.endOfYear());
-        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer19);
-        umsatzsteuer19VMwSt.setBetrag(fealligeUmsatzsteuer19);
-        umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
+        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        umsatzsteuer19VMwSt.setBetrag(-fealligeUmsatzsteuer19);
+        umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer19);
         umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
         umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1789");
 
@@ -403,9 +403,9 @@ export class BusinessModel {
 
         let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
         faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
-        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Vorsteuer);
-        faelligeMehrwertsteuerVorsteuer.setBetrag(-vorsteuer);
-        faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
+        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        faelligeMehrwertsteuerVorsteuer.setBetrag(vorsteuer);
+        faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Vorsteuer);
         faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
         faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1789");
 
@@ -425,9 +425,9 @@ export class BusinessModel {
         })
         let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
         mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
-        mwstUStVAaufVerbindlichkeiten.setKonto(konto.UStVA);
-        mwstUStVAaufVerbindlichkeiten.setBetrag(-ustva);
-        mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
+        mwstUStVAaufVerbindlichkeiten.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        mwstUStVAaufVerbindlichkeiten.setBetrag(ustva);
+        mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.UStVA);
         mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
         mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1789");
 
