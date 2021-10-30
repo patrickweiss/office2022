@@ -81,12 +81,21 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
 
     let datenString = file.getBlob().getDataAsString("UTF-8");
     let buchungenArray = CSVToArray(datenString, ";");
-    console.log(buchungenArray);
     let tableCache: TableCache<TableRow> = new TableCache(sheet.getParent().getId(), sheet.getName());
     const umbuchungenTableCache=bm.getUmbuchungenTableCache();
     const kontenCache = bm.getKontenTableCache();
-    const skr03Konten = kontenCache.getOrCreateHashTable(ooFields.SKR03);
-
+    const skr03Konten = {};
+    const kontenArray = kontenCache.getRowArray();
+  
+    kontenArray.forEach( 
+        kontoRow => {
+            if (!isGKontrollkonto(kontoRow.getKonto())){
+                console.log("OO Konto:"+kontoRow.getKonto())
+                skr03Konten[kontoRow.getSKR03() as string]=kontoRow;
+            }else {console.log("G Konto:"+kontoRow.getKonto())}
+        }
+    )
+   
     let neueBelegnummer = 0;
     for (let row in buchungenArray)
     {
@@ -109,7 +118,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 console.log(dataRow.getValue("Beleg-Nr"));
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
-                //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren
+                //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren (alle außer AfA Buchungen)
 //                if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
                 if (!dataRow.getValue("Buchungstext"))dataRow.setValue("Buchungstext","-");
                 if (dataRow.getValue("Beleg-Nr").toString().substring(0,2)==="JA" && dataRow.getValue("Buchungstext").substring(0,3)!=="AfA")
@@ -131,13 +140,17 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
 
 function getOrCreateOoKonto(skr03Konten:Object,SKR03konto:string, kontenCache:KontenTableCache){
     let ooKontoRow = skr03Konten[SKR03konto] as Konto;
-    if (!ooKontoRow || (ooKontoRow.getKonto().substring(0,1)==="G"&&!isNaN(parseInt(ooKontoRow.getKonto().substring(1,2),10)))){
+    if (!ooKontoRow || isGKontrollkonto(ooKontoRow.getKonto())){
         let ooKonto = "JA"+SKR03konto
         ooKontoRow =  kontenCache.getOrCreateRowById(ooKonto)
         ooKontoRow.setSKR03(SKR03konto);
         ooKontoRow.setQuelle("JA Datenschlürfer");
     }
     return ooKontoRow.getKonto();
+}
+
+function isGKontrollkonto(konto:string){
+    return(konto.substring(0,1)==="G"&&!isNaN(parseInt(konto.substring(1,2),10))) 
 }
 
 
