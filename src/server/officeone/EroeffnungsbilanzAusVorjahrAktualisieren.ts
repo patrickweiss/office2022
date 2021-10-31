@@ -8,16 +8,11 @@ export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, r
     var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
 
     var BMlastYear = new BusinessModel(rootFolderIdLastYear, "EroeffnungsbilanzAusVorjahrAktualisieren");
+    
     KontenStammdatenAusVorjahrAktualisieren(BMlastYear, BMnow);
-    //  AnlagenUndAbschreibungenAusVorjahrAktualisieren(BMlastYear, BMnow);
-    //  OffenePostenAusVorjahrAktualisieren(BMlastYear, BMnow);
-    //    AnfangsbestaendeVonKontenGruppeBestandAktualisieren(BMlastYear, BMnow);
-    //Der Anfangsbestand kommt über den ersten Transaktionsimport im Januar des nächsten Jahres in die Tabelle
-    //AnfangsbestandBankkontenAktualisieren(BMlastYear, BMnow);
-
-
     OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear, BMnow);
     AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear, BMnow);
+    AnfangsbestandBankkontenAktualisieren(BMlastYear,BMnow);
 
     BMnow.save();
 
@@ -148,138 +143,6 @@ function AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear: BusinessModel,
 
 }
 
-
-function AnlagenUndAbschreibungenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
-  let VorsteuerAusVorjahren = 0;
-  BMlastYear.getAnlagenAusAusgabenRechnungArray().forEach(
-    vorjahrAnlage => {
-      //Wenn die Anlage noch nicht bezahlt ist, dann wird sie als "offener Posten" aktualisiert.
-      if (vorjahrAnlage.isBezahlt()) {
-        AusgabeKopierenOhneBezahltAmZuUeberschreiben(vorjahrAnlage, BMnow, "Anlagen Vorjahre", "Anlage aus einem Vorjahr, die noch nicht verkauft wurde");
-        VorsteuerAusVorjahren += vorjahrAnlage.getMehrwertsteuer();
-      }
-      BMlastYear.getAbschreibungenZuAnlageArray(vorjahrAnlage.getKonto()).forEach(
-        vorjahrAbschreibung => {
-          let aktuelleAbschreibung = BMnow.getOrCreateAbschreibung(vorjahrAbschreibung.getId());
-          aktuelleAbschreibung.setLink(vorjahrAbschreibung.getLink());
-          aktuelleAbschreibung.setDatum(vorjahrAbschreibung.getDatum());
-          aktuelleAbschreibung.setKonto(vorjahrAbschreibung.getKonto());
-          aktuelleAbschreibung.setBetrag(vorjahrAbschreibung.getBetrag());
-          aktuelleAbschreibung.setGegenkonto(vorjahrAbschreibung.getGegenkonto());
-          aktuelleAbschreibung.setText(vorjahrAbschreibung.getText());
-        }
-      );
-    }
-  );
-  let vorsteuerKorrektur = BMnow.getOrCreateUmbuchung("UmEBvorsteuerAusAnlagenVorjahre");
-  vorsteuerKorrektur.setDatum(BMlastYear.endOfYear());
-  vorsteuerKorrektur.setBezahltAm(BMlastYear.endOfYear());
-  vorsteuerKorrektur.setKonto("Vorsteuer");
-  vorsteuerKorrektur.setBetrag(-VorsteuerAusVorjahren);
-  vorsteuerKorrektur.setGegenkonto("Vorsteuer aus Anlagen Vorjahre");
-  vorsteuerKorrektur.setText("Vorsteuer aus Anlagen die vor dem " + BMlastYear.endOfYear() + " bezahlt wurden.");
-}
-
-function OffenePostenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
-  let VorsteuerAusVorjahren = 0;
-
-  BMlastYear.getOffeneAusgabenRechnungArray().forEach(
-    offeneAusgabeLastYear => {
-      AusgabeKopierenOhneBezahltAmZuUeberschreiben(offeneAusgabeLastYear, BMnow, offeneAusgabeLastYear.getGegenkonto(), "nicht bezahlte Ausgabe aus dem Vorjahr (offener Posten)");
-      VorsteuerAusVorjahren += offeneAusgabeLastYear.getMehrwertsteuer();
-    }
-  );
-  BMlastYear.getOffeneBewirtungsbelegeArray().forEach(
-    offeneAusgabeLastYear => {
-      BewirtungsbelegKopierenOhneBezahltAmZuUeberschreiben(offeneAusgabeLastYear, BMnow, offeneAusgabeLastYear.getGegenkonto(), "nicht bezahlte Ausgabe aus dem Vorjahr (offener Posten)");
-      VorsteuerAusVorjahren += offeneAusgabeLastYear.getMehrwertsteuer();
-    }
-  );
-  let vorsteuerKorrektur = BMnow.getOrCreateUmbuchung("UmEBvorsteuerAusOffeneAusgabenVorjahre");
-  vorsteuerKorrektur.setDatum(BMlastYear.endOfYear());
-  vorsteuerKorrektur.setBezahltAm(BMlastYear.endOfYear());
-  vorsteuerKorrektur.setKonto("Vorsteuer");
-  vorsteuerKorrektur.setBetrag(-VorsteuerAusVorjahren);
-  vorsteuerKorrektur.setGegenkonto("Vorsteuer Ausgabenrechnungen der Vorjahre");
-  vorsteuerKorrektur.setText("Vorsteuer aus Ausgabenrechnung die vor dem " + BMlastYear.endOfYear() + " nicht bezahlt wurden.");
-
-  BMlastYear.getOffeneEinnahmenRechnungArray().forEach(
-    offeneRechnungLastYear => {
-      RechnungKopierenOhneBezahltAmzuUeberschreiben(offeneRechnungLastYear, BMnow);
-    }
-  );
-  BMlastYear.getOffeneGutschriftenArray().forEach(
-    offeneGutschrift => {
-      let aktuelleGutschrift = BMnow.getOrCreateGutschrift(offeneGutschrift.getId());
-      aktuelleGutschrift.setFileId(offeneGutschrift.getFileId());
-      aktuelleGutschrift.setLink(offeneGutschrift.getLink());
-      aktuelleGutschrift.setStatus("offener Posten");
-      aktuelleGutschrift.setDatum(offeneGutschrift.getDatum());
-      aktuelleGutschrift.setNettoBetrag(offeneGutschrift.getNettoBetrag());
-      aktuelleGutschrift.setMehrwertsteuer(offeneGutschrift.getMehrwertsteuer());
-      aktuelleGutschrift.setBetrag(offeneGutschrift.getBetrag());
-      aktuelleGutschrift.setGegenkonto(offeneGutschrift.getGegenkonto());
-      aktuelleGutschrift.setDokumententyp(offeneGutschrift.getDokumententyp());
-      aktuelleGutschrift.setDateiTyp(offeneGutschrift.getDateiTyp());
-    }
-  )
-
-  //Wenn eines der beiden Konten ein Konto mit Subtyp "Bestand" ist, dann ist der Subtyp falsch!!! 
-  BMlastYear.getOffeneUmbuchungenArray().forEach(offeneUmbuchung => {
-    var aktuelleUmbuchung = BMnow.getOrCreateUmbuchung(offeneUmbuchung.getId());
-    aktuelleUmbuchung.setFileId(offeneUmbuchung.getFileId());
-    aktuelleUmbuchung.setLink(offeneUmbuchung.getLink());
-    aktuelleUmbuchung.setDatum(offeneUmbuchung.getDatum());
-    let konto = offeneUmbuchung.getKonto()
-    if (BMlastYear.getKontenTableCache().getOrCreateRowById(konto).getSubtyp() === "Bestand") konto = "Fehler in " + offeneUmbuchung.getId();
-    aktuelleUmbuchung.setKonto(konto);
-    aktuelleUmbuchung.setBetrag(offeneUmbuchung.getBetrag());
-    let gegenkonto = offeneUmbuchung.getGegenkonto();
-    if (BMlastYear.getKontenTableCache().getOrCreateRowById(gegenkonto).getSubtyp() === "Bestand") gegenkonto = "Fehler in " + offeneUmbuchung.getId();
-    aktuelleUmbuchung.setGegenkonto(offeneUmbuchung.getGegenkonto());
-    //bezahlt am wird nicht überschrieben
-    aktuelleUmbuchung.setText("offener Posten aus Vorjahr");
-
-  })
-  //Wenn die letzte UStVA aus dem Vorjahr übernommen wird, weil sie noch nicht bezahlt ist, dann muss der Betrag 
-  // von der UStVA wieder abgezogen werden (Bestandskonto mit Anfangesbestand 0)
-  // und von den Verbindlichkeiten Umsatzsteuer auch, weil der Betrag dort schon enthalten ist.
-  /* nach Benny import scheint das falsch zu sein ...
-  BMnow.getUStVAVorjahr().forEach(ustva => {
-    let korrekturUStVA = BMnow.getOrCreateUmbuchung("EBustvaOffenePostenKorrekturUStVa" + (new Date(ustva.getDatum()).getMonth() + 1));
-    korrekturUStVA.setDatum(BMlastYear.endOfYear());
-    korrekturUStVA.setKonto("Geld Vorjahre");
-    korrekturUStVA.setBetrag(ustva.getBetrag());
-    korrekturUStVA.setGegenkonto("UStVA");
-    korrekturUStVA.setBezahltAm(BMlastYear.endOfYear());
-    korrekturUStVA.setText("Korrektur des Bestandsfehlers durch offenen UStVA Posten")
-
-    let korrekturVerbindlichkeitenUmsatzsteuer = BMnow.getOrCreateUmbuchung("EBustvaOffenePostenKorrekturVerbindlichkeitenUmsatzsteuer" + (new Date(ustva.getDatum()).getMonth() + 1));
-    korrekturVerbindlichkeitenUmsatzsteuer.setDatum(BMlastYear.endOfYear());
-    korrekturVerbindlichkeitenUmsatzsteuer.setKonto("Geld Vorjahre");
-    korrekturVerbindlichkeitenUmsatzsteuer.setBetrag(-ustva.getBetrag());
-    korrekturVerbindlichkeitenUmsatzsteuer.setGegenkonto("Verbindlichkeiten Umsatzsteuer");
-    korrekturVerbindlichkeitenUmsatzsteuer.setBezahltAm(BMlastYear.endOfYear());
-    korrekturVerbindlichkeitenUmsatzsteuer.setText("Korrektur des Bestandsfehlers durch offenen UStVA Posten")
-  })*/
-}
-
-/*
-function AnfangsbestaendeVonKontenGruppeBestandAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
-  BMlastYear.getBestandskontenArray().forEach(bestandsKonto => {
-    if (!bestandsKonto.isDatenschluerferKonto()) {
-      var anfangsbestandsbuchung = BMnow.getOrCreateUmbuchung("UmEB" + bestandsKonto.getId().toString().replace(/ /g, "-"));
-      anfangsbestandsbuchung.setDatum(BMlastYear.endOfYear());
-      anfangsbestandsbuchung.setKonto("Geld Vorjahre");
-      anfangsbestandsbuchung.setBetrag(bestandsKonto.getSumme());
-      anfangsbestandsbuchung.setGegenkonto(bestandsKonto.getId());
-      anfangsbestandsbuchung.setBezahltAm(BMlastYear.endOfYear());
-      anfangsbestandsbuchung.setText("Anfangsbestand");
-    }
-  })
-
-}
-*/
 
 function AusgabeKopierenOhneBezahltAmZuUeberschreiben(vorjahrAusgabe: AusgabenRechnung, BMnow: BusinessModel, gegenkonto: string, text: string) {
   let aktuelleAnlage = BMnow.getOrCreateAusgabenRechnung(vorjahrAusgabe.getId());

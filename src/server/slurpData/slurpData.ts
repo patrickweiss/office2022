@@ -3,7 +3,7 @@ import { BusinessModel } from "../../officeone/BusinessModel";
 import { TableCache, TableRow } from "../../officetwo/BusinessDataFacade";
 import { CSVToArray } from "../officeone/O1";
 import { getOrCreateFolder } from "../oo21lib/driveConnector";
-import { ooFields, ooFolders } from "../oo21lib/systemEnums";
+import { ooFolders } from "../oo21lib/systemEnums";
 
 
 export function slurpGDPDU(){
@@ -89,7 +89,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
   
     kontenArray.forEach( 
         kontoRow => {
-            if (!isGKontrollkonto(kontoRow.getKonto())){
+            if (!kontoRow.isDatenschluerferKonto()){
                 console.log("OO Konto:"+kontoRow.getKonto())
                 skr03Konten[kontoRow.getSKR03() as string]=kontoRow;
             }else {console.log("G Konto:"+kontoRow.getKonto())}
@@ -140,17 +140,13 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
 
 function getOrCreateOoKonto(skr03Konten:Object,SKR03konto:string, kontenCache:KontenTableCache){
     let ooKontoRow = skr03Konten[SKR03konto] as Konto;
-    if (!ooKontoRow || isGKontrollkonto(ooKontoRow.getKonto())){
+    if (!ooKontoRow || ooKontoRow.isDatenschluerferKonto()){
         let ooKonto = "JA"+SKR03konto
         ooKontoRow =  kontenCache.getOrCreateRowById(ooKonto)
         ooKontoRow.setSKR03(SKR03konto);
         ooKontoRow.setQuelle("JA Datenschlürfer");
     }
     return ooKontoRow.getKonto();
-}
-
-function isGKontrollkonto(konto:string){
-    return(konto.substring(0,1)==="G"&&!isNaN(parseInt(konto.substring(1,2),10))) 
 }
 
 
