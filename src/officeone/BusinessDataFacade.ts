@@ -1291,7 +1291,7 @@ export class Gdpdu extends Umbuchung {
   public getGegenkonto() { return "G" + super.getGegenkonto() }
   public getFilename() { return this.getValue("Filename").toString() }
   public getNettoBetragMitVorzeichen() {
-    if (this.getValue("SoFkt") == 3)
+    if (this.getValue("SoFkt").toString() === "2")
       return -super.getNettoBetragMitVorzeichen()
     else
       return super.getNettoBetragMitVorzeichen();
@@ -1566,11 +1566,6 @@ function bezahltMonat(geschaeftsjahr: Date, bezahltDatum: Date) {
     if (bezahltDatum.getFullYear() - geschaeftsjahr.getFullYear() > 0) return 13;
     return bezahltDatum.getMonth() + 1;
   }
-}
-function shortBelegNr(belegNr: string) {
-  let array = belegNr.split("")
-  array.splice(2, 2);
-  return array.join("");
 }
 
 function uid() { return Math.random.toString() }

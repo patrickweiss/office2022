@@ -16,14 +16,14 @@ declare let window: IOfficeWindow;
 // initial state 
 export const initial = {
 	UI: {
-		status:'2021.'+currentOOversion+'.01',
+		status:'2021.'+currentOOversion+'.03',
 		leaf: Leafs.C2021OfficeOnePocket,
 		renderHelpOf: '',
 		counter: 1,
 		loggedIn: true,
 		waitingForResponse: false,
 		version:currentOOversion,
-		UIversion:'01',
+		UIversion:'03',
 		Ausgaben: {},
 		Gutschriften:{content:"PhotoMachen"},
 		umbuchung:{},

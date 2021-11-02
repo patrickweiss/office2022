@@ -107,6 +107,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 const dataRow = tableCache.createNewRow();
                 dataRow.setValue("Filename", file.getName());
                 dataRow.setValue("Betrag", dataArray[0]);
+                dataRow.setValue("SoFkt",dataArray[1]);
                 dataRow.setValue("Gegenkonto", dataArray[3]);
                 const datum = new Date(parseInt(dataArray[6].toString().substr(-4)),parseInt(dataArray[6].toString().substring(2,4))-1,parseInt(dataArray[6].toString().substring(0,2)))
                 dataRow.setValue("Bg-Datum", datum);

@@ -550,7 +550,6 @@ export class BusinessModel {
 
 
 function padToFour(number: number) { return ("000" + number).slice(-4); }
-function moneyString(number: number) { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number); }
 
 function almostEqual(one: number, two: number, tolerance: number) {
     return (Math.abs(one - two) < tolerance);
