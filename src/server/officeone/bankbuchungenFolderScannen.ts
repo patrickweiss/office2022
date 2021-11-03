@@ -207,7 +207,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     }
 
     //jetzt werden die neuen Buchungen rueckwaerts hinzugefuegt, damit die neueste Buchung am Ende oben steht
-    let elementIndex = parseInt(index);
+    let elementIndex = parseInt(index)-1;
     while (elementIndex >= 0) {
         let transaction: CSVTransaction = transactionArray[elementIndex];
         if (transaction.isValid) {
