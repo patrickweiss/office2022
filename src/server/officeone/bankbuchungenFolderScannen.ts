@@ -204,10 +204,13 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         bankbuchung.setBelegID("Anfangsbestand");
         bankbuchung.setLink("Anfangsbestand");
         bankbuchung.setGegenkonto("Anfangsbestand");
+        //Weil bei Konten die schon mal importiert wurden die letzte Buchung weggelassen wird (weil es die erste Buchung ist, bei der sich die Transaktions
+        //bestände schon überschneiden) wird beim Erstimport der Index im eins erhöht um Zeile 213 zu neutralisieren
+        index=(parseInt(index)+1).toString();
     }
 
     //jetzt werden die neuen Buchungen rueckwaerts hinzugefuegt, damit die neueste Buchung am Ende oben steht
-    let elementIndex = parseInt(index)-1;
+    let elementIndex = parseInt(index)-1;//die letzte Buchung ist bereits in der Tabelle
     while (elementIndex >= 0) {
         let transaction: CSVTransaction = transactionArray[elementIndex];
         if (transaction.isValid) {
