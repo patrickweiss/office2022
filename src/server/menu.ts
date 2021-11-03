@@ -1,9 +1,7 @@
-import { Installation, InstallationenTableCache } from "../officeone/BusinessDataFacade";
 import { doGetApplicant } from "../officetwo/application/doGetApplicant";
 import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
 import { DriveConnector } from "./officeone/driveconnector";
 import { doGetUStVA } from "./oo21lib/doGetUStVA";
-import { updateDrive, updateDriveMaster } from "./officeone/updateDrive";
 import { currentOOversion } from "./oo21lib/systemEnums";
 
 export const onOpen = () => {
@@ -64,22 +62,4 @@ export const doGet = (e: GoogleAppsScript.Events.DoGet) => {
   return html;
 }
 
-export const updateOfficeOne = () => {
-  const location: any[][] = SpreadsheetApp.getActive().getRangeByName("OfficeRootID").getValues();
-  const ooFolderId = location[0][0]
-  const installationenTableCache = new InstallationenTableCache(ooFolderId);
-  const installationenRowArray: Installation[] = installationenTableCache.getRowArray();
-
-  for (let installation of installationenRowArray) {
-    if (installation.getStatus() === "" && installation.getUpdateaufVersion() === currentOOversion) {
-      if (installation.getProdukte() === "OfficeOneMaster") updateDriveMaster(installation.getFolderId());
-      updateDrive(installation.getFolderId());
-      installation.setStatus("Update abgeschlossen");
-      installation.setVersion(currentOOversion);
-      installation.setDatum(new Date());
-      installationenTableCache.save();
-    }
-  }
-
-}
 

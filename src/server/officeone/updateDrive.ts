@@ -13,26 +13,6 @@ export function getPreviousVersion() {
   return oooPreviousVersion;
 }
 
-export function updateDriveMaster(rootFolderId: string) {
-  let oooPreviousVersion = getPreviousVersion();
-
-  //copy DataTable Data
-  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
-    if (rangeName === ooTables.ElsterTransferD || rangeName === ooTables.InstallationenD) {
-      const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, oooPreviousVersion);
-      const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName, currentOOversion);
-      //Wenn die neue Tabelle mehr Spalten hat, dann werden die Daten spaltenweise kopiert
-      if (dataOldVersion[0][0].length === dataNewVersion[0][0].length) DriveConnector.saveNamedRangeData(rootFolderId, rangeName, dataNewVersion[0].length, dataOldVersion[0], dataOldVersion[1], dataOldVersion[2], currentOOversion);
-      else importToBiggerTable(dataOldVersion, rootFolderId, rangeName);
-    }
-  }
-  //read from all Tables from new version to make sure all new Spreadsheets get copied
-  for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[currentOOversion])) {
-    if (rangeName === ooTables.ElsterTransferD || rangeName === ooTables.InstallationenD) {
-      DriveConnector.getNamedRangeData(rootFolderId, rangeName, currentOOversion);
-    }
-  }
-}
 
 export function updateDrive(rootFolderId: string) {
   console.log("update von :" + rootFolderId);

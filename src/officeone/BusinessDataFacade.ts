@@ -761,12 +761,6 @@ export class LastschriftproduktTableCache extends TableCache<Lastschriftprodukt>
     return new Lastschriftprodukt(this.dataArray[0] as Array<string>, this.dataArray[rowIndex], this.formulaArray[rowIndex], this.backgroundArray[rowIndex], this.columnIndex);
   }
 }
-export class InstallationenTableCache extends TableCache<Installation>{
-  constructor(rootId: string) { super(rootId, ooTables.InstallationenD); }
-  public getRowByIndex(rowIndex: string): Installation {
-    return new Installation(this.dataArray[0] as Array<string>, this.dataArray[rowIndex], this.formulaArray[rowIndex], this.backgroundArray[rowIndex], this.columnIndex);
-  }
-}
 export class CSVTableCache extends TableCache<CSVExport>{
   constructor(rootId: string) { super(rootId, ooTables.CSVExportD); }
   public getRowByIndex(rowIndex: string): CSVExport {
@@ -1479,58 +1473,6 @@ export class Lastschriftprodukt extends TableRow {
   public setPreis(value) { this.setValue("Preis", value); }
   public getVerwendungszweck() { return this.getValue("Verwendungszweck"); }
   public setVerwendungszweck(value) { this.setValue("Verwendungszweck", value); }
-}
-
-export class Installation extends TableRow {
-  public getFolderId() { return this.getValue("ID").toString(); }
-  public setFolderId(value: string) { this.setValue("ID", value); }
-
-  public getLink(): string { return this.getFormula("Link"); }
-  public setLink(link: string) { this.setFormula("Link", link); }
-  public createLink(id: string, name: string) { this.setFormula("Link", "=HYPERLINK(\"https://drive.google.com/file/d/" + id + "\";\"" + name + "\")"); }
-
-  public getName() { return this.getValue("Name"); }
-  public setName(value) { this.setValue("Name", value); }
-  public getEMail() { return this.getValue("E-Mail"); }
-  public setEMail(value) { this.setValue("E-Mail", value); }
-  public getDatum() { return this.getValue("Datum"); }
-  public setDatum(value) { this.setValue("Datum", value); }
-  public getVertrag() { return this.getValue("Vertrag"); }
-  public setVertrag(value) { this.setValue("Vertrag", value); }
-  public getUStVA() { return this.getValue("UStVA"); }
-  public setUStVA(value) { this.setValue("UStVA", value); }
-  public getVersion() { return this.getValue("Version"); }
-  public setVersion(value) { this.setValue("Version", value); }
-  public getUpdateaufVersion() { return this.getValue("Update auf Version"); }
-  public setUpdateaufVersion(value) { this.setValue("Update auf Version", value); }
-  public getKundenbetreuer() { return this.getValue("Kundenbetreuer"); }
-  public setKundenbetreuer(value) { this.setValue("Kundenbetreuer", value); }
-  public getStatus() { return this.getValue("Status"); }
-  public setStatus(value) { this.setValue("Status", value); }
-  public getProdukte() { return this.getValue("Produkte"); }
-  public setProdukte(value) { this.setValue("Produkte", value); }
-  public getFormular() { return this.getValue("Formular"); }
-  public setFormular(value) { this.setValue("Formular", value); }
-  public getMIBeruf() { return this.getValue("MIBeruf"); }
-  public setMIBeruf(value) { this.setValue("MIBeruf", value); }
-  public getMIStrasse() { return this.getValue("MIStrasse"); }
-  public setMIStrasse(value) { this.setValue("MIStrasse", value); }
-  public getMIHausnummer() { return this.getValue("MIHausnummer"); }
-  public setMIHausnummer(value) { this.setValue("MIHausnummer", value); }
-  public getMIPLZ() { return this.getValue("MIPLZ"); }
-  public setMIPLZ(value) { this.setValue("MIPLZ", value); }
-  public getMIOrt() { return this.getValue("MIOrt"); }
-  public setMIOrt(value) { this.setValue("MIOrt", value); }
-  public getMITelefonnummer() { return this.getValue("MITelefonnummer"); }
-  public setMITelefonnummer(value) { this.setValue("MITelefonnummer", value); }
-  public getMIEMail() { return this.getValue("MIE-Mail"); }
-  public setMIEMail(value) { this.setValue("MIE-Mail", value); }
-  public getMISteuernummer() { return this.getValue("MISteuernummer"); }
-  public setMISteuernummer(value) { this.setValue("MISteuernummer", value); }
-  public getMIIBAN() { return this.getValue("MIIBAN"); }
-  public setMIIBAN(value) { this.setValue("MIIBAN", value); }
-  public getMIBank() { return this.getValue("MIBank"); }
-  public setMIBank(value) { this.setValue("MIBank", value); }
 }
 
 export class CSVExport extends TableRow {
