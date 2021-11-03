@@ -72,9 +72,6 @@ export class BusinessModel {
     public addLogMessage(message: string) {
         this.logMessage += "\n" + message;
     }
-    public addDebugMessage(message:string){
-        if (this.getConfigurationCache().getValueByName(office.logLevel)===logLevel.debug)this.addLogMessage(message);
-    }
     public saveError(error: Error) {
         this.addLogMessage(error.message)
         const errorMail = this.getConfigurationCache().getValueByName(office.fehlerEmail);

@@ -1510,7 +1510,6 @@ function bezahltMonat(geschaeftsjahr: Date, bezahltDatum: Date) {
   }
 }
 
-function uid() { return Math.random.toString() }
 
 function rgbToHex(R, G, B) { return toHex(R) + toHex(G) + toHex(B) }
 function toHex(n) {

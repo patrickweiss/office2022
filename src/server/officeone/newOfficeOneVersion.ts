@@ -3,12 +3,14 @@ import { currentOOversion, months, ooVersions } from "../oo21lib/systemEnums";
 
 export const getDevOpsFolder = () => {return DriveApp.getFolderById("139Tyi3gOXE7ZkfUdhRXMMl8uZj0uxIb9")};
 
+//Funktion um eine neue Version der OfficeOne Template Datein zu erstellen
 export const newOfficeOneVersion = () => {
     const nextVersion = getNextVersion() as ooVersions;
-
+//Kopiert Ordner und Dateien, wenn die Versionsnummern haben, bekommen sie eine neue Version
     copyFolder(getDevOpsFolder().getFoldersByName(currentOOversion).next().getId(),getDevOpsFolder().getId(),currentOOversion,nextVersion)
 }
 
+/*
 export const copyTemplates = (sourceFolderId: string, destinationFolderId: string) => {
     const templateIterator = DriveApp.getFolderById(sourceFolderId)
         .getFoldersByName("0 Vorlagen").next()
@@ -19,7 +21,7 @@ export const copyTemplates = (sourceFolderId: string, destinationFolderId: strin
         const name = template.getName();
         template.makeCopy(name,destFolder).getId();
     }
-}
+}*/
 
 export const createNewOfficOneFolders = (rootFolderId: string):string => {
     const rootFolder = DriveApp.getFolderById(rootFolderId)

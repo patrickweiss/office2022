@@ -29,18 +29,17 @@ export enum office {
     vorname = "vorname",
     strasse = "strasse",
     hausnummer = "hausnummer",
+    hNrZusatz = "hNrZusatz",
+    anschriftenZusatz = "anschriftenZusatz",
     plz = "plz",
     ort = "ort",
     telefon = "telefon",
     email = "email",
     bank = "bank",
     iban = "iban",
-    subversion = "subversion",
-    importFrom2021_FolderId = "importFrom2021_FolderId",
     triggerMode = "triggerMode",
     officeRootID_FolderId = "officeRootID_FolderId",
     vorjahrOfficeRootID_FolderId = "vorjahrOfficeRootID_FolderId",
-    logLevel="logLevel"
 }
 
 export const adminUser = "eins.stein@officeone.team";

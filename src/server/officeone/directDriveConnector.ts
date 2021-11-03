@@ -58,7 +58,7 @@ export function getSystemFolderIds(): Array<string> {
   }
 }
 
-//Funktionsname passt nicht mehr. Hier wird immer eine neue Instanz installiert.
+//Hier wird immer eine neue Instanz installiert. Funktionsname passt nicht mehr. 
 export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVersion: string) {
   console.log("System installieren")
   // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);

@@ -9,14 +9,7 @@ export const onOpen = () => {
     const name: String = SpreadsheetApp.getActiveSpreadsheet().getName().toString();
     console.log(name);
     console.log(DriveConnector.oooVersionsRangeFileMap[currentOOversion]["InstallationenD"]);
-    if (name === "(1) Installationen - Version:XXXX") {
-      const menu = SpreadsheetApp.getUi()
-        .createMenu('OfficeOneMaster') // edit me!
-        .addItem("Version für nächstes Geschäftsjahr, wenn Spalte Status \"Jahresabschluss\" ist", "OfficeOne")
-        .addItem("update auf Version in Spalte Update auf Version, wenn Spalte Status leer ist", "updateOfficeOne")
-        .addItem("Neue Version erstellen", "newOfficeOneVersion")
-      menu.addToUi();
-    } else if (name.substr(0, 3) === "7 D") {
+    if (name.substr(0, 3) === "7 D") {
       const menu = SpreadsheetApp.getUi()
         .createMenu('OfficeOne Datenschlürfer') // edit me!
         .addItem("GDPdU BB schlürfen","slurpGDPDU")
@@ -42,11 +35,6 @@ export const onOpen = () => {
   } catch (e) { console.log(e) }
 };
 
-
-export const openOfficeOne2021 = () => {
-  const html = HtmlService.createHtmlOutputFromFile('office-one-2021').setTitle("OfficeOne.2021").setWidth(500).setHeight(1000);
-  SpreadsheetApp.getUi().showModelessDialog(html, "OfficeOne.2021");
-};
 
 export const openAboutSidebar = () => {
   const html = HtmlService.createHtmlOutputFromFile('sidebar-about-page').setTitle("OfficeOne.2021").setWidth(500);

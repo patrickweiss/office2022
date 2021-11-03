@@ -42,7 +42,7 @@ export function updateDrive(rootFolderId: string) {
     }
   }
 
-  //copy value Data, except IDs of new spreadsheets!!!: 
+  //Einzelne Werte die in NamedRanges gespeichert sind kopieren (z.B. Rechnungsvorlage Link) 
   for (let valueName of Object.keys(DriveConnector.oooVersionValueFileMap[oooPreviousVersion])) {
     try {
       const dataOldVersion = DriveConnector.getValueByName(rootFolderId, valueName as ooTables, oooPreviousVersion);

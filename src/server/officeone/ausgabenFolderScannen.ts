@@ -59,7 +59,6 @@ export function ausgabenFolderScannen(rootFolderId: string, month: string) {
         var belegIterator = monatsOrdner.getFiles();
         while (belegIterator.hasNext()) {
             var beleg = belegIterator.next();
-            BM.addDebugMessage(beleg.getName());
             wennBelegNeuIstEintragen(beleg, datumZuOrdner[month], BM);
         }
 

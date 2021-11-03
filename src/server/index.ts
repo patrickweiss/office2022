@@ -88,7 +88,6 @@ global.doGet = publicUiFunctions.doGet;
 //
 global.onOpen = publicUiFunctions.onOpen;
 global.openAboutSidebar = publicUiFunctions.openAboutSidebar;
-global.openOfficeOne2021 = publicUiFunctions.openOfficeOne2021;
 global.generateAndMailTableRow = generateAndMailTableRow;
 global.getOrCreateOfficeOneFolders = getOrCreateOfficeOneFolders;
 global.getNamedRangeData = getNamedRangeData;
@@ -96,7 +95,6 @@ global.updateDrive = updateDrive;
 global.UStVAberechnen = UStVAberechnen;
 global.UStVAverschicken = UStVAverschicken;
 global.UStVAbuchen = UStVAbuchen;
-global.updateOfficeOne = publicUiFunctions.updateOfficeOne;
 global.newOfficeOneVersion = newOfficeOneVersion;
 global.generateAndMailoooVersionsFileNameIdMap = generateAndMailoooVersionsFileNameIdMap;
 global.ausgabenFolderScannen = ausgabenFolderScannen;
