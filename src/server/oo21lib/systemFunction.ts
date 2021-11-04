@@ -64,7 +64,7 @@ export function daily() {
     try {
         for (let rootId of folderIds) {
             if (folderIsOwnedCurrentByUserAndCurrentVersion(rootId)) {
-                const bmServer = new BusinessModel(rootId, "daily von id:"+rootId);
+                const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail() }`);
                 try {
                     alleAusgabenFolderScannen(bmServer);
                     alleGutschriftenFolderScannen(bmServer);

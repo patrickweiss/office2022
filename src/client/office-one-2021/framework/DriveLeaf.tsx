@@ -244,7 +244,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
             console.log("ActionBatch cached");
             return (<div className="SAVEBAR"><button id="save-button" onClick={this.handleSaveActionBatch}>Zuordnungen in Google Drive speichern</button> </div>);
         }
-        return (<div className="KIBAR"><ServerButton text={`eins.stein@officeone.team: ${this.getUIState().triggers==="0" ? "Aus":"An"}`} onClick={this.handleKiSwitch}></ServerButton> </div>);
+        return (<div className="KIBAR"><ServerButton text={`Buchungsautomatik: ${this.getUIState().triggers==="0" ? "Aus":"An"}`} onClick={this.handleKiSwitch}></ServerButton> </div>);
     }
     protected handleSaveActionBatch() {
         window.store.dispatch(businessModelBatchUpdateCreator());

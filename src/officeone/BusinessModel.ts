@@ -65,11 +65,16 @@ export class BusinessModel {
 
     //Server specific code
     constructor(rootfolderId: string, functionName: string) {
-        this.userLock = LockService.getUserLock();
-        this.userLock.waitLock(1000);
         this.rootFolderId = rootfolderId;
-        this.logMessage = functionName;
+        this.logMessage = `${developmentYear}.${currentOOversion}.${codeVersion}:${functionName}`;
         this.beginBM = new Date();
+        try {
+            this.userLock = LockService.getUserLock();
+            this.userLock.waitLock(1000);
+        } catch (e) {
+            this.saveError(e);
+            throw e;
+        }
     }
 
     public addLogMessage(message: string) {
@@ -79,9 +84,9 @@ export class BusinessModel {
         this.addLogMessage(error.message)
         const errorMail = this.getConfigurationCache().getValueByName(office.fehlerEmail);
         if (errorMail != "") {
-            try{
-            GmailApp.sendEmail(errorMail, "Fehler bei " + this.logMessage.split("\n")[0], this.logMessage + "\n" + error.stack);
-            }catch(e){this.addLogMessage("ungültige fehlerEmail, keine gültige Email Adresse")}
+            try {
+                GmailApp.sendEmail(errorMail, "Fehler bei " + this.logMessage.split("\n")[0], this.logMessage + "\n" + error.stack);
+            } catch (e) { this.addLogMessage("ungültige fehlerEmail, keine gültige Email Adresse") }
         }
         this.saveLog(error.stack);
 
@@ -93,7 +98,7 @@ export class BusinessModel {
     }
     public saveLog(message: string) {
         this.addLogMessage(message);
-        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, `${developmentYear}+${currentOOversion}+${codeVersion}`);
+        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, currentOOversion);
         let sheet = logSpreadsheet.getSheetByName("log")
         if (!sheet) {
             sheet = logSpreadsheet.insertSheet()
@@ -115,7 +120,7 @@ export class BusinessModel {
     }
     public beginOfYear() { return new Date(this.endOfYear().getFullYear(), 0, 1) }
     public handleAction(action: IBelegZuBankbuchungZuordnen) {
-        if (action.type === Type.buchungZurueckstellen)this.getBankbuchungenTableCache().putBackRowById(action.bankbuchungID);
+        if (action.type === Type.buchungZurueckstellen) this.getBankbuchungenTableCache().putBackRowById(action.bankbuchungID);
         if (action.type === Type.BelegZuBankbuchungZuordnen) {
             if (action.belegTyp === BelegTyp.Ausgabe) this.belegZuordnen(this.getOrCreateAusgabenRechnung(action.belegID), action);
             if (action.belegTyp === BelegTyp.Bewirtungsbeleg) this.belegZuordnen(this.getOrCreateBewirtungsbeleg(action.belegID), action);
@@ -152,10 +157,10 @@ export class BusinessModel {
             neueGutschrift.setGegenkonto(action.gegenkonto);
         }*/
     }
-    public getOffenerBelegBetrag(umbuchung:Umbuchung){
+    public getOffenerBelegBetrag(umbuchung: Umbuchung) {
         let offnerBelegBetrag = umbuchung.getBetragMitVorzeichen();
-        this.getBankbuchungenArray().filter(bankbuchung => umbuchung.getId()===bankbuchung.getBelegID())
-        .forEach(bankbuchung => {offnerBelegBetrag-=bankbuchung.getBetrag()})
+        this.getBankbuchungenArray().filter(bankbuchung => umbuchung.getId() === bankbuchung.getBelegID())
+            .forEach(bankbuchung => { offnerBelegBetrag -= bankbuchung.getBetrag() })
         return offnerBelegBetrag;
     }
     public getEinnahmenRechnungArray(): EinnahmenRechnung[] { return this.getEinnahmenRechnungTableCache().getRowArray() as EinnahmenRechnung[]; }
@@ -207,19 +212,19 @@ export class BusinessModel {
         if (action.bankbuchungID !== "") {
             let bankbuchung = this.getOrCreateBankbuchung(action.bankbuchungID);
             let offnerBelegBetrag = beleg.getBetragMitVorzeichen();
-            if (action.belegTyp!==BelegTyp.Vertrag)offnerBelegBetrag=this.getOffenerBelegBetrag(beleg);
+            if (action.belegTyp !== BelegTyp.Vertrag) offnerBelegBetrag = this.getOffenerBelegBetrag(beleg);
             if (
-                (Math.abs(bankbuchung.getBetrag())+0.0001) >= Math.abs(offnerBelegBetrag)
-                || action.belegTyp===BelegTyp.Vertrag)beleg.setBezahltAm(bankbuchung.getDatum());
+                (Math.abs(bankbuchung.getBetrag()) + 0.0001) >= Math.abs(offnerBelegBetrag)
+                || action.belegTyp === BelegTyp.Vertrag) beleg.setBezahltAm(bankbuchung.getDatum());
             bankbuchung.setBelegID(beleg.getId());
             bankbuchung.setLink(beleg.getLink());
             bankbuchung.setGegenkonto(beleg.getGegenkonto());
             if ((action.belegTyp != BelegTyp.Vertrag || beleg.getBetrag() !== 0) &&
-             (Math.abs(bankbuchung.getBetrag()) >(Math.abs(offnerBelegBetrag)+0.001))
-             ) {
+                (Math.abs(bankbuchung.getBetrag()) > (Math.abs(offnerBelegBetrag) + 0.001))
+            ) {
                 this.addLogMessage(`Bankbetrag:${bankbuchung.getBetrag()} Belegbetrag:${offnerBelegBetrag} BelegId:${beleg.getId()}`)
                 const splitBuchung = this.getBankbuchungenTableCache().createNewRow();
-                this.addLogMessage("Bankbuchung ist größer als Belegsumme, Restbetrag:"+(bankbuchung.getBetrag()-offnerBelegBetrag));
+                this.addLogMessage("Bankbuchung ist größer als Belegsumme, Restbetrag:" + (bankbuchung.getBetrag() - offnerBelegBetrag));
                 splitBuchung.setKonto(beleg.getGegenkonto());
                 splitBuchung.setNr(bankbuchung.getId());
                 splitBuchung.setDatum(bankbuchung.getDatum());
@@ -342,18 +347,18 @@ export class BusinessModel {
         let umsatzMit0 = 0;//9300
 
         const mwstSummieren = (rechnung: Rechnung) => {
-            if (rechnung.getBetrag()===0)return; 
+            if (rechnung.getBetrag() === 0) return;
             const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
             if (almostEqual(mwstSatz, 1.19, 0.0001)) {
-                umsatzMit19+=rechnung.getNettoBetrag();
+                umsatzMit19 += rechnung.getNettoBetrag();
                 fealligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
                 return
             }
             if (almostEqual(mwstSatz, 1.0, 0.0001)) {
-                umsatzMit0+=rechnung.getNettoBetrag();
+                umsatzMit0 += rechnung.getNettoBetrag();
                 return
             }
-            throw new Error(rechnung.getId()+" hat keinen eindeutigen Mehrwertsteuersatz, MwSt:"+(mwstSatz-1)*100+"%");
+            throw new Error(rechnung.getId() + " hat keinen eindeutigen Mehrwertsteuersatz, MwSt:" + (mwstSatz - 1) * 100 + "%");
         }
 
         this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(mwstSummieren);
@@ -378,7 +383,7 @@ export class BusinessModel {
 
         let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
         umsatzsteuer19VMwSt.setDatum(this.endOfYear());
-        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
         umsatzsteuer19VMwSt.setBetrag(-fealligeUmsatzsteuer19);
         umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer19);
         umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
@@ -401,7 +406,7 @@ export class BusinessModel {
 
         let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
         faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
-        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
         faelligeMehrwertsteuerVorsteuer.setBetrag(vorsteuer);
         faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Vorsteuer);
         faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
@@ -423,7 +428,7 @@ export class BusinessModel {
         })
         let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
         mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
-        mwstUStVAaufVerbindlichkeiten.setKonto(konto.Umsatzsteuer_laufendes_Jahr );
+        mwstUStVAaufVerbindlichkeiten.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
         mwstUStVAaufVerbindlichkeiten.setBetrag(ustva);
         mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.UStVA);
         mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());

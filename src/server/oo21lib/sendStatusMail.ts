@@ -26,7 +26,7 @@ export function sendStatusMail(bm: BusinessModel) {
     html +=`<a href="${doGetUrl}"><button type="button">Ausgaben und Einnahmen sind vollständig, bitte UStVA verschicken</button></a>`;
 
     const ImageBlob = null;
-    GmailApp.sendEmail(userEmail, "Neue Belege geparst", html, { htmlBody: html });
+    GmailApp.sendEmail(userEmail, "Neue Belege gebucht", html, { htmlBody: html });
 }
 
 function outerGutschriftenFuerMonat(html: string, bm: BusinessModel, monat: number,vorjahrID:string):string{

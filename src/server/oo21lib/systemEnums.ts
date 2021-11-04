@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
-export const codeVersion = "007";
+export const codeVersion = "015";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
@@ -15,7 +15,7 @@ export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmir
 export enum systemMasterProperty {
     //Muss bei jedem Update aktualisiert werden. Folder der alle Spreadsheet Templates enthält, die von Clients kopiert werden: 2021 My Business.Office 0059
     officeOne2022_TemplateFolderId = "1A2sq-EtAs-vrwPG026iKpanMfz9QAjha",
-    //Bleibt ab Version 0059 für alle Produktivsystem gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht.
+    //Bleibt ab Version 0059 für alle Produktivsystem Nutzer gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht? (Testen)
     webApp_URL = "https://script.google.com/macros/s/AKfycbxiMhdxDyK0IZFV2ZfRbL4bAlF0fOELD0Da2QlvCmuVtYrT-5M/exec"
 }
 
