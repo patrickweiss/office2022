@@ -23,7 +23,7 @@ export const initial = {
 		loggedIn: true,
 		waitingForResponse: false,
 		version:currentOOversion,
-		UIversion:'05',
+		UIversion:`${codeVersion}`,
 		Ausgaben: {},
 		Gutschriften:{content:"PhotoMachen"},
 		umbuchung:{},
