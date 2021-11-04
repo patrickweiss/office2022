@@ -19,7 +19,6 @@ export class TableCache<RowType extends TableRow> {
             let newFormulaArray = [new Array(newDataArray[0].length)];
             let newBackgroundArray = [Array.apply(null, Array(newDataArray[0].length)).map(String.prototype.valueOf, "white")];
             data = [newDataArray,newBackgroundArray,newFormulaArray,];
-            console.log(data);
         }else  data = DriveConnector.getTableData(fileId,tableName)
         this.formatsArray = data[3];
         this.dataArray = data[0];

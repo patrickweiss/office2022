@@ -5,7 +5,6 @@ export function doGetLastschriftmandat(e:GoogleAppsScript.Events.DoGet){
     let lmtc = new LastschriftmandatTableCache(rootId);
     let lmhash = lmtc.getOrCreateHashTable("Status");
     let lmtr = lmhash[e.parameter["uuid"]] as Lastschriftmandat;
-    console.log(JSON.stringify(e.parameter)+lmtr.getKontoinhaber());
     if (lmtr.getEMailAdresse()===e.parameter["email"]){
         lmtr.setStatus("bestätigt");
         lmtc.save();

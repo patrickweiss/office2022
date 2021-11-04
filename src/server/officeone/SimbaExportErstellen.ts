@@ -67,32 +67,20 @@ export function SimbaExportErstellen(rootFolderId: string) {
     //Alle Buchungen werden gelöscht
     a.csvCache.reset();
     // Daten aus Tabellen mit Geschäftsvorfällen eintragen 
-    console.log("simba Export ausgaben");
     ausgabenCSV(a);
-    console.log("simba Export bewirtung");
     bewirtungsbelegeCSV(a);
-    console.log("simba Export verpflegung");
     verpflegungsmehraufwendungenCSV(a);
-    console.log("simba Export rechnungen");
     rechnungenCSV(a);
-    console.log("simba Export gutschriften");
     gutschriftenCSV(a);
-    console.log("simba Export eurechnungen");
     euRechnungenCSV(a);
-    console.log("simba Export umbuchungen");
     umbuchungenCSV(a);
-    console.log("simba Export bank");
     bankbuchungenCSV(a);
-    console.log("simba Export abschreibungen");
     abschreibungenCSV(a);
-    console.log("simba Export negativ konto umdrehen");
     negativeBetraegeTransformierenUndExportgruppeLaufendeBuchungenCSV(a);
-    console.log("simba Export kontenstammdaten");
     //EB Buchungen fuer Simba anpassen
     kontenStammdatenErgaenzenExportgruppeAnlagenCSV(a);
     //Buchungen in CSV-Dateien Exportieren
     a.csvCache.save();
-    console.log("export dateien erstellen");
     var buchungenCSV = {};
     for (var index in a.csvCache.dataArray) {
       if (index !== "0") {
@@ -553,7 +541,6 @@ export function linkFormula(fileId) {
     return "=HYPERLINK(\"" + neueDatei.getUrl() + "\";\"" + neueDatei.getName() + "\")";
   }
   catch (e) {
-    console.log(e);
     var folder = DriveApp.getFolderById(fileId);
     return "HYPERLINK(\"" + folder.getUrl() + "\";\"" + folder.getName() + "\")";
   }

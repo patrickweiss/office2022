@@ -6,7 +6,6 @@ export function doGetApplicant(e:GoogleAppsScript.Events.DoGet){
  
     let lmhash = mailTC.getOrCreateHashTable("Status");
     let lmtr = lmhash[e.parameter["uuid"]] as EMailId;
-    console.log(JSON.stringify(e.parameter)+lmtr.getVorname());
     if (lmtr.getEMail()===e.parameter["applicant"]){
         lmtr.setStatus("bestätigt");
         mailTC.save();

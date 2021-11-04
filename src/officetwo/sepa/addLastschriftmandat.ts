@@ -3,7 +3,6 @@ import { processLastschriftmandatForm } from './processLastschriftmandatForm';
 
 export const addLastschriftmandat = (event: GoogleAppsScript.Events.SheetsOnFormSubmit) => {
    const rootId = SpreadsheetApp.getActiveSpreadsheet().getRangeByName(ooTables.OfficeRootID).getValue().toString();
-   console.log("addLastschriftmandat called");
    if (event===undefined){
       const debugEvent = {
          namedValues:{

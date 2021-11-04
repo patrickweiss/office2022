@@ -9,10 +9,8 @@ export default function createInvoicesAndSepaXml() {
     const lastschriftMandatHash = new LastschriftmandatTableCache(rootId).getRowHashTable();
     const rechnungenTC = new EinnahmenRechnungTableCache(rootId);
     lastschriftenTableCache.getRowArray().filter( ls => ls.getStatus()==="geplant").forEach( ls => {
-        console.log(ls.getLm());
         const lm = lastschriftMandatHash[ls.getLm()] as Lastschriftmandat;
         const email = lm.getEMailAdresse();
-        console.log(email);
         let kunde = kundenEmailHash[email] as Kunde;
         //Wenn es noch keinen Kunde gibt, dann anlegen
         if (kunde === undefined){

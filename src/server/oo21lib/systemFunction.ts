@@ -60,8 +60,6 @@ export function deleteTriggers() {
 }
 
 export function daily() {
-    const lock = LockService.getScriptLock();
-    if (!lock.tryLock(1)) return;
     const folderIds = getSystemFolderIds();
     try {
         for (let rootId of folderIds) {
@@ -82,7 +80,6 @@ export function daily() {
                     }
                     SpreadsheetApp.flush();
                     bmServer.saveLog("daily")
-                    lock.releaseLock();
                 } catch (e) {
                     bmServer.saveError(e)
                     // Deletes all user triggers in the current project.
@@ -96,7 +93,6 @@ export function daily() {
     }
     catch (e) {
         SpreadsheetApp.flush();
-        lock.releaseLock();
     }
 }
 
@@ -104,7 +100,6 @@ function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     const folder = DriveApp.getFolderById(folderId);
     const driveVersion = folder.getName().substr(-4);
     const folderOwnerUser = folder.getOwner();
-    console.log(folderId+" "+driveVersion+" "+Session.getEffectiveUser().getEmail()+" "+folderOwnerUser.getEmail())
     if (getPreviousVersion()===driveVersion){
         //folder has to be updated first
         updateDrive(folderId);

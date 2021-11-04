@@ -19,7 +19,6 @@ export function bankbuchungenFolderScannen(rootFolderId: string, month: string) 
 
         while (belegIterator.hasNext()) {
             var beleg = belegIterator.next();
-            console.log(beleg.getName());
             let belegDaten = beleg.getName().split(" ");
             if (belegDaten[0].substr(0, 1) !== "✔") {
                 let konto = belegDaten[0];
@@ -143,6 +142,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                 betrag = transaction.Betrag;
                 //Wenn der Bestand nach der vorigen Buchung stimmt und die aktuelle Buchung identisch zur letzten gespeicherten Buchung ist, dann gehe ich davon aus,
                 //dass die aktuelle Buchung und die zuletzt gespeicherte identisch sind
+                /*
                 console.log(
                     index + 
                     " Datum:" + formatDate(datumNeu) +
@@ -154,7 +154,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                     " Betrag:" + (betrag === letzteBuchung.getBetrag()).toString() +
                     " Saldendifferenz:" + (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001).toString() +
                     " Text:" + (buchungsText === letzteBuchung.getText()).toString() 
-                );
+                );*/
                 if (
                     (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001)
                     && datumNeu.toString() == letzteBuchung.getDatum().toString()
@@ -314,14 +314,12 @@ export function removeUncompleteRowOf2dArray(dataArray: any[][]) {
     dataArray = dataArray.filter(zeile => {
 
         const korrekt = zeile.length === columns
-        if (!korrekt) console.log(zeile);
         return korrekt
     }
     )
     return dataArray;
 }
 export function saveDataArray(name: string, dataArray: any[][], archivFolder: GoogleAppsScript.Drive.Folder) {
-    console.log(name);
     var debugSpreadsheet = SpreadsheetApp.create(name);
     var tempFile = DriveApp.getFileById(debugSpreadsheet.getId());
     archivFolder.addFile(tempFile);

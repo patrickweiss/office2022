@@ -11,7 +11,6 @@ export function vertraegeFolderScannen(rootFolderId: string) {
         var belegIterator = vertraegeFolder.getFiles();
         while (belegIterator.hasNext()) {
             var beleg = belegIterator.next();
-            console.log(beleg.getName())
             wennVertragNeuEintragen(BM, beleg);
         }
         BM.save();

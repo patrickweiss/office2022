@@ -93,8 +93,6 @@ export class BusinessModel {
     }
     public saveLog(message: string) {
         this.addLogMessage(message);
-    //    console.log(this.rootFolderId);
-    //    console.log(this.logMessage);
         const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, `${developmentYear}+${currentOOversion}+${codeVersion}`);
         let sheet = logSpreadsheet.getSheetByName("log")
         if (!sheet) {
@@ -330,8 +328,6 @@ export class BusinessModel {
             try {
                 umbuchung.addToTableCache(this.getNormalisierteBuchungenTableCache(), this.beginOfYear(), "Umbuchung");
             } catch (e) {
-                console.log(e)
-                console.log(umbuchung.getId());
                 e.umbuchungId = umbuchung.getId();
                 throw e;
             }

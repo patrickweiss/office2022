@@ -588,7 +588,6 @@ export class UStVATableCache extends TableCache<UStVA> {
     //Summen für Formularfelder aus Buchungen berechnen---------------------------------------------------------------------------------
     for (let buchungRow of normalisierteBuchungen) {
       if ((buchungRow.getFileId() as string).substr(0, 4) !== "mwst") {
-        // console.log(buchungRow.getId())
         switch (buchungRow.getValue("Gegenkonto")) {
           case "USt. in Rechnung gestellt":
             var monat = buchungRow.getValue("Monat bezahlt").toString();
@@ -596,10 +595,8 @@ export class UStVATableCache extends TableCache<UStVA> {
             var periode = periodenHash[monat];
             if (periode == undefined) break;
             let ustvaRow = summenHash[periode] as UStVA;
-            console.log(buchungRow.getDatum().getFullYear() + " " + parseInt(buchungRow.getValue("Monat").toString(), 10));
             if (buchungRow.getDatum().getFullYear() === 2020 && parseInt(buchungRow.getValue("Monat").toString(), 10) >= 7) {
               //CoronaMwST: 16% in 35 und 36
-              console.log(ustvaRow.getPeriodeundStatus() + " Corona Einnahme 16%" + buchungRow.getId() + " " + buchungRow.getBetrag())
               let aktuellerBetrag: number = Number(buchungRow.getValue("Betrag")) / 0.16;
               let aktuelleMwSt: number = Number(buchungRow.getValue("Betrag"));
               ustvaRow.set36(ustvaRow.get36() + aktuelleMwSt);
@@ -608,7 +605,6 @@ export class UStVATableCache extends TableCache<UStVA> {
             }
             else {
               //normale MwSt: 19% in 81
-              console.log(ustvaRow.getPeriodeundStatus() + " Einnahme 19%" + buchungRow.getId() + " " + buchungRow.getBetrag())
               var aktuellerBetrag = Number(buchungRow.getValue("Betrag")) / 0.19;
               var aktuelleSumme = ustvaRow.get81();
               ustvaRow.set81(aktuellerBetrag + aktuelleSumme);
@@ -703,10 +699,6 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
     const buchungen = this.getRowArray() as NormalisierteBuchung[];
     buchungen.forEach(buchung => {
       let kontoString: string = buchung.getKonto().toString();
-      //      console.log("BDM.kontenStammdatenAktualisieren " + kontoString + " " + kontoString.substring(1));
-      //      console.log(kontoString.substr(0, 1))
-      //      console.log(/^\d+$/.test(kontoString.substr(1)));
-      //      kontoString.substr(0, 1)
       let konto: Konto = kontenTableCache.getRowHashTable()[kontoString] as Konto;
       if (!konto) {
         if (buchung.getKonto() === "") throw new Error(buchung.getFileId() + buchung.getText() + buchung.getQuelltabelle() + buchung.getLink());

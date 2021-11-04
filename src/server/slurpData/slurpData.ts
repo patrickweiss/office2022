@@ -21,7 +21,6 @@ export function slurpGDPDU(){
             const file = dataFileIterator.next();
             newDataRow.setValue("File Name", file.getName());
             slurpGDPDUCSVFile(file, dataSheet,bm);
-            console.log(file.getName());
         }
         fileTableCache.save();
         bm.save();
@@ -29,7 +28,6 @@ export function slurpGDPDU(){
     } catch (e) {
         bm.saveError(e);
         SpreadsheetApp.getUi().prompt(e.toString());
-        console.log(e.stack);
     }
 }
 
@@ -37,7 +35,6 @@ export function slurpData() {
     const activeSpreadsheet = SpreadsheetApp.getActive();
     try {
         const dataFolderId = activeSpreadsheet.getSheets()[0].getRange(1, 1).getValue().toString();
-        console.log("dataFolderId:" + dataFolderId);
         const dataFolder = DriveApp.getFolderById(dataFolderId);
         const fileTableCache = new TableCache(activeSpreadsheet.getId(), "Files", ["Fn202000001", "File Name"]);
         const dataFileIterator = dataFolder.getFiles();
@@ -46,12 +43,10 @@ export function slurpData() {
             const file = dataFileIterator.next();
             newDataRow.setValue("File Name", file.getName());
             slurpFile(file, "2");
-            console.log(file.getName());
         }
         fileTableCache.save();
     } catch (e) {
         SpreadsheetApp.getUi().prompt(e.toString());
-        console.log(e.stack);
     }
 }
 
@@ -68,12 +63,10 @@ export function slurpCSVData() {
             const file = dataFileIterator.next();
             newDataRow.setValue("File Name", file.getName());
             slurpCSVFile(file, dataSheet);
-            console.log(file.getName());
         }
         fileTableCache.save();
     } catch (e) {
         SpreadsheetApp.getUi().prompt(e.toString());
-        console.log(e.stack);
     }
 }
 
@@ -89,10 +82,7 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
   
     kontenArray.forEach( 
         kontoRow => {
-            if (!kontoRow.isDatenschluerferKonto()){
-                console.log("OO Konto:"+kontoRow.getKonto())
-                skr03Konten[kontoRow.getSKR03() as string]=kontoRow;
-            }else {console.log("G Konto:"+kontoRow.getKonto())}
+            if (!kontoRow.isDatenschluerferKonto())skr03Konten[kontoRow.getSKR03() as string]=kontoRow; 
         }
     )
    
@@ -116,7 +106,6 @@ function slurpGDPDUCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsS
                 dataRow.setValue("Buchungstext", dataArray[11]);
                 dataRow.setValue("Beleg-Nr", dataArray[4]);
                 if (!dataRow.getValue("Beleg-Nr")) dataRow.setValue("Beleg-Nr","JA"+neueBelegnummer++);
-                console.log(dataRow.getValue("Beleg-Nr"));
                 dataRow.setValue("BchgNr", dataArray[15]);
                 dataRow.setValue("USt-IDNr", dataArray[12]);
                 //Jahresabschluss Buchungen vom Steuerberater in Umbuchungen eintragen/aktualisieren (alle außer AfA Buchungen)
@@ -155,7 +144,6 @@ function slurpCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript
 
     let datenString = file.getBlob().getDataAsString("UTF-8");
     let buchungenArray = CSVToArray(datenString, ";");
-    console.log(buchungenArray);
     let tableCache: TableCache<TableRow> = new TableCache(sheet.getParent().getId(), sheet.getName());
 
     for (let row in buchungenArray) {
@@ -181,7 +169,6 @@ function slurpCSVFile(file: GoogleAppsScript.Drive.File, sheet: GoogleAppsScript
 
 
 function slurpFile(file: GoogleAppsScript.Drive.File,headlineRowIndex: string) {
-    //   console.log("Slurp File:" + file.getName());
     const sheet = SpreadsheetApp.getActive().getSheetByName("Data");
     const folderId = file.getParents().next().getId();
     let blob = file.getBlob();
@@ -194,14 +181,12 @@ function slurpFile(file: GoogleAppsScript.Drive.File,headlineRowIndex: string) {
     const spreadsheet = SpreadsheetApp.openById(gsheet.id);
     const sourceSheet = spreadsheet.getSheets()[0];
     const dataTable = sourceSheet.getDataRange().getValues();
-    //  console.log(dataTable);
     let columns = [];
     let tableCache: TableCache<TableRow>;
     const currentColumnArray = sheet.getDataRange().getValues()[0] as unknown as string[];
     if (currentColumnArray.length > 1) tableCache = new TableCache(sheet.getParent().getId(), sheet.getName())
     for (let row in dataTable) {
         const dataArray = dataTable[row];
-        //    console.log(dataArray);
         if (row === headlineRowIndex) columns = dataTable[row];
         if (columns.length > 0) {
             if (!tableCache) tableCache = new TableCache(sheet.getParent().getId(), sheet.getName(), ["De202000001", "Filename", ...columns])
@@ -211,7 +196,6 @@ function slurpFile(file: GoogleAppsScript.Drive.File,headlineRowIndex: string) {
                     dataRow.setValue("Filename", file.getName());
                     for (let index in columns) {
                         dataRow.setValue(columns[index], dataArray[index]);
-                        //  console.log("Betrag" + dataArray[0]);
                     }
                 }
             }

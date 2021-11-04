@@ -27,10 +27,8 @@ export function getOrCreateOfficeOneFolders() {
   } catch (e) {
     //look for FolderIds in 00 System folder configuration spreadsheet
     const folderIds = getSystemFolderIds();
-    console.log(folderIds)
     if (folderIds) {
       for (let ooFolderId of folderIds) {
-        console.log(ooFolderId);
         const folder = DriveApp.getFolderById(ooFolderId);
         const version = folder.getName().slice(-4);
         foldersHash[ooFolderId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
@@ -60,8 +58,7 @@ export function getSystemFolderIds(): Array<string> {
 
 //Hier wird immer eine neue Instanz installiert. Funktionsname passt nicht mehr. 
 export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVersion: string) {
-  console.log("System installieren")
-  // const ooRoot = DriveApp.getRootFolder().createFolder(ooFolders.office + " " + currentOOversion);
+  
   var foldersHash = {};
   let result = {
     serverFunction: ServerFunction.getOrCreateRootFolder,
@@ -75,7 +72,13 @@ export function getOrCreateRootFolder(ooRootFolderLabel: string, ooRootFolderVer
     currentOOversion
   )
   officeFolder.addEditor(adminUser);
-  const officeRootId = officeFolder.getId()
+  const officeRootId = officeFolder.getId();
+  
+  //So früh wie möglich den neuen Ordner in die Subscription Tabelle eintragen, damit wenn später was schief geht eins.stein@officeone.team helfen kann
+  UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
+  "&email=" + Session.getActiveUser().getEmail() +
+  "&product=OfficeOne&version="+currentOOversion);
+
   DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.RechnungenD, currentOOversion);
   DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.AusgabenD, currentOOversion);
   DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.DataFileD, currentOOversion);

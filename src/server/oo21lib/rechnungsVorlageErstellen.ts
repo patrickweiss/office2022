@@ -35,7 +35,6 @@ function replaceDocumentVariablesByObjectData(dokument: GoogleAppsScript.Documen
     if (templateVars == null) { Logger.log("Vorlage enthält keine Variablen (mehr?)"); return; }
     for (var i = 0; i < templateVars.length; ++i) {
         var spalte = templateVars[i].substring(1, templateVars[i].length - 1);
-        console.log(spalte);
         var variableData = datenObject[spalte];
         if (variableData) {
             var variableText = variableData;

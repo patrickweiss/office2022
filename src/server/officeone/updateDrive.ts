@@ -15,15 +15,9 @@ export function getPreviousVersion() {
 
 
 export function updateDrive(rootFolderId: string) {
-  console.log("update von :" + rootFolderId);
-  try {
-    let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
+  UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
       "&email=" + Session.getActiveUser().getEmail() +
       "&product=OfficeOne&version=Beginn_" + currentOOversion);
-    console.log(response)
-  } catch (e) {
-    console.log(e)
-  }
   let oooPreviousVersion = getPreviousVersion();
   //copy DataTable Data
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
@@ -48,7 +42,7 @@ export function updateDrive(rootFolderId: string) {
       const dataOldVersion = DriveConnector.getValueByName(rootFolderId, valueName as ooTables, oooPreviousVersion);
       DriveConnector.saveValueByName(rootFolderId, valueName as ooTables, currentOOversion, dataOldVersion)
     } catch (e) {
-      console.log(valueName);
+      e.valueName = valueName;
       throw e;
     }
   }
@@ -134,14 +128,7 @@ export function updateDrive(rootFolderId: string) {
     }
   }
 
-  try {
-    let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
-      "&email=" + Session.getActiveUser().getEmail() +
-      "&product=OfficeOne&version=" + currentOOversion);
-    console.log(response)
-  } catch (e) {
-    console.log(e)
-  }
+  UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${rootFolderId}&email=${Session.getActiveUser().getEmail()}&product=OfficeOne&version=${currentOOversion}`);
   return getOrCreateOfficeOneFolders();
 }
 

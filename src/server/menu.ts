@@ -7,8 +7,6 @@ import { currentOOversion } from "./oo21lib/systemEnums";
 export const onOpen = () => {
   try {
     const name: String = SpreadsheetApp.getActiveSpreadsheet().getName().toString();
-    console.log(name);
-    console.log(DriveConnector.oooVersionsRangeFileMap[currentOOversion]["InstallationenD"]);
     if (name.substr(0, 3) === "7 D") {
       const menu = SpreadsheetApp.getUi()
         .createMenu('OfficeOne Datenschlürfer') // edit me!
