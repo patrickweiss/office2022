@@ -1,5 +1,5 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
-import { belegNr, currentOOversion, konto, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
+import { belegNr, codeVersion, currentOOversion, developmentYear, konto, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
 import { ValuesCache } from './ValuesCache';
 
@@ -92,7 +92,7 @@ export class BusinessModel {
         this.addLogMessage(message);
     //    console.log(this.rootFolderId);
     //    console.log(this.logMessage);
-        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, currentOOversion);
+        const logSpreadsheet = DriveConnector.getSpreadsheet(this.rootFolderId, ooTables.log, `${developmentYear}+${currentOOversion}+${codeVersion}`);
         let sheet = logSpreadsheet.getSheetByName("log")
         if (!sheet) {
             sheet = logSpreadsheet.insertSheet()
