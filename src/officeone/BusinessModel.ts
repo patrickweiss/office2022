@@ -41,6 +41,7 @@ export interface IBelegZuBankbuchungZuordnen extends IAction {
     datum: Date;
 }
 export class BusinessModel {
+    private userLock: GoogleAppsScript.Lock.Lock;
     private logMessage: string;
     private beginBM: Date;
     private rootFolderId: string;
@@ -64,6 +65,8 @@ export class BusinessModel {
 
     //Server specific code
     constructor(rootfolderId: string, functionName: string) {
+        this.userLock = LockService.getUserLock();
+        this.userLock.waitLock(1000);
         this.rootFolderId = rootfolderId;
         this.logMessage = functionName;
         this.beginBM = new Date();
@@ -100,6 +103,8 @@ export class BusinessModel {
         }
         let now = new Date();
         sheet.appendRow([this.beginBM, now, now.valueOf() - this.beginBM.valueOf(), this.logMessage]);
+        SpreadsheetApp.flush();
+        this.userLock.releaseLock();
     }
 
     public getRootFolderId() { return this.rootFolderId; }

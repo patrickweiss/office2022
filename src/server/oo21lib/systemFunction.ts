@@ -1,10 +1,10 @@
 import { alleAusgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
-import * as OO2021 from "../../officeone/BusinessModel";
 import { getSystemFolderIds } from "../officeone/directDriveConnector";
 import { currentOOversion, ServerFunction } from "./systemEnums";
 import { getPreviousVersion, updateDrive } from "../officeone/updateDrive";
+import { BusinessModel } from "../../officeone/BusinessModel";
 
 
 
@@ -20,7 +20,7 @@ export function yearly() {
 
 //Wenn ein Trigger installiert ist, dann alle Trigger löschen
 //Wenn nicht, dann um Mitternacht die Funktion "daily" triggern
-export function kiSwitch(triggerCount) {
+export function kiSwitch() {
     let result = {
         serverFunction: ServerFunction.kiSwitch,
         triggers: "Fehler"
@@ -49,7 +49,7 @@ export function installTrigger() {
         ScriptApp.deleteTrigger(triggers[i]);
     }
     // ScriptApp.newTrigger("daily").timeBased().everyMinutes(1).create()
-    ScriptApp.newTrigger("daily").timeBased().atHour(0).everyDays(1).create()
+    ScriptApp.newTrigger("daily").timeBased().everyDays(1).atHour(0).nearMinute(0).create()
 }
 export function deleteTriggers() {
     // Deletes all user triggers in the current project.
@@ -66,25 +66,25 @@ export function daily() {
     try {
         for (let rootId of folderIds) {
             if (folderIsOwnedCurrentByUserAndCurrentVersion(rootId)) {
-                const bm2021 = new OO2021.BusinessModel(rootId, "daily von id:"+rootId);
+                const bmServer = new BusinessModel(rootId, "daily von id:"+rootId);
                 try {
-                    alleAusgabenFolderScannen(bm2021);
-                    alleGutschriftenFolderScannen(bm2021);
-                    bm2021.kontoSummenAktualisieren();
-                    bm2021.save();
+                    alleAusgabenFolderScannen(bmServer);
+                    alleGutschriftenFolderScannen(bmServer);
+                    bmServer.kontoSummenAktualisieren();
+                    bmServer.save();
                     //wenn neue Belege gefunden wurden, Mail schicken
                     if (
-                        bm2021.getAusgabenTableCache().loadRowCount < bm2021.getAusgabenTableCache().dataArray.length ||
-                        bm2021.getGutschriftenTableCache().loadRowCount < bm2021.getGutschriftenTableCache().dataArray.length ||
+                        bmServer.getAusgabenTableCache().loadRowCount < bmServer.getAusgabenTableCache().dataArray.length ||
+                        bmServer.getGutschriftenTableCache().loadRowCount < bmServer.getGutschriftenTableCache().dataArray.length ||
                         getTestDatum().getDate() === 1) {
                         //Mail schicken, mit aktuellem Status
-                        sendStatusMail(bm2021);
+                        sendStatusMail(bmServer);
                     }
                     SpreadsheetApp.flush();
-                    bm2021.saveLog("daily")
+                    bmServer.saveLog("daily")
                     lock.releaseLock();
                 } catch (e) {
-                    bm2021.saveError(e)
+                    bmServer.saveError(e)
                     // Deletes all user triggers in the current project.
                     let triggers = ScriptApp.getProjectTriggers();
                     for (let i = 0; i < triggers.length; i++) {
