@@ -1,10 +1,12 @@
 //Aktuelle version (die mit der höheren Nummer) und Vorgängerversion. Die Vorgängerversion wird benötigt, um daraus die Daten zu kopieren
+export const developmentYear = "2021";
 export enum ooVersions {
     oo58 = "0058",
     oo59 = "0059"
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
+export const codeVersion = "006";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0

@@ -9,14 +9,14 @@ import './ui/WaitingForBMUpdate';
 
 import './framework/DriveLeaf';
 import { Leafs } from './framework/OfficeLeaf';
-import { currentOOversion } from '../../server/oo21lib/systemEnums';
+import { codeVersion, currentOOversion, developmentYear } from '../../server/oo21lib/systemEnums';
 
 declare let window: IOfficeWindow;
 
 // initial state 
 export const initial = {
 	UI: {
-		status:'2021.'+currentOOversion+'.05',
+		status:`${developmentYear}.${currentOOversion}.${codeVersion}`,
 		leaf: Leafs.C2021OfficeOnePocket,
 		renderHelpOf: '',
 		counter: 1,
