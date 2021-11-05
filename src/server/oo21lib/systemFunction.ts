@@ -28,11 +28,11 @@ export function kiSwitch() {
     try {
         if (ScriptApp.getProjectTriggers().length > 0) {
             deleteTriggers();
-            const rootFolderIds = getSystemFolderIds();
+            const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));;
             const data = {
                 user: Session.getEffectiveUser().getEmail(),
                 folderIds: rootFolderIds,
-                action:"deleteTrigger"
+                action: "deleteTrigger"
             }
             subscriptionPost(data);
 
@@ -46,7 +46,7 @@ export function kiSwitch() {
             const data = {
                 user: Session.getEffectiveUser().getEmail(),
                 folderIds: rootFolderIds,
-                action:"installTrigger"
+                action: "installTrigger"
             }
             subscriptionPost(data);
             result.triggers = "1";
@@ -76,35 +76,29 @@ export function deleteTriggers() {
 }
 
 export function daily(): string[] {
-    const folderIds = getSystemFolderIds();
+    const folderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));
     console.log(Session.getEffectiveUser().getEmail(), folderIds)
     try {
         for (let rootId of folderIds) {
-            if (folderIsOwnedCurrentByUserAndCurrentVersion(rootId)) {
-                const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
-                try {
-                    alleAusgabenFolderScannen(bmServer);
-                    alleGutschriftenFolderScannen(bmServer);
-                    bmServer.kontoSummenAktualisieren();
-                    bmServer.save();
-                    //wenn neue Belege gefunden wurden, Mail schicken
-                    if (
-                        bmServer.getAusgabenTableCache().loadRowCount < bmServer.getAusgabenTableCache().dataArray.length ||
-                        bmServer.getGutschriftenTableCache().loadRowCount < bmServer.getGutschriftenTableCache().dataArray.length ||
-                        getTestDatum().getDate() === 1) {
-                        //Mail schicken, mit aktuellem Status
-                        sendStatusMail(bmServer);
-                    }
-                    SpreadsheetApp.flush();
-                    bmServer.saveLog("daily")
-                } catch (e) {
-                    bmServer.saveError(e)
-                    // Deletes all user triggers in the current project.
-                    let triggers = ScriptApp.getProjectTriggers();
-                    for (let i = 0; i < triggers.length; i++) {
-                        ScriptApp.deleteTrigger(triggers[i]);
-                    }
+            const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
+            try {
+                alleAusgabenFolderScannen(bmServer);
+                alleGutschriftenFolderScannen(bmServer);
+                bmServer.kontoSummenAktualisieren();
+                bmServer.save();
+                //wenn neue Belege gefunden wurden, Mail schicken
+                if (
+                    bmServer.getAusgabenTableCache().loadRowCount < bmServer.getAusgabenTableCache().dataArray.length ||
+                    bmServer.getGutschriftenTableCache().loadRowCount < bmServer.getGutschriftenTableCache().dataArray.length ||
+                    getTestDatum().getDate() === 1) {
+                    //Mail schicken, mit aktuellem Status
+                    sendStatusMail(bmServer);
                 }
+                SpreadsheetApp.flush();
+                bmServer.saveLog("daily")
+            } catch (e) {
+                bmServer.saveError(e)
+                deleteTriggers()
             }
         }
     }
@@ -116,19 +110,22 @@ export function daily(): string[] {
 
 function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     const folder = DriveApp.getFolderById(folderId);
-    const driveVersion = folder.getName().substr(-4);
     const folderOwnerUser = folder.getOwner();
+    if (Session.getEffectiveUser().getEmail() !== folderOwnerUser.getEmail()) return false;
+    //Nur bei eigenen Instanzen erfolgt ein automatisches Update durch Daily, weil das Update immer mit dem eigenen Benutzer durchgeführt werden muss
+    //Damit der Benutzer Eigentümer der Template Files wird
+    const driveVersion = folder.getName().substr(-4);
     if (getPreviousVersion() === driveVersion) {
         //folder has to be updated first
         updateDrive(folderId);
     }
     //throw error if version is still wrong
     if (currentOOversion !== driveVersion) throw new Error("OO Instance with ID" + folderId + " could not be updated to version " + currentOOversion);
-    return Session.getEffectiveUser().getEmail() === folderOwnerUser.getEmail();
+    return true
 }
 
 
-function subscriptionPost(data){
+function subscriptionPost(data) {
     var options = {
         'method': 'post',
         'contentType': 'application/json',
