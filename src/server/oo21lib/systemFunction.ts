@@ -2,7 +2,7 @@ import { alleAusgabenFolderScannen } from "../officeone/ausgabenFolderScannen";
 import { alleGutschriftenFolderScannen } from "../officeone/gutschriftenFolderScannen";
 import { getTestDatum, sendStatusMail } from "./sendStatusMail";
 import { getSystemFolderIds } from "../officeone/directDriveConnector";
-import { currentOOversion, ServerFunction } from "./systemEnums";
+import { currentOOversion, ServerFunction, subscribeRestEndpoint } from "./systemEnums";
 import { getPreviousVersion, updateDrive } from "../officeone/updateDrive";
 import { BusinessModel } from "../../officeone/BusinessModel";
 
@@ -28,11 +28,27 @@ export function kiSwitch() {
     try {
         if (ScriptApp.getProjectTriggers().length > 0) {
             deleteTriggers();
+            const rootFolderIds = getSystemFolderIds();
+            const data = {
+                user: Session.getEffectiveUser().getEmail(),
+                folderIds: rootFolderIds,
+                action:"deleteTrigger"
+            }
+            subscriptionPost(data);
+
             result.triggers = "0";
         }
         else {
+            const rootFolderIds = daily();
             installTrigger();
-            daily();
+            // Make a POST request with a JSON payload.
+
+            const data = {
+                user: Session.getEffectiveUser().getEmail(),
+                folderIds: rootFolderIds,
+                action:"installTrigger"
+            }
+            subscriptionPost(data);
             result.triggers = "1";
         }
     } catch (e) {
@@ -59,12 +75,13 @@ export function deleteTriggers() {
     }
 }
 
-export function daily() {
+export function daily(): string[] {
     const folderIds = getSystemFolderIds();
+    console.log(Session.getEffectiveUser().getEmail(), folderIds)
     try {
         for (let rootId of folderIds) {
             if (folderIsOwnedCurrentByUserAndCurrentVersion(rootId)) {
-                const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail() }`);
+                const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
                 try {
                     alleAusgabenFolderScannen(bmServer);
                     alleGutschriftenFolderScannen(bmServer);
@@ -94,18 +111,30 @@ export function daily() {
     catch (e) {
         SpreadsheetApp.flush();
     }
+    return folderIds;
 }
 
 function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     const folder = DriveApp.getFolderById(folderId);
     const driveVersion = folder.getName().substr(-4);
     const folderOwnerUser = folder.getOwner();
-    if (getPreviousVersion()===driveVersion){
+    if (getPreviousVersion() === driveVersion) {
         //folder has to be updated first
         updateDrive(folderId);
     }
     //throw error if version is still wrong
-    if (currentOOversion!==driveVersion)throw new Error("OO Instance with ID"+folderId+" could not be updated to version "+currentOOversion);
+    if (currentOOversion !== driveVersion) throw new Error("OO Instance with ID" + folderId + " could not be updated to version " + currentOOversion);
     return Session.getEffectiveUser().getEmail() === folderOwnerUser.getEmail();
+}
+
+
+function subscriptionPost(data){
+    var options = {
+        'method': 'post',
+        'contentType': 'application/json',
+        // Convert the JavaScript object to a JSON string.
+        'payload': JSON.stringify(data)
+    };
+    UrlFetchApp.fetch(subscribeRestEndpoint, options);
 }
 

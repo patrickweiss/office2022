@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
-export const codeVersion = "015";
+export const codeVersion = "016";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
@@ -17,6 +17,11 @@ export enum systemMasterProperty {
     officeOne2022_TemplateFolderId = "1A2sq-EtAs-vrwPG026iKpanMfz9QAjha",
     //Bleibt ab Version 0059 für alle Produktivsystem Nutzer gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht? (Testen)
     webApp_URL = "https://script.google.com/macros/s/AKfycbxiMhdxDyK0IZFV2ZfRbL4bAlF0fOELD0Da2QlvCmuVtYrT-5M/exec"
+}
+
+export enum subscriptionPostActions {
+    deleteTrigger="deleteTrigger",
+    installTrigger="installTrigger"
 }
 
 //Konfigurationsvariablen die in "00 Office" definiert sein müssen
