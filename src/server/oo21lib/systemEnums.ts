@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
-export const codeVersion = "018";
+export const codeVersion = "019";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
@@ -54,16 +54,19 @@ export const subscribeRestEndpoint = "https://script.google.com/macros/s/AKfycbz
 
 
 // MWSt, Konstanten für Konten und Belegnummern von definierten Abschlussbuchungen
-export enum konto{
-    Umsatz9310="Umsatz9310",
-    Umsatz9313="Umsatz9313",
-    USt_in_Rechnunggestellt="USt. in Rechnung gestellt",
-    Umsatzsteuer19="Umsatzsteuer19",
-    Umsatzsteuer_laufendes_Jahr="Umsatzsteuer laufendes Jahr",
-    Umsatz9300="Umsatz9300",
-    Vorsteuer="Vorsteuer",
-    UStVA="UStVA"
 
+
+export enum konto {
+    Umsatz9310 = "Umsatz9310",
+    Umsatz9313 = "Umsatz9313",
+    USt_in_Rechnunggestellt = "USt. in Rechnung gestellt",
+    Umsatzsteuer19 = "Umsatzsteuer19",
+    Umsatzsteuer16 = "Umsatzsteuer16",
+    Umsatzsteuer_laufendes_Jahr = "Umsatzsteuer laufendes Jahr",
+    Umsatz9300 = "Umsatz9300",
+    Vorsteuer = "Vorsteuer",
+    UStVA = "UStVA",
+    Umsatz9312 = "Umsatz9312"
 }
 export enum belegNr {
     mwstFinanzamtOP = "mwstFinanzamtOP",
@@ -72,7 +75,10 @@ export enum belegNr {
     mwstIstUmsatz0 = "mwstIstUmsatz0",
     mwstUmsatzsteuer19AufVMwSt = "mwstUmsatzsteuer19AufVMwSt",
     mwstUStRechnungUSt19 = "mwstUStRechnungUSt19",
-    mwstIstUmsatz19 = "mwstIstUmsatz19"
+    mwstIstUmsatz19 = "mwstIstUmsatz19",
+    mwstIstUmsatz16 = "mwstIstUmsatz16",
+    mwstUStRechnungUSt16 = "mwstUStRechnungUSt16",
+    mwstUmsatzsteuer16AufVMwSt = "mwstUmsatzsteuer16AufVMwSt"
 }
 
 //Banktypen

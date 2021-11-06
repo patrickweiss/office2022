@@ -340,6 +340,7 @@ export class BusinessModel {
     }
     public umsatzsteuerJahresabrechnung() {
         let fealligeUmsatzsteuer19 = 0;
+        let fealligeUmsatzsteuer16 = 0;
         let umsatzMit19 = 0;//9313
         let umsatzMit16 = 0;//9312
         let umsatzMit7 = 0;//9302
@@ -352,6 +353,11 @@ export class BusinessModel {
             if (almostEqual(mwstSatz, 1.19, 0.0001)) {
                 umsatzMit19 += rechnung.getNettoBetrag();
                 fealligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
+                return
+            }
+            if (almostEqual(mwstSatz, 1.16, 0.0001)) {
+                umsatzMit16 += rechnung.getNettoBetrag();
+                fealligeUmsatzsteuer16 += rechnung.getMehrwertsteuer()
                 return
             }
             if (almostEqual(mwstSatz, 1.0, 0.0001)) {
@@ -388,6 +394,32 @@ export class BusinessModel {
         umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer19);
         umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
         umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1789");
+
+        //Alle Buchungen für 16% Umsatzsteuer
+        let istUmsatzBuchung16 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz16);
+        istUmsatzBuchung16.setDatum(this.endOfYear());
+        istUmsatzBuchung16.setKonto(konto.Umsatz9310);
+        istUmsatzBuchung16.setBetrag(umsatzMit16);
+        istUmsatzBuchung16.setGegenkonto(konto.Umsatz9312);
+        istUmsatzBuchung16.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung16.setText("bezahlter Umsatz im Geschaeftsjahr mit 16% Umsatzsteuer");
+
+        let faelligeMehrwertsteuerUmsatzsteuer16 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer16.setKonto(konto.USt_in_Rechnunggestellt);
+        faelligeMehrwertsteuerUmsatzsteuer16.setBetrag(fealligeUmsatzsteuer16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setGegenkonto(konto.Umsatzsteuer16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer16.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer16");
+
+        let umsatzsteuer16VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer16AufVMwSt);
+        umsatzsteuer16VMwSt.setDatum(this.endOfYear());
+        umsatzsteuer16VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        umsatzsteuer16VMwSt.setBetrag(-fealligeUmsatzsteuer16);
+        umsatzsteuer16VMwSt.setGegenkonto(konto.Umsatzsteuer16);
+        umsatzsteuer16VMwSt.setBezahltAm(this.endOfYear());
+        umsatzsteuer16VMwSt.setText("Umsatzsteuer16 auf 1789");
+
 
         //Alle Buchungen für 0% Umsatzsteuer
         let istUmsatzBuchung0 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz0);

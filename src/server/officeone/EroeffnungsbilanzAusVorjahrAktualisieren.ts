@@ -344,8 +344,8 @@ function EURechnungKopierenOhneBezahltAmzuUeberschreiben(vorjahrRechnung: EURech
   aktuelleRechnung.setNachname(vorjahrRechnung.getNachname());
   aktuelleRechnung.setGeburtsdatum(vorjahrRechnung.getGeburtsdatum());
   aktuelleRechnung.setUStIdNr(vorjahrRechnung.getUStIdNr());
-  aktuelleRechnung.setDateiTyp(vorjahrRechnung.getDateiTyp());
-  aktuelleRechnung.setDokumententyp(vorjahrRechnung.getDokumententyp());
+  //aktuelleRechnung.setDateiTyp(vorjahrRechnung.getDateiTyp());
+  //aktuelleRechnung.setDokumententyp(vorjahrRechnung.getDokumententyp());
   aktuelleRechnung.setZahlungsziel(vorjahrRechnung.getZahlungsziel());
 
 }
