@@ -401,7 +401,7 @@ function umbuchungenCSV(a: agent) {
         neueBuchung.setValue("Betrag", buchungRow.getValue("Betrag"));
         neueBuchung.setValue("Konto (Soll)", buchungRow.getValue("Konto"));
         neueBuchung.setValue("Konto (Haben)", buchungRow.getValue("Gegenkonto"));
-        neueBuchung.setValue("Buchungstext", buchungRow.getValue("Text"));
+        neueBuchung.setValue("Buchungstext", buchungRow.getValue("Text").toString().replace(/\r?\n|\r/g, " ").substring(0,200));
       }
     }
 
