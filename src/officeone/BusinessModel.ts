@@ -349,7 +349,7 @@ export class BusinessModel {
 
         //Buchungen im Folgenden Scope werden erzeugt damit Simba die MWST Erklärungen richtig machen kann 
         //diese müssen beim Export der laufenden Buchungen enthalten sein
-        {
+        
             const mwstSummieren = (rechnung: Rechnung) => {
                 if (rechnung.getBetrag() === 0) return;
                 const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
@@ -390,13 +390,6 @@ export class BusinessModel {
             faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
 
-            let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
-            umsatzsteuer19VMwSt.setDatum(this.endOfYear());
-            umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
-            umsatzsteuer19VMwSt.setBetrag(-fealligeUmsatzsteuer19);
-            umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer19);
-            umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
-            umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1789");
 
             //Alle Buchungen für 16% Umsatzsteuer
             let istUmsatzBuchung16 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz16);
@@ -415,13 +408,6 @@ export class BusinessModel {
             faelligeMehrwertsteuerUmsatzsteuer16.setBezahltAm(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer16.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer16");
 
-            let umsatzsteuer16VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer16AufVMwSt);
-            umsatzsteuer16VMwSt.setDatum(this.endOfYear());
-            umsatzsteuer16VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
-            umsatzsteuer16VMwSt.setBetrag(-fealligeUmsatzsteuer16);
-            umsatzsteuer16VMwSt.setGegenkonto(konto.Umsatzsteuer16);
-            umsatzsteuer16VMwSt.setBezahltAm(this.endOfYear());
-            umsatzsteuer16VMwSt.setText("Umsatzsteuer16 auf 1789");
 
 
             //Alle Buchungen für 0% Umsatzsteuer
@@ -432,55 +418,78 @@ export class BusinessModel {
             istUmsatzBuchung0.setGegenkonto(konto.Umsatz9300);
             istUmsatzBuchung0.setBezahltAm(this.endOfYear());
             istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
-        }
-        //Die folgenden Buchungen sind Buchungen, um die MWSt Konten abzuschließen
+        
+            //Abschluss wird nur in Simba gemacht und dann importiert
+            //this.umsatzsteuerAbschluss(fealligeUmsatzsteuer19,faelligeMehrwertsteuerUmsatzsteuer16)
+
+    }
+    private umsatzsteuerAbschluss(fealligeUmsatzsteuer19,fealligeUmsatzsteuer16){
+        //Die folgenden Buchungen sind Buchungen, um die MWSt Konten auf 1789 "Umsatzsteuer laufendes Jahr" abzuschließen
         //Die dürfen nicht in den laufenden Buchungen für den Simba Export sein
-        {
-            let vorsteuer = 0;
-            //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Ausgaben Rechnungen
-            this.getAusgabenRechnungArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
-            //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Bewirtungs Rechnungen
-            this.getBewirtungsbelegeArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
+        
+        let vorsteuer = 0;
+        //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Ausgaben Rechnungen
+        this.getAusgabenRechnungArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
+        //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Bewirtungs Rechnungen
+        this.getBewirtungsbelegeArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
 
-            let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
-            faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
-            faelligeMehrwertsteuerVorsteuer.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
-            faelligeMehrwertsteuerVorsteuer.setBetrag(vorsteuer);
-            faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Vorsteuer);
-            faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
-            faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1789");
+        let faelligeMehrwertsteuerVorsteuer = this.getOrCreateUmbuchung(belegNr.mwstVorsteuerAufVMwSt);
+        faelligeMehrwertsteuerVorsteuer.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerVorsteuer.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        faelligeMehrwertsteuerVorsteuer.setBetrag(vorsteuer);
+        faelligeMehrwertsteuerVorsteuer.setGegenkonto(konto.Vorsteuer);
+        faelligeMehrwertsteuerVorsteuer.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerVorsteuer.setText("Vorsteuer auf 1789");
 
-            //UStVA auf Verbindlichkeiten Umsatzsteuer buchen
+        let umsatzsteuer19VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer19AufVMwSt);
+        umsatzsteuer19VMwSt.setDatum(this.endOfYear());
+        umsatzsteuer19VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        umsatzsteuer19VMwSt.setBetrag(-fealligeUmsatzsteuer19);
+        umsatzsteuer19VMwSt.setGegenkonto(konto.Umsatzsteuer19);
+        umsatzsteuer19VMwSt.setBezahltAm(this.endOfYear());
+        umsatzsteuer19VMwSt.setText("Umsatzsteuer19 auf 1789");
 
-            let ustva = 0;
-            this.getAusgabenRechnungArray().forEach(ausgabe => {
-                if (
-                    ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
-                    ausgabe.getKonto() === konto.UStVA) ustva += ausgabe.getBetrag();
-            })
-            this.getUmbuchungenArray().forEach(ausgabe => {
-                if (
-                    ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
-                    ausgabe.getKonto() === konto.UStVA &&
-                    (ausgabe.getId() as string).substr(0, 4) !== "mwst") ustva += ausgabe.getBetrag();
-            })
-            let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
-            mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
-            mwstUStVAaufVerbindlichkeiten.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
-            mwstUStVAaufVerbindlichkeiten.setBetrag(ustva);
-            mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.UStVA);
-            mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
-            mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1789");
+        let umsatzsteuer16VMwSt = this.getOrCreateUmbuchung(belegNr.mwstUmsatzsteuer16AufVMwSt);
+        umsatzsteuer16VMwSt.setDatum(this.endOfYear());
+        umsatzsteuer16VMwSt.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        umsatzsteuer16VMwSt.setBetrag(-fealligeUmsatzsteuer16);
+        umsatzsteuer16VMwSt.setGegenkonto(konto.Umsatzsteuer16);
+        umsatzsteuer16VMwSt.setBezahltAm(this.endOfYear());
+        umsatzsteuer16VMwSt.setText("Umsatzsteuer16 auf 1789");
 
-            //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
-            let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstOP+this.beginOfYear().getFullYear().toString());
-            mwstFinanzamtOP.setDatum(this.endOfYear());
-            mwstFinanzamtOP.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
-            mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 - vorsteuer - ustva);
-            mwstFinanzamtOP.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
-            //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
-            mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
-        }
+        //UStVA auf Verbindlichkeiten Umsatzsteuer buchen
+
+        let ustva = 0;
+        this.getAusgabenRechnungArray().forEach(ausgabe => {
+            if (
+                ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
+                ausgabe.getKonto() === konto.UStVA) ustva += ausgabe.getBetrag();
+        })
+        this.getUmbuchungenArray().forEach(ausgabe => {
+            if (
+                ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear() &&
+                ausgabe.getKonto() === konto.UStVA &&
+                (ausgabe.getId() as string).substr(0, 4) !== "mwst") ustva += ausgabe.getBetrag();
+        })
+        let mwstUStVAaufVerbindlichkeiten = this.getOrCreateUmbuchung(belegNr.mwstUStVAAufVMwSt);
+        mwstUStVAaufVerbindlichkeiten.setDatum(this.endOfYear());
+        mwstUStVAaufVerbindlichkeiten.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        mwstUStVAaufVerbindlichkeiten.setBetrag(ustva);
+        mwstUStVAaufVerbindlichkeiten.setGegenkonto(konto.UStVA);
+        mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
+        mwstUStVAaufVerbindlichkeiten.setText("UStVA auf 1789");
+
+
+
+        //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
+        let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstOP+this.beginOfYear().getFullYear().toString());
+        mwstFinanzamtOP.setDatum(this.endOfYear());
+        mwstFinanzamtOP.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
+        mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 + fealligeUmsatzsteuer16 - vorsteuer - ustva);
+        mwstFinanzamtOP.setGegenkonto(konto.Umsatzsteuer_laufendes_Jahr);
+        //mwstUStVAaufVerbindlichkeiten.setBezahltAm(this.endOfYear());
+        mwstFinanzamtOP.setText("Offener Posten für Zahlung ans/vom Finanzamt im nächsten Jahr");
+
     }
     public getUStVAVorjahr(): AusgabenRechnung[] {
         return this.getAusgabenRechnungArray().filter(ausgabe => {
