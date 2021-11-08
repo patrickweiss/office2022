@@ -1,6 +1,6 @@
 import { AusgabenRechnung, Bewirtungsbeleg, EinnahmenRechnung, Konto, EURechnung } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { office, ServerFunction } from "../oo21lib/systemEnums";
+import { konto, office, ServerFunction } from "../oo21lib/systemEnums";
 
 export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, rootFolderNameVorjahr: string) {
   const BMnow = new BusinessModel(rootFolderId, "EroeffnungsbilanzAusVorjahrAktualisieren");
@@ -136,6 +136,7 @@ function AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear: BusinessModel,
       anfangsbestandsbuchung.setKonto("Geld Vorjahre");
       anfangsbestandsbuchung.setBetrag(bestandsKonto.getSumme());
       anfangsbestandsbuchung.setGegenkonto(bestandsKonto.getId());
+      if (anfangsbestandsbuchung.getGegenkonto()===konto.Umsatzsteuerforderungen)anfangsbestandsbuchung.setGegenkonto(konto.Umsatzsteuer_Vorjahr)
       anfangsbestandsbuchung.setBezahltAm(BMlastYear.endOfYear());
       anfangsbestandsbuchung.setText("Anfangsbestand");
     }
