@@ -21,7 +21,7 @@ reducerFunctions[ServerFunction.unbehandelterFehler] = function (newState: any, 
 }
 
 reducerFunctions[ServerFunction.kiSwitch] = function (newState: any, serverResponse: any) {
-    window.logger.debug("ServerProxy.tsx --> reducerFunctions[ServerFunction.kiSwitch]"+serverResponse);
+    window.logger.debug("ServerProxy.tsx --> reducerFunctions[ServerFunction.kiSwitch]" + serverResponse);
     if (serverResponse.error) {
         newState.BM.serverError = serverResponse.error;
         newState.UI.leaf = Leafs.ServerError;
@@ -177,15 +177,11 @@ export class ServerProxy {
             )
         )
     }
-    public getOrCreateRootFolder(rootFolderName: string) {
+    public installNewInstance() {
         window.store.dispatch(
             serverCall(
                 {
-                    functionName: ServerFunction.installNewInstance,
-                    parametersArray: [
-                        rootFolderName,
-                        window.store.getState().UI.version
-                    ]
+                    functionName: ServerFunction.installNewInstance
                 })
         );
     }

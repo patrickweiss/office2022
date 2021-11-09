@@ -27,7 +27,7 @@ Action.reducerFunctions[Action.Type.ServerCall] = function (newState: any, actio
         case ServerFunction.getOrCreateOfficeOneFolders:
             newState.BM.instanceName = "loading";
             break
-        case ServerFunction.getOrCreateRootFolder:
+        case ServerFunction.installNewInstance:
             newState.BM.rootFolder.id = "loading";
             break
         case ServerFunction.getNamedRangeData:

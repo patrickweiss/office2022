@@ -68,7 +68,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         return <div className="LIST_ITEM"><button className="linkButton" type="button" onClick={this.handleClick}>{this.sentence}</button></div>;
     }
     protected getBM() {
-        if (window.store.getState().BM.rootFolder.id === undefined) window.serverProxy.getOrCreateRootFolder(window.store.getState().BM.instanceName);
+        if (window.store.getState().BM.rootFolder.id === undefined) window.serverProxy.installNewInstance();
         if (window.store.getState().BM.rootFolder.id === "loading") throw new Error("OfficeOne Ordner wird erstellt");
         return window.BM;
     }
@@ -255,7 +255,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
     }
     
     protected handleFolderCreate(e: any) {
-        window.serverProxy.getOrCreateRootFolder("2019 OfficeOne.Office")
+        window.serverProxy.installNewInstance()
     }
     protected handleFolderSelect(e: any) {
         console.log(e.target);

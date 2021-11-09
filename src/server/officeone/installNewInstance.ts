@@ -4,7 +4,7 @@ import { getOrCreateFolder } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
 
 //Hier wird immer eine neue Instanz installiert. Funktionsname passt nicht mehr. 
-export function installNewInstance(ooRootFolderLabel: string, ooRootFolderVersion: string) {
+export function installNewInstance() {
   
     var foldersHash = {};
     let result = {
