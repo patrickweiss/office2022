@@ -1,51 +1,59 @@
 import { UmbuchungenTableCache } from "../../officeone/BusinessDataFacade";
+import { BusinessModel } from "../../officeone/BusinessModel";
 import { ServerFunction } from "../oo21lib/systemEnums";
 
 export function UStVAbuchen(rootFolderId: string) {
+    let BM = new BusinessModel(rootFolderId, "UStVAbuchen");
+    try {
 
-    const mail = searchUStVABeleg()[0];
-    markUStVABelegProcessed(mail);
-    const belegDaten = mail.getMessages()[0].getBody();
-    const subjectArray = mail.getMessages()[0].getSubject().split(" ");
-    const jahr = subjectArray[3];
-    const kzperiode = subjectArray[4];
-    const kzMonatMapping = {
-        "01":1,
-        "02":2,
-        "03":3,
-        "04":4,
-        "05":5,
-        "06":6,
-        "07":7,
-        "08":8,
-        "09":9,
-        "10":10,
-        "11":11,
-        "12":12,
-        "41":3,
-        "42":6,
-        "43":9,
-        "44":12
+        const mail = searchUStVABeleg()[0];
+        markUStVABelegProcessed(mail);
+        const belegDaten = mail.getMessages()[0].getBody();
+        const subjectArray = mail.getMessages()[0].getSubject().split(" ");
+        const jahr = subjectArray[3];
+        const kzperiode = subjectArray[4];
+        const kzMonatMapping = {
+            "01": 1,
+            "02": 2,
+            "03": 3,
+            "04": 4,
+            "05": 5,
+            "06": 6,
+            "07": 7,
+            "08": 8,
+            "09": 9,
+            "10": 10,
+            "11": 11,
+            "12": 12,
+            "41": 3,
+            "42": 6,
+            "43": 9,
+            "44": 12
+        }
+        const periode = kzMonatMapping[kzperiode];
+
+        const umbuchungenTableCache = new UmbuchungenTableCache(rootFolderId);
+
+        const ustvaUmbuchung = umbuchungenTableCache.getOrCreateRowById("Um" + jahr + "UStVA" + kzperiode);
+
+        ustvaUmbuchung.setDatum(new Date(parseInt(jahr, 10), parseInt(periode, 10) - 1));
+        ustvaUmbuchung.setKonto("UStVA");
+        ustvaUmbuchung.setGegenkonto("Verbindlichkeiten UStVA");
+        ustvaUmbuchung.setText(belegDaten);
+        ustvaUmbuchung.setBetrag(parseKz83FromUStVA(belegDaten));
+        umbuchungenTableCache.save();
+
+        var result = {
+            serverFunction: ServerFunction.getNamedRangeData,
+            rangeName: "UmbuchungenD",
+            namedRangeData: umbuchungenTableCache.getData()
+        }
+        BM.saveLog(ustvaUmbuchung.getId().toString());
+        return JSON.stringify(result);
     }
-    const periode = kzMonatMapping[kzperiode];
-
-    const umbuchungenTableCache = new UmbuchungenTableCache(rootFolderId);
-
-    const ustvaUmbuchung = umbuchungenTableCache.getOrCreateRowById("Um" + jahr + "UStVA" + kzperiode);
-
-    ustvaUmbuchung.setDatum(new Date(parseInt(jahr,10),parseInt(periode,10)-1));
-    ustvaUmbuchung.setKonto("UStVA");
-    ustvaUmbuchung.setGegenkonto("Verbindlichkeiten UStVA");
-    ustvaUmbuchung.setText(belegDaten);
-    ustvaUmbuchung.setBetrag(parseKz83FromUStVA(belegDaten));
-    umbuchungenTableCache.save();
-
-    var result = {
-        serverFunction: ServerFunction.getNamedRangeData,
-        rangeName: "UmbuchungenD",
-        namedRangeData: umbuchungenTableCache.getData()
+    catch (e) {
+        return BM.saveError(e)
     }
-    return JSON.stringify(result);
 }
 
 const UStVA_Beleg_PROCESSED_LABEL = "UStVA gebucht";
@@ -73,11 +81,11 @@ function markUStVABelegProcessed(thread) {
     thread.markRead();
 }
 
-function parseKz83FromUStVA(belegHTML:string){
+function parseKz83FromUStVA(belegHTML: string) {
     const beginnIndex = belegHTML.indexOf("Kz83_usb1_1-1-1-1");
-    const beginnSteuerStringBisEnde = belegHTML.slice(beginnIndex+19);
-    const steuerString = beginnSteuerStringBisEnde.slice(0,beginnSteuerStringBisEnde.indexOf("&"));
+    const beginnSteuerStringBisEnde = belegHTML.slice(beginnIndex + 19);
+    const steuerString = beginnSteuerStringBisEnde.slice(0, beginnSteuerStringBisEnde.indexOf("&"));
 
-    return parseFloat(steuerString.replace(".","").replace(",","."));
+    return parseFloat(steuerString.replace(".", "").replace(",", "."));
 }
 
