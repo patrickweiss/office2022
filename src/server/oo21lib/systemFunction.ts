@@ -82,7 +82,9 @@ export function daily(): string[] {
         for (let rootId of folderIds) {
             const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
             try {
+                bmServer.addLogMessage("alle Ausgaben Ordner scannen")
                 alleAusgabenFolderScannen(bmServer);
+                bmServer.addLogMessage("alle Gutschriften Ordner scannen")
                 alleGutschriftenFolderScannen(bmServer);
                 bmServer.kontoSummenAktualisieren();
                 bmServer.save();

@@ -1,11 +1,13 @@
+import { NavItem } from "react-bootstrap";
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { UStVAverschickenFromBackend } from "../officeone/UStVAverschicken";
 
 export function doGetUStVA(e: GoogleAppsScript.Events.DoGet) {
-    const bm = new BusinessModel(e.parameters["officeId"], "doGetUStVA")
+    let monatKey: string = e.parameters["ustva"].toString();
+    let originalParameter = monatKey;
+    if (monatKey.length === 1) monatKey = "0" + monatKey;
+    const bm = new BusinessModel(e.parameters["officeId"], `doGetUStVA: parameter=${originalParameter} length= ${originalParameter.length} ${monatKey}`)
     try {
-        let monatKey = e.parameters["ustva"]
-        if (monatKey.length === 1) monatKey = "0" + monatKey
         const zeitraum = UStVAverschickenFromBackend(bm, monatKey)
         const months = {
             '01': '(01) Januar',
@@ -25,6 +27,7 @@ export function doGetUStVA(e: GoogleAppsScript.Events.DoGet) {
             '43': '3. Quartal',
             '44': '4. Quartal',
         }
+        bm.saveLog("Zeitraum:" + zeitraum);
         return HtmlService.createHtmlOutput(`<b>UStVA Daten verschickt für ${months[zeitraum]} ${bm.endOfYear().getFullYear()}</b>`);
     }
     catch (e) {

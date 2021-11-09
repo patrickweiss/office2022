@@ -358,7 +358,7 @@ function AnfangsbestandBankkontenAktualisieren(BMlastYear: BusinessModel, BMnow:
     const ebBuchung = BMnow.getOrCreateBankbuchung("EB" + bankkonto.getKonto() + BMnow.endOfYear().getFullYear().toString());
     ebBuchung.setKonto(bankkonto.getKonto());
     ebBuchung.setNr("EB");
-    ebBuchung.setDatum(new Date(BMnow.endOfYear().getFullYear(), 0, 1));
+    ebBuchung.setDatum(BMlastYear.endOfYear());
     ebBuchung.setBetrag(bestand);
     ebBuchung.setText("Anfangsbestand aus den Vorjahren");
     ebBuchung.setBelegID("keine");

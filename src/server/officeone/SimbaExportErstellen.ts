@@ -35,7 +35,8 @@ enum exportgruppe {
   abschreibung = "OfficeOneAbschreibung.Export",
   Anlage = "OfficeOne.Export",
   laufendeBuchungen = "OfficeOne.Export",
-  mwstAbschluss = "OfficeOneMwstAbschluss.Export"
+  mwstAbschluss = "OfficeOneMwstAbschluss.Export",
+  eb="OfficeOneEB.Export"
 }
 
 export function SimbaExportErstellen(rootFolderId: string) {
@@ -140,7 +141,7 @@ function isoDate(date) {
   return [day, month, year].join('.');
 }
 function ebBuchungAnpassen(a: agent, csvRow: CSVExport, soll: Konto, haben: Konto) {
-  //  csvRow.setValue("Exportgruppe", "EB " + csvRow.getValue("Exportgruppe"));
+  csvRow.setValue("Exportgruppe", exportgruppe.eb);
   csvRow.setValue("Datum", a.geschaeftsjahr);
   if (soll.getKontentyp() === "GuV") csvRow.setValue("SKR03 (Soll)", "9000");
   if (haben.getKontentyp() === "GuV") csvRow.setValue("SKR03 (Haben)", "9000");
