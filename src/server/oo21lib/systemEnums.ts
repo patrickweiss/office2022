@@ -170,7 +170,7 @@ export const months = {
 
 export enum ServerFunction {
     kiSwitch = "kiSwitch",
-    getOrCreateRootFolder = "getOrCreateRootFolder",
+    installNewInstance = "installNewInstance",
     getOrCreateAusgabenFolder = "getOrCreateAusgabenFolder",
     getNamedRangeData = "getNamedRangeData",
     getSpreadsheetIdbyFolderIdAndName = "getSpreadsheetIdbyFolderIdAndName",

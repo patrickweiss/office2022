@@ -253,6 +253,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
         console.log("DL.handleKiSwitch");
         window.serverProxy.kiSwitch(window.store.getState().UI.triggers);
     }
+    
     protected handleFolderCreate(e: any) {
         window.serverProxy.getOrCreateRootFolder("2019 OfficeOne.Office")
     }

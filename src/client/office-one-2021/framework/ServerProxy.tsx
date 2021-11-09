@@ -40,7 +40,7 @@ reducerFunctions[ServerFunction.getOrCreateOfficeOneFolders] = function (newStat
     newState.UI.triggers = serverResponse.triggers as String;
     setRootFolderIfOnlyOne(newState);
 }
-reducerFunctions[ServerFunction.getOrCreateRootFolder] = function (newState: any, serverResponse: any) {
+reducerFunctions[ServerFunction.installNewInstance] = function (newState: any, serverResponse: any) {
     if (serverResponse.error) {
         newState.BM.serverError = serverResponse.error;
         newState.UI.leaf = Leafs.ServerError;
@@ -127,6 +127,9 @@ reducerFunctions[ServerFunction.businessModelBatchUpdate] = function (newState: 
 reducerFunctions[ServerFunction.SimbaExportErstellen] = function (newState: any, serverResponse: any) {
     newState.UI.leaf = Leafs.Jahresabschluss;
 }
+reducerFunctions[ServerFunction.naechstesJahrInstallieren] = function (newState: any, serverResponse: any) {
+    newState.UI.leaf = Leafs.C2021OfficeOnePocket;
+}
 
 
 
@@ -141,6 +144,16 @@ export class ServerProxy {
                     parametersArray: [window.BM.getRootFolderId()]
                 })
         );
+    }
+    public kiSwitch(triggerCount: string) {
+        window.store.dispatch(
+            serverCall(
+                {
+                    functionName: ServerFunction.kiSwitch,
+                    parametersArray: [triggerCount]
+                }
+            )
+        )
     }
     public EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderNameVorjahr: string) {
         window.store.dispatch(
@@ -168,7 +181,7 @@ export class ServerProxy {
         window.store.dispatch(
             serverCall(
                 {
-                    functionName: ServerFunction.getOrCreateRootFolder,
+                    functionName: ServerFunction.installNewInstance,
                     parametersArray: [
                         rootFolderName,
                         window.store.getState().UI.version

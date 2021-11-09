@@ -4,7 +4,7 @@
 //old system
 import * as publicUiFunctions from './menu';
 import { generateAndMailTableRow, generateAndMailoooVersionsFileNameIdMap } from './officeone/driveconnector';
-import { getNamedRangeData, getOrCreateOfficeOneFolders, getOrCreateRootFolder } from './officeone/directDriveConnector';
+import { getNamedRangeData, getOrCreateOfficeOneFolders } from './officeone/directDriveConnector';
 import { updateDrive } from './officeone/updateDrive';
 import { UStVAberechnen } from './officeone/UStVAberechnen';
 import { UStVAverschicken } from './officeone/UStVAverschicken';
@@ -21,7 +21,6 @@ import { slurpData, slurpCSVData, slurpGDPDU } from './slurpData/slurpData';
 import createLastschriften from '../officetwo/sepa/createLastschriften';
 import createInvoicesAndSepaXml from '../officetwo/sepa/createInvoicesAndSepaXml';
 import { deleteData } from './slurpData/deleteData';
-import { installFromForm, installTest } from './officeone/installFromForm';
 
 //0055 WebAppTrue
 import { mrechnungErstellen, mneuePosition } from './officeone/rechnungSchreiben';
@@ -32,6 +31,7 @@ import { vertraegeFolderScannen } from './officeone/vertraegeFolderScannen';
 import { rechnungsVorlageErstellen } from './oo21lib/rechnungsVorlageErstellen';
 import { daily, kiSwitch } from './oo21lib/systemFunction';
 import { naechstesJahrInstallieren } from './officeone/naechstesJahrInstallieren';
+import { installNewInstance } from './officeone/installNewInstance';
 
 
 global.onOpen = publicUiFunctions.onOpen;
@@ -49,7 +49,7 @@ interface IOfficeGlobal {
     installTestsystemTest: () => void;
     installTest: () => void;
     installFromForm: (e: any) => void;
-    getOrCreateRootFolder: (ooRootFolderLabel:string, ooRootFolderVersion:string) => void;
+    installNewInstance: (ooRootFolderLabel:string, ooRootFolderVersion:string) => void;
     rechnungsVorlageErstellen :  () => void;
     doGet: any;
     openAboutSidebar: any;
@@ -112,8 +112,6 @@ global.slurpGDPDU = slurpGDPDU;
 global.createLastschriften = createLastschriften;
 global.createInvoicesAndSepaXml = createInvoicesAndSepaXml;
 global.deleteData = deleteData;
-global.installFromForm = installFromForm;
-global.installTest = installTest;
 global.installTestsystemTest = installTestsystemTest;
 global.testFromForm = testFromForm;
 global.kiSwitch = kiSwitch;
@@ -126,7 +124,7 @@ global.mrechnungErstellen = mrechnungErstellen;
 //E Mail Form
 global.addEmailId = addEmailId;
 global.vertraegeFolderScannen = vertraegeFolderScannen;
-global.getOrCreateRootFolder = getOrCreateRootFolder;
+global.installNewInstance = installNewInstance;
 global.rechnungsVorlageErstellen = rechnungsVorlageErstellen;
 global.daily=daily;
 

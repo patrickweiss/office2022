@@ -27,7 +27,7 @@ class Jahresabschluss extends DriveLeaf {
         <div className="LIST_ITEM">
           <ServerButton text="Umsatzsteuer Jahresabrechnung erstellen" onClick={this.handleBuchungenFuerUmsatzsteuerBerechnenUndEintragen}></ServerButton>
           <ServerButton text="Simbaexport erstellen" onClick={window.serverProxy.SimbaExportErstellen}></ServerButton>
-          <ServerButton text={`${this.getBM().beginOfYear().getFullYear().toString()} installieren`} onClick={window.serverProxy.naechstesJahrInstallieren}></ServerButton>
+          <ServerButton text={`${(this.getBM().beginOfYear().getFullYear()+1).toString()} installieren`} onClick={window.serverProxy.naechstesJahrInstallieren}></ServerButton>
         </div>
         <div className="LIST_ITEM">{this.renderTableArray(this.getBM().getKontenArray(),"Subtyp,Konto,Summe")}</div>
       </div>

@@ -3,7 +3,7 @@ import { currentOOversion, months, ooVersions } from "../oo21lib/systemEnums";
 
 export const getDevOpsFolder = () => {return DriveApp.getFolderById("139Tyi3gOXE7ZkfUdhRXMMl8uZj0uxIb9")};
 
-//Funktion um eine neue Version der OfficeOne Template Datein zu erstellen
+//Funktion um eine neue Version der OfficeOne Template Dateien zu erstellen
 export const newOfficeOneVersion = () => {
     const nextVersion = getNextVersion() as ooVersions;
 //Kopiert Ordner und Dateien, wenn die Versionsnummern haben, bekommen sie eine neue Version
