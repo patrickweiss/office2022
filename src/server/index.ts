@@ -31,6 +31,7 @@ import { addEmailId } from '../officetwo/application/addEMailId';
 import { vertraegeFolderScannen } from './officeone/vertraegeFolderScannen';
 import { rechnungsVorlageErstellen } from './oo21lib/rechnungsVorlageErstellen';
 import { daily, kiSwitch } from './oo21lib/systemFunction';
+import { naechstesJahrInstallieren } from './officeone/naechstesJahrInstallieren';
 
 
 global.onOpen = publicUiFunctions.onOpen;
@@ -81,6 +82,7 @@ interface IOfficeGlobal {
     deleteData: any;
     daily: () => void;
     kiSwitch: (triggerCount:any)=>string;
+    naechstesJahrInstallieren:(rootFolderId:string)=>string;
 }
 
 declare let global: IOfficeGlobal;
@@ -115,6 +117,7 @@ global.installTest = installTest;
 global.installTestsystemTest = installTestsystemTest;
 global.testFromForm = testFromForm;
 global.kiSwitch = kiSwitch;
+global.naechstesJahrInstallieren=naechstesJahrInstallieren;
 
 //Rechnung
 global.onEdit = onEdit;

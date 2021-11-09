@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
-export const codeVersion = "032";
+export const codeVersion = "034";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
@@ -167,8 +167,9 @@ export const months = {
     '12': '(12) Dezember',
 }
 
+
 export enum ServerFunction {
-    kiSwitch="kiSwitch",
+    kiSwitch = "kiSwitch",
     getOrCreateRootFolder = "getOrCreateRootFolder",
     getOrCreateAusgabenFolder = "getOrCreateAusgabenFolder",
     getNamedRangeData = "getNamedRangeData",
@@ -188,7 +189,8 @@ export enum ServerFunction {
     updateDrive = "updateDrive",
     businessModelBatchUpdate = "businessModelBatchUpdate",
     vertraegeFolderScannen = "vertraegeFolderScannen",
-    unbehandelterFehler = "unbehandelterFehler"
+    unbehandelterFehler = "unbehandelterFehler",
+    naechstesJahrInstallieren = "naechstesJahrInstallieren"
 }
 
 export enum ooFields{

@@ -132,18 +132,16 @@ reducerFunctions[ServerFunction.SimbaExportErstellen] = function (newState: any,
 
 export class ServerProxy {
     static actionBatch: IAction[] = [];
-    public kiSwitch(triggerCount: string) {
-        console.log("ServerProxy.kiSwitch, dispatch(serverCall())"+triggerCount);
+
+    public naechstesJahrInstallieren() {
         window.store.dispatch(
             serverCall(
                 {
-                    functionName: ServerFunction.kiSwitch,
-                    parametersArray: [triggerCount]
-                }
-            )
-        )
+                    functionName: ServerFunction.naechstesJahrInstallieren,
+                    parametersArray: [window.BM.getRootFolderId()]
+                })
+        );
     }
-
     public EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderNameVorjahr: string) {
         window.store.dispatch(
             serverCall(
