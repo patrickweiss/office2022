@@ -1,10 +1,9 @@
 import { copyFolder } from "../oo21lib/driveConnector";
-import { adminUser, clientSystemMasterId, currentOOversion, ooFolders, ooTables, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
+import { adminUser, clientSystemMasterId, currentOOversion, office, ooFolders, ooTables, ServerFunction, subscribeRestEndpoint, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
 
-//Hier wird immer eine neue Instanz installiert. Funktionsname passt nicht mehr. 
-export function installNewInstance() {
+export function installNewInstance(name:string) {
   
     var foldersHash = {};
     let result = {
@@ -18,6 +17,7 @@ export function installNewInstance() {
       currentOOversion,
       currentOOversion
     )
+    if (name)officeFolder.setName(name);
     officeFolder.addEditor(adminUser);
     const officeRootId = officeFolder.getId();
     
@@ -35,7 +35,7 @@ export function installNewInstance() {
     const systemFolder = getOrCreateFolder(DriveApp.getRootFolder(), ooFolders.system);
     systemFolder.addEditor(adminUser);
     const systemSpreadsheetName = ooFolders.system + " - " + ooFolders.version + currentOOversion
-    const ssIterator = systemFolder.getFilesByName(systemSpreadsheetName);
+    const ssIterator = systemFolder.getFiles();
     if (ssIterator.hasNext()) {
       //add office folder id to array
       const systemSpreadsheet = SpreadsheetApp.openById(ssIterator.next().getId());
