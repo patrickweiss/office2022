@@ -62,6 +62,9 @@ export class BusinessModel {
     private normalisierteBuchungenTableCache: NormalisierteBuchungenTableCache;
     private gdpduTableCache: GdpduTableCache;
     private configurationCache: ValuesCache;
+    private konfiguration: any[][];
+    private valueIndex:{};
+
 
     //Server specific code
     constructor(rootfolderId: string, functionName: string) {
@@ -496,23 +499,6 @@ export class BusinessModel {
             return (ausgabe.getKonto() === konto.UStVA && ausgabe.getDatum().getFullYear() === (this.endOfYear().getFullYear() - 1))
         })
     }
-    public save() {
-        if (this.ausgabenTableCache !== undefined) this.ausgabenTableCache.save();
-        if (this.bewirtungsbelegeTableCache !== undefined) this.bewirtungsbelegeTableCache.save();
-        if (this.kontenTableCache !== undefined) this.kontenTableCache.save();
-        if (this.ustvaTableCache !== undefined) this.ustvaTableCache.save();
-        if (this.eurTableCache !== undefined) this.eurTableCache.save();
-        if (this.abschreibungenTableCache !== undefined) this.abschreibungenTableCache.save();
-        if (this.verpflegungsmehraufwendungenTableCache !== undefined) this.verpflegungsmehraufwendungenTableCache.save();
-        if (this.bankbuchungenTableCache !== undefined) this.bankbuchungenTableCache.save();
-        if (this.umbuchungenTableCache !== undefined) this.umbuchungenTableCache.save();
-        if (this.einnahmenRechnungTableCache !== undefined) this.einnahmenRechnungTableCache.save();
-        if (this.kundenTableCache !== undefined) this.kundenTableCache.save();
-        if (this.EURechnungTableCache !== undefined) this.EURechnungTableCache.save();
-        if (this.gutschriftenTableCache !== undefined) this.gutschriftenTableCache.save();
-        if (this.vertraegeTableCache !== undefined) this.vertraegeTableCache.save();
-        if (this.normalisierteBuchungenTableCache !== undefined) this.normalisierteBuchungenTableCache.save();
-    }
     public getEinnahmenRechnungTableCache(): EinnahmenRechnungTableCache {
         if (this.einnahmenRechnungTableCache === undefined) this.einnahmenRechnungTableCache = new EinnahmenRechnungTableCache(this.getRootFolderId());
         return this.einnahmenRechnungTableCache;
@@ -582,6 +568,26 @@ export class BusinessModel {
         if (this.configurationCache === undefined) this.configurationCache = new ValuesCache(ooTables.Konfiguration, this.getRootFolderId());
         return this.configurationCache;
     }
+    public getKonfigurationValue(key:office):any{
+        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion)[0];
+        if (!this.valueIndex){
+            this.valueIndex={};
+            for (let index = 0; index<this.konfiguration.length; index++){
+                this.valueIndex[this.konfiguration[index][0]]=index;
+            }
+        }
+        return this.konfiguration[this.valueIndex[key]][1];
+    }
+    public setKonfigurationValue(key:office,value:any){
+        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion)[0];
+        if (!this.valueIndex){
+            this.valueIndex={};
+            for (let index = 0; index<this.konfiguration.length; index++){
+                this.valueIndex[this.konfiguration[index][0]]=index;
+            }
+        }
+        this.konfiguration[this.valueIndex[key]][1]=value;
+    }
     public netto(brutto: number, prozent: string) {
         if (prozent == "19%") return Math.round(brutto / 1.19 * 100) / 100;
         if (prozent == "7%") return Math.round(brutto / 1.07 * 100) / 100;
@@ -596,6 +602,23 @@ export class BusinessModel {
         return (this.getConfigurationCache().getValueByName("bankKonten") as string).split(",");
     }
     public isBankkonto(kontoName: string) { return this.getBankontenArray().indexOf(kontoName) >= 0; }
+    public save() {
+        if (this.ausgabenTableCache !== undefined) this.ausgabenTableCache.save();
+        if (this.bewirtungsbelegeTableCache !== undefined) this.bewirtungsbelegeTableCache.save();
+        if (this.kontenTableCache !== undefined) this.kontenTableCache.save();
+        if (this.ustvaTableCache !== undefined) this.ustvaTableCache.save();
+        if (this.eurTableCache !== undefined) this.eurTableCache.save();
+        if (this.abschreibungenTableCache !== undefined) this.abschreibungenTableCache.save();
+        if (this.verpflegungsmehraufwendungenTableCache !== undefined) this.verpflegungsmehraufwendungenTableCache.save();
+        if (this.bankbuchungenTableCache !== undefined) this.bankbuchungenTableCache.save();
+        if (this.umbuchungenTableCache !== undefined) this.umbuchungenTableCache.save();
+        if (this.einnahmenRechnungTableCache !== undefined) this.einnahmenRechnungTableCache.save();
+        if (this.kundenTableCache !== undefined) this.kundenTableCache.save();
+        if (this.EURechnungTableCache !== undefined) this.EURechnungTableCache.save();
+        if (this.gutschriftenTableCache !== undefined) this.gutschriftenTableCache.save();
+        if (this.vertraegeTableCache !== undefined) this.vertraegeTableCache.save();
+        if (this.normalisierteBuchungenTableCache !== undefined) this.normalisierteBuchungenTableCache.save();
+    }
 }
 
 

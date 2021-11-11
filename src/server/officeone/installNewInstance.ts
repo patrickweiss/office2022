@@ -8,7 +8,8 @@ export function installNewInstance(name:string) {
     var foldersHash = {};
     let result = {
       serverFunction: ServerFunction.installNewInstance,
-      foldersHash: foldersHash
+      foldersHash: foldersHash,
+      newFolderId:""
     };
   
     const officeFolder = copyFolder(
@@ -53,6 +54,7 @@ export function installNewInstance(name:string) {
     const folder = officeFolder;
     const version = folder.getName().slice(-4);
     foldersHash[officeRootId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
+    result.newFolderId=officeRootId;
    
     let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
     "&email=" + Session.getActiveUser().getEmail() +

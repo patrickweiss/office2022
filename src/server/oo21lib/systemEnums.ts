@@ -27,7 +27,7 @@ export enum subscriptionPostActions {
 //Konfigurationsvariablen die in "00 Office" definiert sein müssen
 export enum office {
     fehlerEmail = "fehlerEmail",
-    geschaeftsjahr = "zeitraumJahr",
+    zeitraumJahr = "zeitraumJahr",
     taxNumberOffice = "taxNumberOffice",
     taxNumberDistrict = "taxNumberDistrict",
     taxNumberDistinctionNumber = "taxNumberDistinctionNumber",
