@@ -17,9 +17,8 @@ export function naechstesJahrInstallieren(rootFolderId: string):string {
         BMneu.setKonfigurationValue(office.vorjahrOfficeRootID_FolderId,BM.getKonfigurationValue(office.officeRootID_FolderId))
         BMneu.setKonfigurationValue(office.zeitraumJahr,neuesJahr);
         BMneu.setKonfigurationValue(office.officeRootID_FolderId,BMneu.getRootFolderId());
+        BMneu.save();
     
-
-
         BM.save();
         result.serverFunction =  ServerFunction.naechstesJahrInstallieren,
         

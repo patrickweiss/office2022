@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo59;
-export const codeVersion = "038";
+export const codeVersion = "040";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
@@ -44,9 +44,10 @@ export enum office {
     email = "email",
     bank = "bank",
     iban = "iban",
-    triggerMode = "triggerMode",
+    UStVAPeriode = "UStVAPeriode",
     officeRootID_FolderId = "officeRootID_FolderId",
     vorjahrOfficeRootID_FolderId = "vorjahrOfficeRootID_FolderId",
+    bankKonten="bankKonten"
 }
 
 export const adminUser = "eins.stein@officeone.team";

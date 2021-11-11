@@ -1,7 +1,7 @@
 import { DriveConnector } from "../server/officeone/driveconnector";
 import { belegNr, codeVersion, currentOOversion, developmentYear, konto, logLevel, office, ooTables, ServerFunction } from "../server/oo21lib/systemEnums";
 import { Abschreibung, AbschreibungenTableCache, AusgabenRechnung, AusgabenTableCache, Bankbuchung, BankbuchungenTableCache, Bewirtungsbeleg, BewirtungsbelegeTableCache, EinnahmenRechnung, EinnahmenRechnungTableCache, EURechnung, EURechnungTableCache, EURTableCache, Gutschrift, GutschriftenTableCache, KontenTableCache, Konto, NormalisierteBuchung, NormalisierteBuchungenTableCache, Umbuchung, UmbuchungenTableCache, UStVA, UStVATableCache, Verpflegungsmehraufwendung, VerpflegungsmehraufwendungenTableCache, VertraegeTableCache, Vertrag, GdpduTableCache, Gdpdu, KundenTableCache, Rechnung } from "./BusinessDataFacade";
-import { ValuesCache } from './ValuesCache';
+//import { ValuesCache } from './ValuesCache';
 
 export enum BelegTyp {
     Ausgabe = "Ausgabe",
@@ -61,8 +61,8 @@ export class BusinessModel {
     private eurTableCache: EURTableCache;
     private normalisierteBuchungenTableCache: NormalisierteBuchungenTableCache;
     private gdpduTableCache: GdpduTableCache;
-    private configurationCache: ValuesCache;
-    private konfiguration: any[][];
+  //  private configurationCache: ValuesCache;
+    private konfiguration: any[][][];
     private valueIndex:{};
 
 
@@ -85,7 +85,7 @@ export class BusinessModel {
     }
     public saveError(error: Error) {
         this.addLogMessage(error.message)
-        const errorMail = this.getConfigurationCache().getValueByName(office.fehlerEmail);
+        const errorMail = this.getKonfigurationValue(office.fehlerEmail);
         if (errorMail != "") {
             try {
                 GmailApp.sendEmail(errorMail, "Fehler bei " + this.logMessage.split("\n")[0], this.logMessage + "\n" + error.stack);
@@ -117,7 +117,7 @@ export class BusinessModel {
 
     // Generic code for client and server identical 
     public endOfYear() {
-        const jahr = this.getConfigurationCache().getValueByName("zeitraumJahr");
+        const jahr = this.getKonfigurationValue(office.zeitraumJahr);
         if (jahr === "") throw new Error("Konfiguration:zeitraumJahr fehlt");
         return new Date(parseInt(jahr, 10), 11, 31);
     }
@@ -327,7 +327,7 @@ export class BusinessModel {
         this.getKontenTableCache().bilanzSummenAktualisieren(this.getNormalisierteBuchungenArray());
         this.getEURTableCache().setKontenSpalten(this.endOfYear().getFullYear());
         this.getEURTableCache().eurSummenAktualisieren(this.getNormalisierteBuchungenArray());
-        this.getUStVATableCache().UStVASummenAktualisieren(this.getNormalisierteBuchungenArray(), this.beginOfYear(), this.getConfigurationCache().getValueByName("UStVAPeriode"));
+        this.getUStVATableCache().UStVASummenAktualisieren(this.getNormalisierteBuchungenArray(), this.beginOfYear(), this.getKonfigurationValue(office.UStVAPeriode));
         this.getKontenTableCache().kontenEinfaerben();
 
     }
@@ -564,29 +564,30 @@ export class BusinessModel {
         if (this.gdpduTableCache === undefined) this.gdpduTableCache = new GdpduTableCache(this.getRootFolderId());
         return this.gdpduTableCache;
     }
+    /*
     public getConfigurationCache(): ValuesCache {
         if (this.configurationCache === undefined) this.configurationCache = new ValuesCache(ooTables.Konfiguration, this.getRootFolderId());
         return this.configurationCache;
-    }
+    }*/
     public getKonfigurationValue(key:office):any{
-        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion)[0];
+        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion);
         if (!this.valueIndex){
             this.valueIndex={};
-            for (let index = 0; index<this.konfiguration.length; index++){
-                this.valueIndex[this.konfiguration[index][0]]=index;
+            for (let index = 0; index<this.konfiguration[0].length; index++){
+                this.valueIndex[this.konfiguration[0][index][0]]=index;
             }
         }
-        return this.konfiguration[this.valueIndex[key]][1];
+        return this.konfiguration[0][this.valueIndex[key]][1];
     }
     public setKonfigurationValue(key:office,value:any){
-        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion)[0];
+        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion);
         if (!this.valueIndex){
             this.valueIndex={};
-            for (let index = 0; index<this.konfiguration.length; index++){
-                this.valueIndex[this.konfiguration[index][0]]=index;
+            for (let index = 0; index<this.konfiguration[0].length; index++){
+                this.valueIndex[this.konfiguration[0][index][0]]=index;
             }
         }
-        this.konfiguration[this.valueIndex[key]][1]=value;
+        this.konfiguration[0][this.valueIndex[key]][1]=value;
     }
     public netto(brutto: number, prozent: string) {
         if (prozent == "19%") return Math.round(brutto / 1.19 * 100) / 100;
@@ -599,7 +600,7 @@ export class BusinessModel {
     }
     public germanDate(datum: Date) { return datum.getDate() + "." + (datum.getMonth() + 1) + "." + datum.getFullYear() }
     public getBankontenArray() {
-        return (this.getConfigurationCache().getValueByName("bankKonten") as string).split(",");
+        return (this.getKonfigurationValue(office.bankKonten) as string).split(",");
     }
     public isBankkonto(kontoName: string) { return this.getBankontenArray().indexOf(kontoName) >= 0; }
     public save() {
@@ -618,6 +619,7 @@ export class BusinessModel {
         if (this.gutschriftenTableCache !== undefined) this.gutschriftenTableCache.save();
         if (this.vertraegeTableCache !== undefined) this.vertraegeTableCache.save();
         if (this.normalisierteBuchungenTableCache !== undefined) this.normalisierteBuchungenTableCache.save();
+        if (this.konfiguration!==undefined)DriveConnector.saveNamedRangeData(this.getRootFolderId(), ooTables.Konfiguration, this.konfiguration[0].length,this.konfiguration[0], this.konfiguration[1], this.konfiguration[2], currentOOversion)
     }
 }
 
