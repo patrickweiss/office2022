@@ -47,7 +47,8 @@ export enum office {
     UStVAPeriode = "UStVAPeriode",
     officeRootID_FolderId = "officeRootID_FolderId",
     vorjahrOfficeRootID_FolderId = "vorjahrOfficeRootID_FolderId",
-    bankKonten="bankKonten"
+    bankKonten="bankKonten",
+    umsatzsteuerAbschluss="umsatzsteuerAbschluss"
 }
 
 export const adminUser = "eins.stein@officeone.team";

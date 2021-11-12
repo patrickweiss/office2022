@@ -423,7 +423,7 @@ export class BusinessModel {
             istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
         
             //Abschluss wird nur in Simba gemacht und dann importiert
-            //this.umsatzsteuerAbschluss(fealligeUmsatzsteuer19,faelligeMehrwertsteuerUmsatzsteuer16)
+            if (this.getKonfigurationValue(office.umsatzsteuerAbschluss)==="ja")this.umsatzsteuerAbschluss(fealligeUmsatzsteuer19,faelligeMehrwertsteuerUmsatzsteuer16)
 
     }
     private umsatzsteuerAbschluss(fealligeUmsatzsteuer19,fealligeUmsatzsteuer16){
