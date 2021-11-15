@@ -5,7 +5,7 @@ import { konto, office, ServerFunction } from "../oo21lib/systemEnums";
 export function EroeffnungsbilanzAusVorjahrAktualisieren(rootFolderId: string, rootFolderNameVorjahr: string) {
   const BMnow = new BusinessModel(rootFolderId, "EroeffnungsbilanzAusVorjahrAktualisieren");
   try {
-    var rootFolderIdLastYear = BMnow.getConfigurationCache().getValueByName(office.vorjahrOfficeRootID_FolderId);
+    var rootFolderIdLastYear = BMnow.getKonfigurationValue(office.vorjahrOfficeRootID_FolderId);
 
     var BMlastYear = new BusinessModel(rootFolderIdLastYear, "EroeffnungsbilanzAusVorjahrAktualisieren");
     

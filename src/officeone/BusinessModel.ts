@@ -342,8 +342,8 @@ export class BusinessModel {
         }
     }
     public umsatzsteuerJahresabrechnung() {
-        let fealligeUmsatzsteuer19 = 0;
-        let fealligeUmsatzsteuer16 = 0;
+        let faelligeUmsatzsteuer19 = 0;
+        let faelligeUmsatzsteuer16 = 0;
         let umsatzMit19 = 0;//9313
         let umsatzMit16 = 0;//9312
         let umsatzMit7 = 0;//9302
@@ -358,12 +358,12 @@ export class BusinessModel {
                 const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
                 if (almostEqual(mwstSatz, 1.19, 0.0001)) {
                     umsatzMit19 += rechnung.getNettoBetrag();
-                    fealligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
+                    faelligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
                     return
                 }
                 if (almostEqual(mwstSatz, 1.16, 0.0001)) {
                     umsatzMit16 += rechnung.getNettoBetrag();
-                    fealligeUmsatzsteuer16 += rechnung.getMehrwertsteuer()
+                    faelligeUmsatzsteuer16 += rechnung.getMehrwertsteuer()
                     return
                 }
                 if (almostEqual(mwstSatz, 1.0, 0.0001)) {
@@ -388,7 +388,7 @@ export class BusinessModel {
             let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt19);
             faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer19.setKonto(konto.USt_in_Rechnunggestellt);
-            faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(fealligeUmsatzsteuer19);
+            faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(faelligeUmsatzsteuer19);
             faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto(konto.Umsatzsteuer19);
             faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
@@ -406,7 +406,7 @@ export class BusinessModel {
             let faelligeMehrwertsteuerUmsatzsteuer16 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt16);
             faelligeMehrwertsteuerUmsatzsteuer16.setDatum(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer16.setKonto(konto.USt_in_Rechnunggestellt);
-            faelligeMehrwertsteuerUmsatzsteuer16.setBetrag(fealligeUmsatzsteuer16);
+            faelligeMehrwertsteuerUmsatzsteuer16.setBetrag(faelligeUmsatzsteuer16);
             faelligeMehrwertsteuerUmsatzsteuer16.setGegenkonto(konto.Umsatzsteuer16);
             faelligeMehrwertsteuerUmsatzsteuer16.setBezahltAm(this.endOfYear());
             faelligeMehrwertsteuerUmsatzsteuer16.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer16");
@@ -423,10 +423,10 @@ export class BusinessModel {
             istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
         
             //Abschluss wird nur in Simba gemacht und dann importiert
-            if (this.getKonfigurationValue(office.umsatzsteuerAbschluss)==="ja")this.umsatzsteuerAbschluss(fealligeUmsatzsteuer19,faelligeMehrwertsteuerUmsatzsteuer16)
+            if (this.getKonfigurationValue(office.umsatzsteuerAbschluss)==="ja")this.umsatzsteuerAbschluss(faelligeUmsatzsteuer19,faelligeUmsatzsteuer16)
 
     }
-    private umsatzsteuerAbschluss(fealligeUmsatzsteuer19,fealligeUmsatzsteuer16){
+    private umsatzsteuerAbschluss(fealligeUmsatzsteuer19:number,fealligeUmsatzsteuer16:number){
         //Die folgenden Buchungen sind Buchungen, um die MWSt Konten auf 1789 "Umsatzsteuer laufendes Jahr" abzuschließen
         //Die dürfen nicht in den laufenden Buchungen für den Simba Export sein
         

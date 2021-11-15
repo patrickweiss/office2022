@@ -1278,7 +1278,11 @@ export class Gdpdu extends Umbuchung {
   public getFilename() { return this.getValue("Filename").toString() }
   public getNettoBetragMitVorzeichen() {
     if (this.getValue("SoFkt").toString() === "2")
-      return -super.getNettoBetragMitVorzeichen()
+    //richtig wäre hier "-super.getNettoBetragMitVorzeichen()"
+    //indem hier 0 verwendet wird, wird aus der Steuerbilanz (bei richtiger Verrechnung) die Handelsbilanz
+    //ob das in jedem Fall funktioniert (d.h. ob dieses Kennzeichnen tatsächlich immer nur verwendet wird um aus der Handelsbilanz die Steuerbilanz zu erstellen)
+    //sollte mit weiteren Jahresabschlüssen geprüft werden
+      return 0;
     else
       return super.getNettoBetragMitVorzeichen();
   }

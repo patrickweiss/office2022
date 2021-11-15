@@ -1,5 +1,5 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { csvTypes, months, ServerFunction } from "../oo21lib/systemEnums";
+import { csvTypes, months, office, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { CSVToArray } from "./O1";
 import { formatDate } from "./rechnungSchreiben";
@@ -76,7 +76,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
     let konto = belegDaten[0];
-    const datenFormat = (BM.getConfigurationCache().getValueByName(konto + "Is") as csvTypes)
+    const datenFormat = (BM.getKonfigurationValue((konto + "Is")as office) as csvTypes)
     BM.addLogMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
     let datenString;
     if (datenFormat === csvTypes.Commerzbank || datenFormat === csvTypes.KSK) datenString = beleg.getBlob().getDataAsString("utf-8");
