@@ -61,9 +61,9 @@ export class BusinessModel {
     private eurTableCache: EURTableCache;
     private normalisierteBuchungenTableCache: NormalisierteBuchungenTableCache;
     private gdpduTableCache: GdpduTableCache;
-  //  private configurationCache: ValuesCache;
+    //  private configurationCache: ValuesCache;
     private konfiguration: any[][][];
-    private valueIndex:{};
+    private valueIndex: {};
 
 
     //Server specific code
@@ -264,9 +264,9 @@ export class BusinessModel {
     }
     public getBankbuchungLatest(konto: string): Bankbuchung {
         let latestEntry: Bankbuchung = undefined;
-        this.getBankbuchungenArray().filter(buchung => { return buchung.getKonto() === konto && buchung.getNr() !== "EB" }).forEach(buchung => {
+        this.getBankbuchungenArray().filter(buchung => { return buchung.getKonto() === konto }).forEach(buchung => {
             if (latestEntry === undefined) latestEntry = buchung;
-            if (latestEntry.getId() < buchung.getId()) latestEntry = buchung;
+            if ((latestEntry.getId() < buchung.getId()) && buchung.getNr() !== "EB") latestEntry = buchung;
         })
         return latestEntry;
     }
@@ -352,84 +352,84 @@ export class BusinessModel {
 
         //Buchungen im Folgenden Scope werden erzeugt damit Simba die MWST Erklärungen richtig machen kann 
         //diese müssen beim Export der laufenden Buchungen enthalten sein
-        
-            const mwstSummieren = (rechnung: Rechnung) => {
-                if (rechnung.getBetrag() === 0) return;
-                const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
-                if (almostEqual(mwstSatz, 1.19, 0.0001)) {
-                    umsatzMit19 += rechnung.getNettoBetrag();
-                    faelligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
-                    return
-                }
-                if (almostEqual(mwstSatz, 1.16, 0.0001)) {
-                    umsatzMit16 += rechnung.getNettoBetrag();
-                    faelligeUmsatzsteuer16 += rechnung.getMehrwertsteuer()
-                    return
-                }
-                if (almostEqual(mwstSatz, 1.0, 0.0001)) {
-                    umsatzMit0 += rechnung.getNettoBetrag();
-                    return
-                }
-                throw new Error(rechnung.getId() + " hat keinen eindeutigen Mehrwertsteuersatz, MwSt:" + (mwstSatz - 1) * 100 + "%");
+
+        const mwstSummieren = (rechnung: Rechnung) => {
+            if (rechnung.getBetrag() === 0) return;
+            const mwstSatz = rechnung.getBetrag() / rechnung.getNettoBetrag();
+            if (almostEqual(mwstSatz, 1.19, 0.0001)) {
+                umsatzMit19 += rechnung.getNettoBetrag();
+                faelligeUmsatzsteuer19 += rechnung.getMehrwertsteuer()
+                return
             }
+            if (almostEqual(mwstSatz, 1.16, 0.0001)) {
+                umsatzMit16 += rechnung.getNettoBetrag();
+                faelligeUmsatzsteuer16 += rechnung.getMehrwertsteuer()
+                return
+            }
+            if (almostEqual(mwstSatz, 1.0, 0.0001)) {
+                umsatzMit0 += rechnung.getNettoBetrag();
+                return
+            }
+            throw new Error(rechnung.getId() + " hat keinen eindeutigen Mehrwertsteuersatz, MwSt:" + (mwstSatz - 1) * 100 + "%");
+        }
 
-            this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(mwstSummieren);
-            this.getImGeschaeftsjahrBezahlteGutschriften().forEach(mwstSummieren);
+        this.getImGeschaeftsjahrBezahlteEinnahmenRechnungen().forEach(mwstSummieren);
+        this.getImGeschaeftsjahrBezahlteGutschriften().forEach(mwstSummieren);
 
-            //Alle Buchungen für 19% Umsatzsteuer
-            let istUmsatzBuchung19 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz19);
-            istUmsatzBuchung19.setDatum(this.endOfYear());
-            istUmsatzBuchung19.setKonto(konto.Umsatz9310);
-            istUmsatzBuchung19.setBetrag(umsatzMit19);
-            istUmsatzBuchung19.setGegenkonto(konto.Umsatz9313);
-            istUmsatzBuchung19.setBezahltAm(this.endOfYear());
-            istUmsatzBuchung19.setText("bezahlter Umsatz im Geschaeftsjahr mit 19% Umsatzsteuer");
+        //Alle Buchungen für 19% Umsatzsteuer
+        let istUmsatzBuchung19 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz19);
+        istUmsatzBuchung19.setDatum(this.endOfYear());
+        istUmsatzBuchung19.setKonto(konto.Umsatz9310);
+        istUmsatzBuchung19.setBetrag(umsatzMit19);
+        istUmsatzBuchung19.setGegenkonto(konto.Umsatz9313);
+        istUmsatzBuchung19.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung19.setText("bezahlter Umsatz im Geschaeftsjahr mit 19% Umsatzsteuer");
 
-            let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt19);
-            faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
-            faelligeMehrwertsteuerUmsatzsteuer19.setKonto(konto.USt_in_Rechnunggestellt);
-            faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(faelligeUmsatzsteuer19);
-            faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto(konto.Umsatzsteuer19);
-            faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
-            faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
-
-
-            //Alle Buchungen für 16% Umsatzsteuer
-            let istUmsatzBuchung16 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz16);
-            istUmsatzBuchung16.setDatum(this.endOfYear());
-            istUmsatzBuchung16.setKonto(konto.Umsatz9310);
-            istUmsatzBuchung16.setBetrag(umsatzMit16);
-            istUmsatzBuchung16.setGegenkonto(konto.Umsatz9312);
-            istUmsatzBuchung16.setBezahltAm(this.endOfYear());
-            istUmsatzBuchung16.setText("bezahlter Umsatz im Geschaeftsjahr mit 16% Umsatzsteuer");
-
-            let faelligeMehrwertsteuerUmsatzsteuer16 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt16);
-            faelligeMehrwertsteuerUmsatzsteuer16.setDatum(this.endOfYear());
-            faelligeMehrwertsteuerUmsatzsteuer16.setKonto(konto.USt_in_Rechnunggestellt);
-            faelligeMehrwertsteuerUmsatzsteuer16.setBetrag(faelligeUmsatzsteuer16);
-            faelligeMehrwertsteuerUmsatzsteuer16.setGegenkonto(konto.Umsatzsteuer16);
-            faelligeMehrwertsteuerUmsatzsteuer16.setBezahltAm(this.endOfYear());
-            faelligeMehrwertsteuerUmsatzsteuer16.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer16");
+        let faelligeMehrwertsteuerUmsatzsteuer19 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt19);
+        faelligeMehrwertsteuerUmsatzsteuer19.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer19.setKonto(konto.USt_in_Rechnunggestellt);
+        faelligeMehrwertsteuerUmsatzsteuer19.setBetrag(faelligeUmsatzsteuer19);
+        faelligeMehrwertsteuerUmsatzsteuer19.setGegenkonto(konto.Umsatzsteuer19);
+        faelligeMehrwertsteuerUmsatzsteuer19.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer19.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer19");
 
 
+        //Alle Buchungen für 16% Umsatzsteuer
+        let istUmsatzBuchung16 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz16);
+        istUmsatzBuchung16.setDatum(this.endOfYear());
+        istUmsatzBuchung16.setKonto(konto.Umsatz9310);
+        istUmsatzBuchung16.setBetrag(umsatzMit16);
+        istUmsatzBuchung16.setGegenkonto(konto.Umsatz9312);
+        istUmsatzBuchung16.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung16.setText("bezahlter Umsatz im Geschaeftsjahr mit 16% Umsatzsteuer");
 
-            //Alle Buchungen für 0% Umsatzsteuer
-            let istUmsatzBuchung0 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz0);
-            istUmsatzBuchung0.setDatum(this.endOfYear());
-            istUmsatzBuchung0.setKonto(konto.Umsatz9310);
-            istUmsatzBuchung0.setBetrag(umsatzMit0);
-            istUmsatzBuchung0.setGegenkonto(konto.Umsatz9300);
-            istUmsatzBuchung0.setBezahltAm(this.endOfYear());
-            istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
-        
-            //Abschluss wird nur in Simba gemacht und dann importiert
-            if (this.getKonfigurationValue(office.umsatzsteuerAbschluss)==="ja")this.umsatzsteuerAbschluss(faelligeUmsatzsteuer19,faelligeUmsatzsteuer16)
+        let faelligeMehrwertsteuerUmsatzsteuer16 = this.getOrCreateUmbuchung(belegNr.mwstUStRechnungUSt16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setDatum(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer16.setKonto(konto.USt_in_Rechnunggestellt);
+        faelligeMehrwertsteuerUmsatzsteuer16.setBetrag(faelligeUmsatzsteuer16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setGegenkonto(konto.Umsatzsteuer16);
+        faelligeMehrwertsteuerUmsatzsteuer16.setBezahltAm(this.endOfYear());
+        faelligeMehrwertsteuerUmsatzsteuer16.setText("USt. in Rechnung gestellt --> wenn bezahlt --> Umsatzsteuer16");
+
+
+
+        //Alle Buchungen für 0% Umsatzsteuer
+        let istUmsatzBuchung0 = this.getOrCreateUmbuchung(belegNr.mwstIstUmsatz0);
+        istUmsatzBuchung0.setDatum(this.endOfYear());
+        istUmsatzBuchung0.setKonto(konto.Umsatz9310);
+        istUmsatzBuchung0.setBetrag(umsatzMit0);
+        istUmsatzBuchung0.setGegenkonto(konto.Umsatz9300);
+        istUmsatzBuchung0.setBezahltAm(this.endOfYear());
+        istUmsatzBuchung0.setText("bezahlter Umsatz im Geschaeftsjahr mit 0% Umsatzsteuer");
+
+        //Abschluss wird nur in Simba gemacht und dann importiert
+        if (this.getKonfigurationValue(office.umsatzsteuerAbschluss) === "ja") this.umsatzsteuerAbschluss(faelligeUmsatzsteuer19, faelligeUmsatzsteuer16)
 
     }
-    private umsatzsteuerAbschluss(fealligeUmsatzsteuer19:number,fealligeUmsatzsteuer16:number){
+    private umsatzsteuerAbschluss(fealligeUmsatzsteuer19: number, fealligeUmsatzsteuer16: number) {
         //Die folgenden Buchungen sind Buchungen, um die MWSt Konten auf 1789 "Umsatzsteuer laufendes Jahr" abzuschließen
         //Die dürfen nicht in den laufenden Buchungen für den Simba Export sein
-        
+
         let vorsteuer = 0;
         //Summe der Vorsteuer aller im Geschäftsjahr ausgestellten Ausgaben Rechnungen
         this.getAusgabenRechnungArray().forEach(ausgabe => { if (ausgabe.getDatum().getFullYear() === this.endOfYear().getFullYear()) vorsteuer += ausgabe.getMehrwertsteuer(); })
@@ -485,7 +485,7 @@ export class BusinessModel {
 
 
         //offenen Posten für die spätere Bankbuchung ans Finanzamt erstellen
-        let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstOP+this.beginOfYear().getFullYear().toString());
+        let mwstFinanzamtOP = this.getOrCreateUmbuchung(belegNr.mwstOP + this.beginOfYear().getFullYear().toString());
         mwstFinanzamtOP.setDatum(this.endOfYear());
         mwstFinanzamtOP.setKonto(konto.Umsatzsteuer_laufendes_Jahr);
         mwstFinanzamtOP.setBetrag(fealligeUmsatzsteuer19 + fealligeUmsatzsteuer16 - vorsteuer - ustva);
@@ -569,25 +569,25 @@ export class BusinessModel {
         if (this.configurationCache === undefined) this.configurationCache = new ValuesCache(ooTables.Konfiguration, this.getRootFolderId());
         return this.configurationCache;
     }*/
-    public getKonfigurationValue(key:office):any{
-        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion);
-        if (!this.valueIndex){
-            this.valueIndex={};
-            for (let index = 0; index<this.konfiguration[0].length; index++){
-                this.valueIndex[this.konfiguration[0][index][0]]=index;
+    public getKonfigurationValue(key: office): any {
+        if (!this.konfiguration) this.konfiguration = DriveConnector.getNamedRangeData(this.getRootFolderId(), ooTables.Konfiguration, currentOOversion);
+        if (!this.valueIndex) {
+            this.valueIndex = {};
+            for (let index = 0; index < this.konfiguration[0].length; index++) {
+                this.valueIndex[this.konfiguration[0][index][0]] = index;
             }
         }
         return this.konfiguration[0][this.valueIndex[key]][1];
     }
-    public setKonfigurationValue(key:office,value:any){
-        if (!this.konfiguration)this.konfiguration =  DriveConnector.getNamedRangeData( this.getRootFolderId(),ooTables.Konfiguration,currentOOversion);
-        if (!this.valueIndex){
-            this.valueIndex={};
-            for (let index = 0; index<this.konfiguration[0].length; index++){
-                this.valueIndex[this.konfiguration[0][index][0]]=index;
+    public setKonfigurationValue(key: office, value: any) {
+        if (!this.konfiguration) this.konfiguration = DriveConnector.getNamedRangeData(this.getRootFolderId(), ooTables.Konfiguration, currentOOversion);
+        if (!this.valueIndex) {
+            this.valueIndex = {};
+            for (let index = 0; index < this.konfiguration[0].length; index++) {
+                this.valueIndex[this.konfiguration[0][index][0]] = index;
             }
         }
-        this.konfiguration[0][this.valueIndex[key]][1]=value;
+        this.konfiguration[0][this.valueIndex[key]][1] = value;
     }
     public netto(brutto: number, prozent: string) {
         if (prozent == "19%") return Math.round(brutto / 1.19 * 100) / 100;
@@ -619,7 +619,7 @@ export class BusinessModel {
         if (this.gutschriftenTableCache !== undefined) this.gutschriftenTableCache.save();
         if (this.vertraegeTableCache !== undefined) this.vertraegeTableCache.save();
         if (this.normalisierteBuchungenTableCache !== undefined) this.normalisierteBuchungenTableCache.save();
-        if (this.konfiguration!==undefined)DriveConnector.saveNamedRangeData(this.getRootFolderId(), ooTables.Konfiguration, this.konfiguration[0].length,this.konfiguration[0], this.konfiguration[1], this.konfiguration[2], currentOOversion)
+        if (this.konfiguration !== undefined) DriveConnector.saveNamedRangeData(this.getRootFolderId(), ooTables.Konfiguration, this.konfiguration[0].length, this.konfiguration[0], this.konfiguration[1], this.konfiguration[2], currentOOversion)
     }
 }
 
