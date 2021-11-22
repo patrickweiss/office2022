@@ -6,7 +6,7 @@ import { formatDate } from "./rechnungSchreiben";
 
 
 export function bankbuchungenFolderScannen(rootFolderId: string, month: string) {
-    const bm = new BusinessModel(rootFolderId,"bankbuchungenFolderScannen");
+    const bm = new BusinessModel(rootFolderId, "bankbuchungenFolderScannen");
     try {
 
 
@@ -76,7 +76,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
     let konto = belegDaten[0];
-    const datenFormat = (BM.getKonfigurationValue((konto + "Is")as office) as csvTypes)
+    const datenFormat = (BM.getKonfigurationValue((konto + "Is") as office) as csvTypes)
     BM.addLogMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
     let datenString;
     if (datenFormat === csvTypes.Commerzbank || datenFormat === csvTypes.KSK) datenString = beleg.getBlob().getDataAsString("utf-8");
@@ -120,7 +120,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let letzteBuchung = BM.getBankbuchungLatest(konto);
     //durch das Array iterieren:
     let index: string = "";
-    
+
     if (letzteBuchung !== undefined) {
         //Wenn bereits Bankbuchungen importiert wurden ... erster Import im else Zweig, dort wird Anfangsbestand errechnet und ergänzt
         BM.addLogMessage("letzte Buchung Id:" + letzteBuchung.getId());
@@ -170,14 +170,21 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         //Wenn die erste Buchung aus dem Vorjahr ist, dann kann die letzte importierte Buchung nicht gefunden werden (ist im aktuellen Jahr nicht vorhanden)
         //Wenn der der Betrag stimmt, ist trotzdem alles ok
         if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) &&
-            transactionArray[transactionArray.length - 2].WertstellungsDatum.getFullYear() < geschaeftsjahr) foundFlag = true;
+            transactionArray[transactionArray.length - 2].WertstellungsDatum.getFullYear() < geschaeftsjahr) {
+            foundFlag = true;
+            //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index im eins erhöht werden
+            index = (parseInt(index) + 1).toString()
+        }
         //bei Kreditkarte zunaechst keine Prüfung auf letzte Buchung
         // if (konto==="Kreditkarte1")foundFlag=true;
 
         //Wenn die erste Buchung eine EB Buchung aus dem Vorjahr ist, dann kann diese ebenfalls nicht in den importierten Buchungen gefunden werden (es gibt dort keine EB Buchungen)
         //Wenn der Betrag stimmt, ist auch in diesem Fall alles ok
-        if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) &&  letzteBuchung.getNr()===BankEBNr) foundFlag = true;
-
+        if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) && letzteBuchung.getNr() === BankEBNr) {
+            foundFlag = true;
+            //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index im eins erhöht werden
+            index = (parseInt(index) + 1).toString()
+        }
         //falls alle Buchungen eingelesen wurden, die letzte Buchung aber nicht identifiziert werden konnte ...
         if (foundFlag === false) throw new Error(
             "Die Buchungen der CSV-Datei " + beleg.getName() +
@@ -210,11 +217,11 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         bankbuchung.setGegenkonto("Anfangsbestand");
         //Weil bei Konten die schon mal importiert wurden die letzte Buchung weggelassen wird (weil es die erste Buchung ist, bei der sich die Transaktions
         //bestände schon überschneiden) wird beim Erstimport der Index im eins erhöht um Zeile 213 zu neutralisieren
-        index=(parseInt(index)+1).toString();
+        index = (parseInt(index) + 1).toString();
     }
 
     //jetzt werden die neuen Buchungen rueckwaerts hinzugefuegt, damit die neueste Buchung am Ende oben steht
-    let elementIndex = parseInt(index)-1;//die letzte Buchung ist bereits in der Tabelle
+    let elementIndex = parseInt(index) - 1;//die letzte Buchung ist bereits in der Tabelle
     while (elementIndex >= 0) {
         let transaction: CSVTransaction = transactionArray[elementIndex];
         if (transaction.isValid) {
@@ -245,11 +252,11 @@ class CSVTransaction {
 
         if (datenFormat === csvTypes.Voba) {
             const valueDate = element[1];
-            const purpose = element[3]+" "+element[8];
+            const purpose = element[3] + " " + element[8];
             const amount = element[11];
             this.isValid = (valueDate != "" && valueDate !== "Valuta" && valueDate != undefined);
 
-            this.Betrag = parseFloat(amount.replace(".","").replace(",", "."));
+            this.Betrag = parseFloat(amount.replace(".", "").replace(",", "."));
             if (element[12] === "S") this.Betrag = -this.Betrag;
             this.Buchungstext = purpose;
             let datum = valueDate.split(".");
@@ -265,7 +272,7 @@ class CSVTransaction {
             this.isValid = (valueDate != "" && valueDate !== "Valutadatum" && valueDate != undefined);
             this.isPlanned = element[16] === "Umsatz vorgemerkt";
             if (this.isPlanned) this.isValid = false;//zweifelhafte Buchung soll einfach ignoriert werden. Geht bei KSK, weil im Endbestand sowieso nicht berücksichtigt
-            if (this.isPlanned || this.isValid) this.Betrag = parseFloat(amount.replace(".","").replace(",", "."));
+            if (this.isPlanned || this.isValid) this.Betrag = parseFloat(amount.replace(".", "").replace(",", "."));
             if (this.isValid) {
                 datumString = valueDate;
                 this.Buchungstext = element[3] + " " + purpose + " " + element[11];
@@ -276,7 +283,7 @@ class CSVTransaction {
         if (datenFormat === csvTypes.Commerzbank) {
             this.isValid = (element[1] != "" && element[1] != "Wertstellung" && element[1] != undefined);
             this.isPlanned = element[0] === "" && element[1] === "" && element[2] === "" && element[4] !== "";
-            if (this.isPlanned || this.isValid) this.Betrag = parseFloat(element[4].replace(".","").replace(",", "."));
+            if (this.isPlanned || this.isValid) this.Betrag = parseFloat(element[4].replace(".", "").replace(",", "."));
             if (this.isValid) {
                 datumString = element[1];
                 this.Buchungstext = element[3];
@@ -290,7 +297,7 @@ class CSVTransaction {
             this.isValid = (element[1] != "" && element[1] != "Kaufdatum" && element[1] != undefined && element[5] != undefined);
             this.isPlanned = false;
             if (this.isValid) {
-                this.Betrag = parseFloat(element[5].replace(".","").replace(",", "."));
+                this.Betrag = parseFloat(element[5].replace(".", "").replace(",", "."));
                 datumString = element[1];
                 if (element[6] === "S") this.Betrag = -this.Betrag;
                 this.Buchungstext = element[3];
