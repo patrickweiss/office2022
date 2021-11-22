@@ -1,5 +1,5 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { csvTypes, months, office, ServerFunction } from "../oo21lib/systemEnums";
+import { BankEBNr, csvTypes, months, office, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { CSVToArray } from "./O1";
 import { formatDate } from "./rechnungSchreiben";
@@ -173,6 +173,10 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
             transactionArray[transactionArray.length - 2].WertstellungsDatum.getFullYear() < geschaeftsjahr) foundFlag = true;
         //bei Kreditkarte zunaechst keine Prüfung auf letzte Buchung
         // if (konto==="Kreditkarte1")foundFlag=true;
+
+        //Wenn die erste Buchung eine EB Buchung aus dem Vorjahr ist, dann kann diese ebenfalls nicht in den importierten Buchungen gefunden werden (es gibt dort keine EB Buchungen)
+        //Wenn der Betrag stimmt, ist auch in diesem Fall alles ok
+        if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) &&  letzteBuchung.getNr()===BankEBNr) foundFlag = true;
 
         //falls alle Buchungen eingelesen wurden, die letzte Buchung aber nicht identifiziert werden konnte ...
         if (foundFlag === false) throw new Error(
