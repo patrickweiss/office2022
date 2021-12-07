@@ -189,7 +189,7 @@ class DriveLeaf extends OfficeLeaf.OfficeLeaf {
                         </div>;
                 else
                     driveData = <div className="LIST_ITEM">
-                        <p> In Ihrem Google Drive wurde noch kein OfficeOne.System gefunden, soll ein neues System installiert werden?</p>
+                        <p> In Ihrem Google Drive wurde noch keine OfficeOne.Team Software gefunden, soll die Software in Ihrem Google Drive installiert werden?</p>
                         <button onClick={this.handleFolderCreate} >Neuen Ordner "00 System" und neuen Ordner "2021 My Business.Office" in Goolge Drive anlegen</button>
                     </div>
             }
