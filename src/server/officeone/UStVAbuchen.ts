@@ -1,6 +1,6 @@
 import { UmbuchungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
-import { ServerFunction } from "../oo21lib/systemEnums";
+import { ServerFunction, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 
 export function UStVAbuchen(rootFolderId: string) {
     let BM = new BusinessModel(rootFolderId, "UStVAbuchen");
@@ -49,6 +49,8 @@ export function UStVAbuchen(rootFolderId: string) {
             namedRangeData: umbuchungenTableCache.getData()
         }
         BM.saveLog(ustvaUmbuchung.getId().toString());
+        UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear} ${kzperiode} Gebucht`);
+
         return JSON.stringify(result);
     }
     catch (e) {

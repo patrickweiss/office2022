@@ -1,6 +1,6 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { getTestDatum } from "../oo21lib/sendStatusMail";
-import { currentOOversion, ooTables,ServerFunction } from "../oo21lib/systemEnums";
+import { currentOOversion, ooTables,ServerFunction, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 import { DriveConnector } from "./driveconnector";
 
 
@@ -56,6 +56,7 @@ export function UStVAverschickenFromBackend(BM: BusinessModel, ustvaID: string):
   verschicktUStVA.set36(ustva.get36());
   verschicktUStVA.set83(ustva.get83());
   BM.save();
+  UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear} ${ustvaElster["zeitraum"]} Kunde`);
   return ustvaElster["zeitraum"];
 }
 
