@@ -15,9 +15,7 @@ export function getPreviousVersion() {
 
 
 export function updateDrive(rootFolderId: string) {
-  UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + rootFolderId +
-    "&email=" + Session.getActiveUser().getEmail() +
-    "&product=OfficeOne&version=Beginn_" + currentOOversion);
+  UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${rootFolderId}&email=${Session.getActiveUser().getEmail()}&product=OfficeOne&version=Beginn_${currentOOversion}`);
   let oooPreviousVersion = getPreviousVersion();
   //copy DataTable Data
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {

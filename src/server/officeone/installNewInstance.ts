@@ -23,9 +23,7 @@ export function installNewInstance(name:string) {
     const officeRootId = officeFolder.getId();
     
     //So früh wie möglich den neuen Ordner in die Subscription Tabelle eintragen, damit wenn später was schief geht eins.stein@officeone.team helfen kann
-    UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
-    "&email=" + Session.getActiveUser().getEmail() +
-    "&product=OfficeOne&version="+currentOOversion);
+    UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${officeRootId}&email=${Session.getActiveUser().getEmail()}&product=OfficeOne&version=FolderCopied_${currentOOversion}`);
   
     DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.RechnungenD, currentOOversion);
     DriveConnector.saveRootIdtoSpreadsheet(officeRootId, ooTables.AusgabenD, currentOOversion);
@@ -56,9 +54,7 @@ export function installNewInstance(name:string) {
     foldersHash[officeRootId] = { name: folder.getName().slice(0, -5), version: version, leaf: "" };
     result.newFolderId=officeRootId;
    
-    let response = UrlFetchApp.fetch(subscribeRestEndpoint + "?folderId=" + officeRootId +
-    "&email=" + Session.getActiveUser().getEmail() +
-    "&product=OfficeOne&version="+currentOOversion);
+    UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${officeRootId}&email=${Session.getActiveUser().getEmail()}&product=OfficeOne&version=${currentOOversion}`);
   
     return JSON.stringify(result);
   }
