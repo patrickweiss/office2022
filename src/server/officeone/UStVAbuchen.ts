@@ -49,7 +49,7 @@ export function UStVAbuchen(rootFolderId: string) {
             namedRangeData: umbuchungenTableCache.getData()
         }
         BM.saveLog(ustvaUmbuchung.getId().toString());
-        UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear} ${kzperiode} Gebucht`);
+        UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear()} ${kzperiode} Gebucht`);
 
         return JSON.stringify(result);
     }

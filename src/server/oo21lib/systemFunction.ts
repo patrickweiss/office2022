@@ -28,13 +28,6 @@ export function kiSwitch() {
     try {
         if (ScriptApp.getProjectTriggers().length > 0) {
             deleteTriggers();
-            const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));;
-            const data = {
-                user: Session.getEffectiveUser().getEmail(),
-                folderIds: rootFolderIds,
-                action: "deleteTrigger"
-            }
-            subscriptionPost(data);
 
             result.triggers = "0";
         }
@@ -73,6 +66,15 @@ export function deleteTriggers() {
     for (let i = 0; i < triggers.length; i++) {
         ScriptApp.deleteTrigger(triggers[i]);
     }
+    //update Trigger status in subscription
+    const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));;
+    const data = {
+        user: Session.getEffectiveUser().getEmail(),
+        folderIds: rootFolderIds,
+        action: "deleteTrigger"
+    }
+    subscriptionPost(data);
+
 }
 
 export function daily(): string[] {
