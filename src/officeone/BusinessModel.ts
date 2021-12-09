@@ -88,7 +88,7 @@ export class BusinessModel {
         const errorMail = this.getKonfigurationValue(office.fehlerEmail);
         if (errorMail != "") {
             try {
-                GmailApp.sendEmail(errorMail, "Fehler bei " + this.logMessage.split("\n")[0], this.logMessage + "\n" + error.stack);
+                GmailApp.sendEmail(errorMail, `Fehler bei ${this.rootFolderId} ${this.logMessage.split("\n")[0]}`, this.logMessage + "\n" + error.stack);
             } catch (e) { this.addLogMessage("ungültige fehlerEmail, keine gültige Email Adresse") }
         }
         this.saveLog(error.stack);

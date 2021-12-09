@@ -56,7 +56,7 @@ export function UStVAverschickenFromBackend(BM: BusinessModel, ustvaID: string):
   verschicktUStVA.set36(ustva.get36());
   verschicktUStVA.set83(ustva.get83());
   BM.save();
-  UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear} ${ustvaElster["zeitraum"]} Kunde`);
+  UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear()} ${ustvaElster["zeitraum"]} Kunde`);
   return ustvaElster["zeitraum"];
 }
 

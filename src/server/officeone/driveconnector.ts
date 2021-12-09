@@ -185,7 +185,9 @@ export class DriveConnector {
       }
       return spreadsheet as GoogleAppsScript.Spreadsheet.Spreadsheet;
     } catch (e) {
-      return SpreadsheetApp.getActive();
+      const activeSpreadsheet =  SpreadsheetApp.getActive();
+      if (!activeSpreadsheet)throw e
+      return activeSpreadsheet;
     }
   }
   private static copyAndInitializeSpreadsheet(rangeName: string, version: string, spreadsheetFolder: GoogleAppsScript.Drive.Folder) {
