@@ -19,6 +19,13 @@ export function yearly() {
     return true;
 }
 
+interface ITriggerPost{
+    user:string,
+    folderIds:string[],
+    folderNames:string[],
+    action:string
+}
+
 //Wenn ein Trigger installiert ist, dann alle Trigger löschen
 //Wenn nicht, dann um Mitternacht die Funktion "daily" triggern
 export function kiSwitch() {
@@ -41,7 +48,7 @@ export function kiSwitch() {
             installTrigger();
             // Make a POST request with a JSON payload.
 
-            const data = {
+            const data:ITriggerPost = {
                 user: Session.getEffectiveUser().getEmail(),
                 folderIds: rootFolderIds,
                 folderNames: rootFolderNames,
@@ -78,9 +85,10 @@ export function deleteTriggers() {
     rootFolderIds.forEach((folderId:string) => {
         rootFolderNames.push(DriveApp.getFolderById(folderId).getName())
     })
-    const data = {
+    const data:ITriggerPost = {
         user: Session.getEffectiveUser().getEmail(),
         folderIds: rootFolderIds,
+        folderNames: rootFolderNames,
         action: "deleteTrigger"
     }
     subscriptionPost(data);
@@ -139,7 +147,7 @@ function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
 }
 
 
-function subscriptionPost(data) {
+function subscriptionPost(data:ITriggerPost) {
     var options = {
         'method': 'post',
         'contentType': 'application/json',
