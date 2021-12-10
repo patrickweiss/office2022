@@ -73,7 +73,11 @@ export function deleteTriggers() {
         ScriptApp.deleteTrigger(triggers[i]);
     }
     //update Trigger status in subscription
-    const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));;
+    const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));
+    const rootFolderNames:string[]=new Array<string>();
+    rootFolderIds.forEach((folderId:string) => {
+        rootFolderNames.push(DriveApp.getFolderById(folderId).getName())
+    })
     const data = {
         user: Session.getEffectiveUser().getEmail(),
         folderIds: rootFolderIds,
