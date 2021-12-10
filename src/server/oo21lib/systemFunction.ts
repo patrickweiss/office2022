@@ -5,6 +5,7 @@ import { getSystemFolderIds } from "../officeone/directDriveConnector";
 import { currentOOversion, ServerFunction, subscribeRestEndpoint } from "./systemEnums";
 import { getPreviousVersion, updateDrive } from "../officeone/updateDrive";
 import { BusinessModel } from "../../officeone/BusinessModel";
+import { string } from "prop-types";
 
 
 
@@ -33,12 +34,17 @@ export function kiSwitch() {
         }
         else {
             const rootFolderIds = daily();
+            const rootFolderNames:string[]=new Array<string>();
+            rootFolderIds.forEach((folderId:string) => {
+                rootFolderNames.push(DriveApp.getFolderById(folderId).getName())
+            })
             installTrigger();
             // Make a POST request with a JSON payload.
 
             const data = {
                 user: Session.getEffectiveUser().getEmail(),
                 folderIds: rootFolderIds,
+                folderNames: rootFolderNames,
                 action: "installTrigger"
             }
             subscriptionPost(data);
