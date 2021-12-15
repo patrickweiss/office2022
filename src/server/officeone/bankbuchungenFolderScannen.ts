@@ -2,7 +2,7 @@ import { BusinessModel } from "../../officeone/BusinessModel";
 import { BankEBNr, csvTypes, months, office, ServerFunction } from "../oo21lib/systemEnums";
 import { getOrCreateFolder } from "./directDriveConnector";
 import { CSVToArray } from "./O1";
-import { formatDate } from "./rechnungSchreiben";
+import { formatDate, formatMoney } from "./rechnungSchreiben";
 
 
 export function bankbuchungenFolderScannen(rootFolderId: string, month: string) {
@@ -186,11 +186,12 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
             index = (parseInt(index) + 1).toString()
         }
         //falls alle Buchungen eingelesen wurden, die letzte Buchung aber nicht identifiziert werden konnte ...
-        if (foundFlag === false) throw new Error(
-            "Die Buchungen der CSV-Datei " + beleg.getName() +
-            "führen nicht zum Endbestand von " + neuerBankbestand +
-            "sondern: " + aktuellerBankbestand +
-            "Geschäftsjahr" + geschaeftsjahr);
+        if (foundFlag === false){
+
+            if (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001)throw new Error(
+                `Die Buchungen der CSV-Datei ${beleg.getName()} führen zwar zum Endbestand von ${formatMoney(neuerBankbestand)}, aber die letzte Bankbuchung aus dem vorigen Import wurde nicht gefunden. \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt` );
+                else  throw new Error(`Die Buchungen der CSV-Datei ${beleg.getName()} führen nicht zum Endbestand von ${formatMoney(neuerBankbestand)} sondern ${formatMoney(aktuellerBankbestand)} Geschäftsjahr: ${geschaeftsjahr} \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt` );
+        }
     } else {
         //Dieses Konto wurde noch nie importiert
         //Die erste Buchung erfolgt daher mit dem aus dem Endbestand berechneten Anfangsbestand
