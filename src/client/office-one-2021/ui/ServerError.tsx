@@ -20,10 +20,12 @@ class ServerError extends OfficeLeaf.OfficeLeaf {
     return (
       <div>
       <h1>Server Error</h1>
-       <p>{this.getUIState().error}</p>
+       {(this.getUIState().error as string).split("\n").map( text => <p>{text}</p>)}
       </div>
     );
-
+  }
+  private renderParagraph(text:string){
+    return (<p>{text}</p>)
   }
 }
 

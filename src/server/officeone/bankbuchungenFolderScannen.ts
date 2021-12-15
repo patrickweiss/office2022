@@ -71,20 +71,20 @@ function gehaltsbuchungenImportieren(beleg, BM: BusinessModel): void {
 
 function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: BusinessModel, monthFolder: GoogleAppsScript.Drive.Folder): void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
-    BM.addLogMessage("Geschäftsjahr:" + geschaeftsjahr);
+    BM.addLogMessage(`Geschäftsjahr: ${geschaeftsjahr}`);
 
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
     let konto = belegDaten[0];
     const datenFormat = (BM.getKonfigurationValue((konto + "Is") as office) as csvTypes)
-    BM.addLogMessage("bankbuchungenImportieren:" + beleg.getName() + " " + datenFormat);
+    BM.addLogMessage(`bankbuchungenImportieren: ${beleg.getName()} ${datenFormat}`);
     let datenString;
     if (datenFormat === csvTypes.Commerzbank || datenFormat === csvTypes.KSK) datenString = beleg.getBlob().getDataAsString("utf-8");
     else datenString = beleg.getBlob().getDataAsString("ISO-8859-1");
     let neuerBankbestand = parseFloat(beleg.getName().split(" ")[1].replace(".", "").replace(",", "."));
     let alterBankbestand = BM.getBankbestand(konto);
     let aktuellerBankbestand = alterBankbestand;
-    BM.addLogMessage("alter Bankbestand:" + alterBankbestand);
+    BM.addLogMessage(`alter Bankbestand: ${formatMoney(alterBankbestand)}`);
 
     if (datenFormat === csvTypes.Voba) {
         //die ersten 12 Zeilen wegwerfen
@@ -123,7 +123,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
 
     if (letzteBuchung !== undefined) {
         //Wenn bereits Bankbuchungen importiert wurden ... erster Import im else Zweig, dort wird Anfangsbestand errechnet und ergänzt
-        BM.addLogMessage("letzte Buchung Id:" + letzteBuchung.getId());
+        BM.addLogMessage(`letzte Buchung Id: ${letzteBuchung.getId()} am ${formatDate(letzteBuchung.getDatum())}`);
         let foundFlag = false;
         for (index in transactionArray) {
             let transaction: CSVTransaction = transactionArray[index];
