@@ -355,13 +355,13 @@ function AnfangsbestandBankkontenAktualisieren(BMlastYear: BusinessModel, BMnow:
   const bankkonten = BMlastYear.getKontenArray().filter(konto => konto.isBankkonto() && !konto.isDatenschluerferKonto());
   bankkonten.forEach(bankkonto => {
     const bestand = BMlastYear.getBankbestand(bankkonto.getKonto());
-    const ebBuchung = BMnow.getOrCreateBankbuchung("EB" + bankkonto.getKonto() + BMnow.endOfYear().getFullYear().toString());
+    const ebBuchung = BMnow.getOrCreateBankbuchung(`Ba${BMnow.endOfYear().getFullYear().toString()}EB${bankkonto.getKonto()}`);
     ebBuchung.setKonto(bankkonto.getKonto());
     ebBuchung.setNr("EB");
     ebBuchung.setDatum(BMlastYear.endOfYear());
     ebBuchung.setBetrag(bestand);
     ebBuchung.setText("Anfangsbestand aus den Vorjahren");
-    ebBuchung.setBelegID("EB" + bankkonto.getKonto() + BMnow.endOfYear().getFullYear().toString());
+    ebBuchung.setBelegID(`Ba${BMnow.endOfYear().getFullYear().toString()}EB${bankkonto.getKonto()}`);
     ebBuchung.setGegenkonto("Bankbestand Vorjahre");
   })
 }

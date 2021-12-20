@@ -71,13 +71,6 @@ export class BusinessModel {
         this.rootFolderId = rootfolderId;
         this.logMessage = `${developmentYear}.${currentOOversion}.${codeVersion}:${functionName}`;
         this.beginBM = new Date();
-        try {
-            this.userLock = LockService.getUserLock();
-            this.userLock.waitLock(1000);
-        } catch (e) {
-            this.saveError(e);
-            throw e;
-        }
     }
 
     public addLogMessage(message: string) {
