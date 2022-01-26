@@ -230,7 +230,11 @@ export function formatMoney(betrag: any) {
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(betrag);
 }
 export function formatDate(date: Date) {
+  try{
   return new Intl.DateTimeFormat("de-DE").format(date);
+  }catch(e){
+    return "unbekannt"
+  }
 }
 export function formatPercent(number:number){
   return (number*100).toFixed(0)+" %";

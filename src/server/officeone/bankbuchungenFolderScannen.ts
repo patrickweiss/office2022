@@ -73,6 +73,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     BM.addLogMessage(`Geschäftsjahr: ${geschaeftsjahr}`);
     let errorLog = "Transaktionen:\n";
+    let indexErsteBuchungImGeschäftsjahr = "0";
 
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
@@ -170,6 +171,7 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                 }
             }
             aktuellerBankbestand += betrag;
+            if (transaction.WertstellungsDatum.getFullYear()===geschaeftsjahr)indexErsteBuchungImGeschäftsjahr=index;
             errorLog += `\n${index}\t${formatDate(transaction.WertstellungsDatum)}\t${foundFlag}\t${formatMoney(transaction.Betrag)}\t${aktuellerBankbestand}`;
 
         }
@@ -178,10 +180,10 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
         BM.addLogMessage(formatMoney(aktuellerBankbestand - neuerBankbestand));
 
         if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) &&
-            transactionArray[transactionArray.length - 2].WertstellungsDatum.getFullYear() < geschaeftsjahr) {
+            transactionArray[transactionArray.length - 1].WertstellungsDatum.getFullYear() < geschaeftsjahr) {
             foundFlag = true;
             //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index um eins erhöht werden
-            index = (parseInt(index) + 1).toString()
+            index = (parseInt(indexErsteBuchungImGeschäftsjahr) + 1).toString()
             BM.addLogMessage("Transaktion im Vorjahr:" + index + " " + JSON.stringify(transactionArray[index]))
         }
         //bei Kreditkarte zunaechst keine Prüfung auf letzte Buchung
