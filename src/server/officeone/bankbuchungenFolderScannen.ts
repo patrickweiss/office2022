@@ -72,6 +72,7 @@ function gehaltsbuchungenImportieren(beleg, BM: BusinessModel): void {
 function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: BusinessModel, monthFolder: GoogleAppsScript.Drive.Folder): void {
     let geschaeftsjahr = BM.endOfYear().getFullYear();
     BM.addLogMessage(`Geschäftsjahr: ${geschaeftsjahr}`);
+    let errorLog = "Transaktionen:\n";
 
     let belegDaten = beleg.getName().split(" ");
     if (belegDaten[0] === "✔") return;
@@ -113,9 +114,12 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
     saveDataArray(`Transaktionsdaten: ${beleg.getName()}`, transaction2dArray, importDataFolder);
     //Rausfinden bis zu welcher Buchung importiert werden muss. 
     //1. Bedingung: neuer Bankbestand stimmt
-    //2. Bedingung: die nächste Buchung, welche nach der Buchung kommt nach der der Bankbestand stimmt, muss schon vorhanden sein
-    //Vorsicht: damit ist nur ziemlich sicher, aber nicht 100% sicher, dass alle neuen Buchungen importiert wurden! 
-    //Aus reinem Zufall kann es immer sein, dass der Bankbestand stimmt und an demselben Tag können 2 Buchungen komplett identisch sein!!! 
+    //2. Bedingung:
+    //  die nächste Buchung, welche nach der Buchung kommt nach der der Bankbestand stimmt, muss schon vorhanden sein
+    //  Vorsicht: damit ist nur ziemlich sicher, aber nicht 100% sicher, dass alle neuen Buchungen importiert wurden! 
+    //  Aus reinem Zufall kann es immer sein, dass der Bankbestand stimmt und an demselben Tag können 2 Buchungen komplett identisch sein!!! 
+    //oder
+    //  die nächste Buchung ist im Vorjahr
 
     let letzteBuchung = BM.getBankbuchungLatest(konto);
     //durch das Array iterieren:
@@ -166,14 +170,19 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
                 }
             }
             aktuellerBankbestand += betrag;
+            errorLog += `\n${index}\t${formatDate(transaction.WertstellungsDatum)}\t${foundFlag}\t${formatMoney(transaction.Betrag)}\t${aktuellerBankbestand}`;
+
         }
         //Wenn die erste Buchung aus dem Vorjahr ist, dann kann die letzte importierte Buchung nicht gefunden werden (ist im aktuellen Jahr nicht vorhanden)
         //Wenn der der Betrag stimmt, ist trotzdem alles ok
+        BM.addLogMessage(formatMoney(aktuellerBankbestand - neuerBankbestand));
+
         if ((Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001) &&
             transactionArray[transactionArray.length - 2].WertstellungsDatum.getFullYear() < geschaeftsjahr) {
             foundFlag = true;
-            //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index im eins erhöht werden
+            //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index um eins erhöht werden
             index = (parseInt(index) + 1).toString()
+            BM.addLogMessage("Transaktion im Vorjahr:" + index + " " + JSON.stringify(transactionArray[index]))
         }
         //bei Kreditkarte zunaechst keine Prüfung auf letzte Buchung
         // if (konto==="Kreditkarte1")foundFlag=true;
@@ -184,17 +193,18 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
             foundFlag = true;
             //später wird davon ausgegangen, dass der Index auf die erste bereits importierte Buchung zeigt, weil dies in diesem Fall nicht so ist, muss der Index im eins erhöht werden
             index = (parseInt(index) + 1).toString()
+            BM.addLogMessage("neueste OO Buchung EB aus Vorjahr:" + index + " " + JSON.stringify(transactionArray[index]))
         }
         //falls alle Buchungen eingelesen wurden, die letzte Buchung aber nicht identifiziert werden konnte ...
-        if (foundFlag === false){
-
-            if (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001)throw new Error(
-                `Die Buchungen der CSV-Datei ${beleg.getName()} führen zwar zum Endbestand von ${formatMoney(neuerBankbestand)}, aber die letzte Bankbuchung aus dem vorigen Import wurde nicht gefunden. \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt` );
-                else  throw new Error(`Die Buchungen der CSV-Datei ${beleg.getName()} führen nicht zum Endbestand von ${formatMoney(neuerBankbestand)} sondern ${formatMoney(aktuellerBankbestand)} Geschäftsjahr: ${geschaeftsjahr} \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt` );
+        if (foundFlag === false) {
+            BM.addLogMessage(errorLog);
+            if (Math.abs(aktuellerBankbestand - neuerBankbestand) < 0.0001)
+                throw new Error(
+                    `Die Buchungen der CSV-Datei ${beleg.getName()} führen zwar zum Endbestand von ${formatMoney(neuerBankbestand)}, aber die letzte Bankbuchung aus dem vorigen Import wurde nicht gefunden. \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt`);
+            else throw new Error(`Die Buchungen der CSV-Datei ${beleg.getName()} führen nicht zum Endbestand von ${formatMoney(neuerBankbestand)} sondern ${formatMoney(aktuellerBankbestand)} Geschäftsjahr: ${geschaeftsjahr} \nBitte stellen Sie sicher, dass das Beginndatum des neuen Imports mindestens einen Tag VOR dem Datum der letzten bereits importierten Bankbuchung in Tabelle "3 Bankbuchungen zuordnen" Sheet "Bankbuchungen" liegt`);
         }
     } else {
-        //Dieses Konto wurde noch nie importiert
-        //Die erste Buchung erfolgt daher mit dem aus dem Endbestand berechneten Anfangsbestand
+        BM.addLogMessage("Dieses Konto wurde noch nie importiert, die erste Buchung erfolgt daher mit dem aus dem Endbestand berechneten Anfangsbestand ")
         let anfangsbestand = neuerBankbestand;
         let erstesDatum;
         for (index in transactionArray) {
@@ -223,21 +233,27 @@ function bankbuchungenImportieren(beleg: GoogleAppsScript.Drive.File, BM: Busine
 
     //jetzt werden die neuen Buchungen rueckwaerts hinzugefuegt, damit die neueste Buchung am Ende oben steht
     let elementIndex = parseInt(index) - 1;//die letzte Buchung ist bereits in der Tabelle
-    while (elementIndex >= 0) {
-        let transaction: CSVTransaction = transactionArray[elementIndex];
-        if (transaction.isValid) {
-            var datumNeu = transaction.WertstellungsDatum;
-            let bankbuchung = BM.createBankbuchung();
-            bankbuchung.setKonto(konto);
-            bankbuchung.setNr(new Date().toISOString());
-            bankbuchung.setDatum(datumNeu);
-            bankbuchung.setBetrag(transaction.Betrag);
-            bankbuchung.setText(transaction.Buchungstext);
-            bankbuchung.setGegenkontoBank("");
+    try {
+        while (elementIndex >= 0) {
+            let transaction: CSVTransaction = transactionArray[elementIndex];
+            BM.addLogMessage(`${elementIndex} ${JSON.stringify(transaction)}`)
+            if (transaction.isValid) {
+                var datumNeu = transaction.WertstellungsDatum;
+                let bankbuchung = BM.createBankbuchung();
+                bankbuchung.setKonto(konto);
+                bankbuchung.setNr(new Date().toISOString());
+                bankbuchung.setDatum(datumNeu);
+                bankbuchung.setBetrag(transaction.Betrag);
+                bankbuchung.setText(transaction.Buchungstext);
+                bankbuchung.setGegenkontoBank("");
+            }
+            elementIndex--;
         }
-        elementIndex--;
+        beleg.setName("✔_" + beleg.getName());
+    } catch (e) {
+        BM.addLogMessage(errorLog);
+        throw e;
     }
-    beleg.setName("✔_" + beleg.getName());
 }
 
 class CSVTransaction {
