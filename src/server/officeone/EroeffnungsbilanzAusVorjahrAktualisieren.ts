@@ -130,11 +130,11 @@ function OffenePostenUndKorrekturAusVorjahrAktualisieren(BMlastYear: BusinessMod
 
 function AnfangsbestaendeVonBilanzkontenAktualisieren(BMlastYear: BusinessModel, BMnow: BusinessModel) {
   BMlastYear.getBilanzkontenArray().forEach(bestandsKonto => {
-    if (!bestandsKonto.isDatenschluerferKonto() && !bestandsKonto.isBankkonto() && bestandsKonto.getSumme() != 0) {
+    if (!bestandsKonto.isDatenschluerferKonto() && !bestandsKonto.isBankkonto()) {
       var anfangsbestandsbuchung = BMnow.getOrCreateUmbuchung("UmEB" + bestandsKonto.getId().toString().replace(/ /g, "-"));
       anfangsbestandsbuchung.setDatum(BMlastYear.endOfYear());
       anfangsbestandsbuchung.setKonto("Geld Vorjahre");
-      anfangsbestandsbuchung.setBetrag(bestandsKonto.getSumme());
+      anfangsbestandsbuchung.setBetrag(anfangsbestand(bestandsKonto.getSumme()));
       anfangsbestandsbuchung.setGegenkonto(bestandsKonto.getId());
       if (anfangsbestandsbuchung.getGegenkonto()===konto.Umsatzsteuerforderungen)anfangsbestandsbuchung.setGegenkonto(konto.Umsatzsteuer_Vorjahr)
       anfangsbestandsbuchung.setBezahltAm(BMlastYear.endOfYear());
@@ -372,5 +372,10 @@ function createObjectArray(anlagenArray: Konto[]) {
     result.push(anlagenArray[index].getKonto());
   }
   return result;
+}
+
+function anfangsbestand(bestand:any){
+const bestandNumber = parseFloat(bestand);
+if (isNaN(bestandNumber))return 0; else return bestandNumber;
 }
 
