@@ -6,6 +6,7 @@ import { currentOOversion, ServerFunction, subscribeRestEndpoint } from "./syste
 import { getPreviousVersion, updateDrive } from "../officeone/updateDrive";
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { string } from "prop-types";
+import { UStVAbuchenBM } from "../officeone/UStVAbuchen";
 
 
 
@@ -106,6 +107,8 @@ export function daily(): string[] {
                 alleAusgabenFolderScannen(bmServer);
                 bmServer.addLogMessage("alle Gutschriften Ordner scannen")
                 alleGutschriftenFolderScannen(bmServer);
+                bmServer.addLogMessage("E-Mail nach UStVA Beleg scannen");
+                UStVAbuchenBM(bmServer);
                 bmServer.kontoSummenAktualisieren();
                 bmServer.save();
                 //wenn neue Belege gefunden wurden, Mail schicken

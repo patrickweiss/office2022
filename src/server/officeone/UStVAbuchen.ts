@@ -2,8 +2,8 @@ import { UmbuchungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { ServerFunction, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 
-export function UStVAbuchen(rootFolderId: string) {
-    let BM = new BusinessModel(rootFolderId, "UStVAbuchen");
+
+export function UStVAbuchenBM(BM:BusinessModel):string{
     try {
 
         const mail = searchUStVABeleg()[0];
@@ -56,6 +56,12 @@ export function UStVAbuchen(rootFolderId: string) {
     catch (e) {
         return BM.saveError(e)
     }
+
+}
+
+export function UStVAbuchen(rootFolderId: string):string {
+    let BM = new BusinessModel(rootFolderId, "UStVAbuchen");
+    return UStVAbuchenBM(BM);
 }
 
 const UStVA_Beleg_PROCESSED_LABEL = "UStVA gebucht";
