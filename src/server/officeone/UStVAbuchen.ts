@@ -32,7 +32,7 @@ export function UStVAbuchenBM(BM:BusinessModel):string{
         }
         const periode = kzMonatMapping[kzperiode];
 
-        const umbuchungenTableCache = new UmbuchungenTableCache(rootFolderId);
+        const umbuchungenTableCache = new UmbuchungenTableCache(BM.getRootFolderId());
 
         const ustvaUmbuchung = umbuchungenTableCache.getOrCreateRowById("Um" + jahr + "UStVA" + kzperiode);
 
@@ -69,7 +69,7 @@ const UStVA_Beleg_PROCESSED_LABEL = "UStVA gebucht";
 function searchUStVABeleg(): GoogleAppsScript.Gmail.GmailThread[] {
     let SEARCH_FROM_EMAIL = "patrick.sbrzesny@saw-office.net";
     let SEARCH_SUBJECT = "UStVA Elster Beleg";
-    var SEARCH_STRING = `from:${SEARCH_FROM_EMAIL} AND (subject:"${SEARCH_SUBJECT}") AND NOT (label:"${UStVA_Beleg_PROCESSED_LABEL}")`;
+    var SEARCH_STRING = `in:inbox from:${SEARCH_FROM_EMAIL} AND (subject:"${SEARCH_SUBJECT}") AND NOT (label:"${UStVA_Beleg_PROCESSED_LABEL}")`;
 
 
     return GmailApp.search(SEARCH_STRING);
