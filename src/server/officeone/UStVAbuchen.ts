@@ -3,53 +3,54 @@ import { BusinessModel } from "../../officeone/BusinessModel";
 import { ServerFunction, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 
 
-export function UStVAbuchenBM(BM:BusinessModel):string{
+export function UStVAbuchenBM(BM: BusinessModel): string {
     try {
 
         const mail = searchUStVABeleg()[0];
-        markUStVABelegProcessed(mail);
-        const belegDaten = mail.getMessages()[0].getBody();
-        const subjectArray = mail.getMessages()[0].getSubject().split(" ");
-        const jahr = subjectArray[3];
-        const kzperiode = subjectArray[4];
-        const kzMonatMapping = {
-            "01": 1,
-            "02": 2,
-            "03": 3,
-            "04": 4,
-            "05": 5,
-            "06": 6,
-            "07": 7,
-            "08": 8,
-            "09": 9,
-            "10": 10,
-            "11": 11,
-            "12": 12,
-            "41": 3,
-            "42": 6,
-            "43": 9,
-            "44": 12
-        }
-        const periode = kzMonatMapping[kzperiode];
-
         const umbuchungenTableCache = new UmbuchungenTableCache(BM.getRootFolderId());
+        if (mail != null) {
+            markUStVABelegProcessed(mail);
+            const belegDaten = mail.getMessages()[0].getBody();
+            const subjectArray = mail.getMessages()[0].getSubject().split(" ");
+            const jahr = subjectArray[3];
+            const kzperiode = subjectArray[4];
+            const kzMonatMapping = {
+                "01": 1,
+                "02": 2,
+                "03": 3,
+                "04": 4,
+                "05": 5,
+                "06": 6,
+                "07": 7,
+                "08": 8,
+                "09": 9,
+                "10": 10,
+                "11": 11,
+                "12": 12,
+                "41": 3,
+                "42": 6,
+                "43": 9,
+                "44": 12
+            }
+            const periode = kzMonatMapping[kzperiode];
 
-        const ustvaUmbuchung = umbuchungenTableCache.getOrCreateRowById("Um" + jahr + "UStVA" + kzperiode);
+        
+            const ustvaUmbuchung = umbuchungenTableCache.getOrCreateRowById("Um" + jahr + "UStVA" + kzperiode);
 
-        ustvaUmbuchung.setDatum(new Date(parseInt(jahr, 10), parseInt(periode, 10) - 1));
-        ustvaUmbuchung.setKonto("UStVA");
-        ustvaUmbuchung.setGegenkonto("Verbindlichkeiten UStVA");
-        ustvaUmbuchung.setText(belegDaten);
-        ustvaUmbuchung.setBetrag(parseKz83FromUStVA(belegDaten));
-        umbuchungenTableCache.save();
-
+            ustvaUmbuchung.setDatum(new Date(parseInt(jahr, 10), parseInt(periode, 10) - 1));
+            ustvaUmbuchung.setKonto("UStVA");
+            ustvaUmbuchung.setGegenkonto("Verbindlichkeiten UStVA");
+            ustvaUmbuchung.setText(belegDaten);
+            ustvaUmbuchung.setBetrag(parseKz83FromUStVA(belegDaten));
+            umbuchungenTableCache.save();
+            BM.saveLog(ustvaUmbuchung.getId().toString());
+            UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear()} ${kzperiode} Gebucht`);
+        }
         var result = {
             serverFunction: ServerFunction.getNamedRangeData,
             rangeName: "UmbuchungenD",
             namedRangeData: umbuchungenTableCache.getData()
         }
-        BM.saveLog(ustvaUmbuchung.getId().toString());
-        UrlFetchApp.fetch(`${subscribeRestEndpoint}?folderId=${BM.getRootFolderId()}&Status=${BM.beginOfYear().getFullYear()} ${kzperiode} Gebucht`);
 
         return JSON.stringify(result);
     }
@@ -59,7 +60,7 @@ export function UStVAbuchenBM(BM:BusinessModel):string{
 
 }
 
-export function UStVAbuchen(rootFolderId: string):string {
+export function UStVAbuchen(rootFolderId: string): string {
     let BM = new BusinessModel(rootFolderId, "UStVAbuchen");
     return UStVAbuchenBM(BM);
 }
