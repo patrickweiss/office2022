@@ -1,4 +1,4 @@
-import { currentOOversion, office, ooFolders, ooTables, systemMasterProperty } from "../oo21lib/systemEnums";
+import { currentOOversion, office, ooFolders, ooTables, ooVersions, systemMasterProperty } from "../oo21lib/systemEnums";
 import { getDevOpsFolder } from "./newOfficeOneVersion";
 
 
@@ -78,7 +78,7 @@ export class DriveConnector {
       Rechnungsvorlagelink: "1 Rechnung schreiben"
     }
   }
-  public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: ooTables, version: string) {
+  public static saveRootIdtoSpreadsheet(rootFolderId: string, rangeName: ooTables, version: ooVersions) {
     //rootID in spreadsheet
     const spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     spreadsheet.getRangeByName(ooTables.OfficeRootID).getCell(1, 1).setValue(rootFolderId);
@@ -97,20 +97,20 @@ export class DriveConnector {
 
 
   //alte Funktionen, alle mit rootFolderId und Version
-  static getNamedRangeData(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][]] {
+  static getNamedRangeData(rootFolderId: string, rangeName: ooTables, version: ooVersions): [Object[][], string[][], string[][]] {
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     return [spreadsheet.getRangeByName(rangeName).getValues(),
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1()];
   }
-  static getNamedRangeDataAndFormat(rootFolderId: string, rangeName: ooTables, version: string): [Object[][], string[][], string[][], string[][]] {
+  static getNamedRangeDataAndFormat(rootFolderId: string, rangeName: ooTables, version: ooVersions): [Object[][], string[][], string[][], string[][]] {
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     return [spreadsheet.getRangeByName(rangeName).getValues(),
     spreadsheet.getRangeByName(rangeName).getBackgrounds(),
     spreadsheet.getRangeByName(rangeName).getFormulasR1C1(),
     spreadsheet.getRangeByName(rangeName).getNumberFormats()];
   }
-  static getValueByName(rootFolderId: string, rangeName: ooTables, version: string) {
+  static getValueByName(rootFolderId: string, rangeName: ooTables, version: ooVersions) {
     let value = this.rangeValues[rootFolderId + rangeName + version];
     if (value === undefined) {
       value = this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).getFormula();
@@ -119,16 +119,16 @@ export class DriveConnector {
     }
     return value;
   }
-  static saveValueByName(rootFolderId: string, rangeName: ooTables, version: string, value: any) {
+  static saveValueByName(rootFolderId: string, rangeName: ooTables, version: ooVersions, value: any) {
     this.rangeValues[rootFolderId + rangeName + version] = value
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setValue(value);
     SpreadsheetApp.flush()
   }
-  static saveFormulaByName(rootFolderId: string, rangeName: ooTables, version: string, value: any) {
+  static saveFormulaByName(rootFolderId: string, rangeName: ooTables, version: ooVersions, value: any) {
     this.getSpreadsheet(rootFolderId, rangeName, version).getRangeByName(rangeName).setFormula(value);
     SpreadsheetApp.flush()
   }
-  static saveNamedRangeData(rootFolderId: string, rangeName: ooTables, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: string) {
+  static saveNamedRangeData(rootFolderId: string, rangeName: ooTables, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: ooVersions) {
     var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
     let dataRange = spreadsheet.getRangeByName(rangeName);
     // wenn nötig Zeilen einfügen oder löschen
@@ -165,7 +165,7 @@ export class DriveConnector {
     dataRange.setBackgrounds(backgroundArray).setBorder(true, true, true, true, true, true, "#b7b7b7", SpreadsheetApp.BorderStyle.SOLID);
     SpreadsheetApp.flush();
   }
-  public static getSpreadsheet(rootFolderId: string, rangeName: ooTables, version: string) {
+  public static getSpreadsheet(rootFolderId: string, rangeName: ooTables, version: ooVersions) {
     try {
       let spreadsheetFolder: GoogleAppsScript.Drive.Folder = this.driveFolders[rootFolderId];
       if (spreadsheetFolder === undefined) {
@@ -190,7 +190,7 @@ export class DriveConnector {
       return activeSpreadsheet;
     }
   }
-  private static copyAndInitializeSpreadsheet(rangeName: string, version: string, spreadsheetFolder: GoogleAppsScript.Drive.Folder) {
+  private static copyAndInitializeSpreadsheet(rangeName: string, version: ooVersions, spreadsheetFolder: GoogleAppsScript.Drive.Folder) {
     //throw new Error("Update needed to Version: "+oooVersion); 
     const masterId = this.getMasterFileID(rangeName, version);
     const masterSpreadsheet = SpreadsheetApp.openById(masterId);
@@ -203,13 +203,13 @@ export class DriveConnector {
   }
 
   //alte Konfiguration
-  static getRangeFileName(rangeName: string, version: string) {
+  static getRangeFileName(rangeName: string, version: ooVersions) {
     let fileName = DriveConnector.oooVersionsRangeFileMap[version][rangeName];
     if (fileName === undefined) fileName = DriveConnector.oooVersionValueFileMap[version][rangeName];
     if (fileName === undefined) throw new Error("Range:" + rangeName + " is not defined in DriveConnector");
     return fileName + " - Version:" + version;
   }
-  static getMasterFileID(rangeName: string, version: string) {
+  static getMasterFileID(rangeName: string, version: ooVersions) {
     const masterFolder = DriveApp.getFolderById(systemMasterProperty.officeOne2022_TemplateFolderId);
     const fileName = this.getRangeFileName(rangeName, version)
     masterFolder.getFilesByName(fileName).next().getId()

@@ -1,5 +1,5 @@
 import { TableCache, TableRow } from "../../officeone/BusinessDataFacade";
-import { currentOOversion, ooTables, subscribeRestEndpoint } from "../oo21lib/systemEnums";
+import { currentOOversion, ooTables, ooVersions, subscribeRestEndpoint } from "../oo21lib/systemEnums";
 import { getOrCreateFolder, getOrCreateOfficeOneFolders } from "./directDriveConnector";
 import { DriveConnector } from "./driveconnector";
 
@@ -10,7 +10,7 @@ export function getPreviousVersion() {
     nix += "0";
   }
   oooPreviousVersion = nix + oooPreviousVersion;
-  return oooPreviousVersion;
+  return oooPreviousVersion as ooVersions;
 }
 
 

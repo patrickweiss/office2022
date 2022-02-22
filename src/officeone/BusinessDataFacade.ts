@@ -176,13 +176,16 @@ export class TableRow {
     this.backgroundRow = backgroundRow
     this.columnIndex = columnIndex
   }
-  public getId() { return this.getDataArray()[0].toString(); }
-  public setId(value: string) { this.getDataArray()[0] = value; }
+  public getId() { return this.getValueArray()[0].toString(); }
+  public setId(value: string) { this.getValueArray()[0] = value; }
   public getTitlesArray() { return this.titleRow }
-  public getDataArray() { return this.valueRow; }
+  public getValueArray() { return this.valueRow; }
+  public setValueArray(values: Array<string | number | Date | boolean>) { this.valueRow.splice(0, values.length,...values) }
+  public getFomulaArray() { return this.formulaRow; }
+  public setFormulaArray(values: Array<string>) { this.formulaRow.splice(0, values.length,...values) }
   public getTitle(columnName: string) { return this.titleRow[this.columnIndex[columnName]].toString(); }
   public getValueStringOrNumber(columnName: string) {
-    const value = this.getDataArray()[this.columnIndex[columnName]];
+    const value = this.getValueArray()[this.columnIndex[columnName]];
     if (typeof value === "string") {
       let a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
       if (a) {

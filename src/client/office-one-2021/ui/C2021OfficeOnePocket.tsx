@@ -1,5 +1,5 @@
 import * as React from "react";
-import { currentOOversion } from "../../../server/oo21lib/systemEnums";
+import { currentOOversion, developmentYear } from "../../../server/oo21lib/systemEnums";
 import { DriveLeaf } from "../framework/DriveLeaf";
 import * as OfficeLeaf from "../framework/OfficeLeaf";
 import { IOfficeWindow } from "../framework/OfficeWindow";
@@ -19,7 +19,7 @@ class C2021OfficeOnePocket extends DriveLeaf {
 
     const newProps: OfficeLeaf.ILeaf = {
       size: props.size,
-      title: props.title || "2021 OfficeOne.Pocket",
+      title: props.title || `${developmentYear} OfficeOne.Pocket`,
       path: props.path || [OfficeLeaf.Leafs.C2021OfficeOnePocket],
       sentence: props.sentence || "Business mit Google Workplace",
       charactericon: props.charactericon || "OOP"
