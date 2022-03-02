@@ -82,6 +82,8 @@ export function deleteTriggers() {
     }
     //update Trigger status in subscription
     const rootFolderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));
+    console.log(Session.getEffectiveUser().getEmail(),"deleteTriggers", rootFolderIds)
+
     const rootFolderNames:string[]=new Array<string>();
     rootFolderIds.forEach((folderId:string) => {
         rootFolderNames.push(DriveApp.getFolderById(folderId).getName())
@@ -98,7 +100,7 @@ export function deleteTriggers() {
 
 export function daily(): string[] {
     const folderIds = getSystemFolderIds().filter(folderId => folderIsOwnedCurrentByUserAndCurrentVersion(folderId));
-    console.log(Session.getEffectiveUser().getEmail(), folderIds)
+    console.log(Session.getEffectiveUser().getEmail(),"daily", folderIds)
     try {
         for (let rootId of folderIds) {
             const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
