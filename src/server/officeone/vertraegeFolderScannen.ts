@@ -31,15 +31,14 @@ function wennVertragNeuEintragen(BM: BusinessModel, beleg: GoogleAppsScript.Driv
     if (ausgabeDaten != null) {
         return;
     }
-    let neueAusgabeRow = BM.getVertraegeTableCache().createNewRow();
-    neueAusgabeRow.setFileId(beleg.getId());
-    neueAusgabeRow.createLink(beleg.getId(), beleg.getName());
 
     const belegWoerter = beleg.getName().split(" ");
 
-    if (belegWoerter.length > 2) {
-        //Wenn die Datei nicht umbenannt wurde, wird sie mit aktuellem Dateinamen und richtigem Monat abgelegt
-        var index = 1;
+    if (belegWoerter.length > 1) {
+        let neueAusgabeRow = BM.getVertraegeTableCache().createNewRow();
+        neueAusgabeRow.setFileId(beleg.getId());
+        neueAusgabeRow.createLink(beleg.getId(), beleg.getName());
+            var index = 1;
         var konto = belegWoerter[0];
         Logger.log("BelegWoerter:" + belegWoerter);
         while (isNaN(parseFloat(belegWoerter[index].charAt(0))) && belegWoerter[index].charAt(0) != "-") {
@@ -47,8 +46,7 @@ function wennVertragNeuEintragen(BM: BusinessModel, beleg: GoogleAppsScript.Driv
             index++;
         }
         neueAusgabeRow.setBetrag(parseFloat(belegWoerter[index].replace(".", "").replace(",", ".")));
-        var belegName = beleg.getName();
-
+    
         neueAusgabeRow.setKonto(konto);
 
 
