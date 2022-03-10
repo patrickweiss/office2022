@@ -1,8 +1,6 @@
 import { doGetApplicant } from "../officetwo/application/doGetApplicant";
 import { doGetLastschriftmandat } from "../officetwo/sepa/doGetLastschriftmandat";
-import { DriveConnector } from "./officeone/driveconnector";
 import { doGetUStVA } from "./oo21lib/doGetUStVA";
-import { currentOOversion } from "./oo21lib/systemEnums";
 
 export const onOpen = () => {
   try {
