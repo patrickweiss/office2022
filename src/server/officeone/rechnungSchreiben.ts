@@ -210,10 +210,14 @@ export function mneuePosition() {
                                                positionsRange.getNumColumns()));    
 }
 
-export function URLFromLinkCell(cell) {
+export function URLFromLinkCell(cell:GoogleAppsScript.Spreadsheet.Range):string {
   var formel = cell.getFormula();
   var url = formel.match("\"(.*?)\"");
   try {
+//    console.log(url);
+//    console.log();
+//    console.log(cell.getFormula());
+    if (url===null)return cell.getValue().toString();
     return url[1];
   } catch (e) {
     SpreadsheetApp.getUi().alert('Um diese Funktion korrekt auszuführen muss in "' + cell.getA1Notation()
