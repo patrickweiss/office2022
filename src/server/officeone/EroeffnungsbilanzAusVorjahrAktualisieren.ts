@@ -37,7 +37,9 @@ function KontenStammdatenAusVorjahrAktualisieren(BMlastYear: BusinessModel, BMno
       aktuellesKonto.setSubtyp(element.getSubtyp());
       aktuellesKonto.setGruppe(element.getGruppe());
       aktuellesKonto.setSKR03(element.getSKR03());
-      aktuellesKonto.setFormula("SKR04", element.getFormula("SKR04"));
+      if (element.getFormula("SKR04")==="")aktuellesKonto.setValue("SKR04", element.getValue("SKR04"));
+      else
+        aktuellesKonto.setFormula("SKR04", element.getFormula("SKR04"));
       aktuellesKonto.setFormula("Exportgruppe", element.getFormula("Exportgruppe"));
       aktuellesKonto.setFormular(element.getFormular());
       aktuellesKonto.setZN(element.getZN());
