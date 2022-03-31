@@ -1314,6 +1314,8 @@ export class Konto extends TableRow {
   public setKonto(value: any) { this.setValue("Konto", value); }
   public getSKR03() { return this.getValue("SKR03"); }
   public setSKR03(value: any) { this.setValue("SKR03", value); }
+  public getSKR04() { return this.getValue("SKR04"); }
+  public setSKR04(value: any) { this.setValue("SKR04", value); }
   public getExportgruppe() { return this.getValue("Exportgruppe"); }
   public setExportgruppe(value: any) { this.setValue("Exportgruppe", value); }
   public getBeispiel() { return this.getValue("Beispiel"); }

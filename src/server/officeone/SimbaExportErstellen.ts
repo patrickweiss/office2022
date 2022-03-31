@@ -1,6 +1,4 @@
-import { string } from "prop-types";
-import { Konto } from "../../client/office-one-2021/bm/BusinessDataFacade";
-import { AbschreibungenTableCache, AusgabenTableCache, BankbuchungenTableCache, BewirtungsbelegeTableCache, CSVExport, CSVTableCache, EinnahmenRechnungTableCache, EURechnungTableCache, GutschriftenTableCache, KontenTableCache, UmbuchungenTableCache, VerpflegungsmehraufwendungenTableCache } from "../../officeone/BusinessDataFacade";
+import { AbschreibungenTableCache, AusgabenTableCache, BankbuchungenTableCache, BewirtungsbelegeTableCache, CSVExport, CSVTableCache, EinnahmenRechnungTableCache, EURechnungTableCache, GutschriftenTableCache, KontenTableCache, Konto, UmbuchungenTableCache, VerpflegungsmehraufwendungenTableCache } from "../../officeone/BusinessDataFacade";
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { belegNr, currentOOversion, ooTables, ServerFunction } from "../oo21lib/systemEnums";
 import { DriveConnector } from "./driveconnector";
@@ -87,9 +85,10 @@ export function SimbaExportErstellen(rootFolderId: string) {
       if (index !== "0") {
         var csvRow = a.csvCache.getRowByIndex(index);
         if (csvRow.getValue("Exportgruppe") != "") {
-          if (buchungenCSV[csvRow.getValue("Exportgruppe") as string] === undefined) buchungenCSV[csvRow.getValue("Exportgruppe") as string] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
+          let Exportgruppe = "SKR03 "+csvRow.getValue("Exportgruppe").toString();
+          if (buchungenCSV[Exportgruppe] === undefined) buchungenCSV[Exportgruppe] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
           var datum = isoDate(csvRow.getValue("Datum"));
-          buchungenCSV[csvRow.getValue("Exportgruppe") as string] +=
+          buchungenCSV[Exportgruppe] +=
             datum + ";" +
             formatBetrag(csvRow.getValue("Betrag")) + ";" +
             csvRow.getValue("SKR03 (Soll)") + ";" +
@@ -98,7 +97,20 @@ export function SimbaExportErstellen(rootFolderId: string) {
             belegNrInSimbaFormat(csvRow.getValue("BelegNr")as string) + ";" +
             csvRow.getId() + ";" +
             csvRow.getValue("USt-IDNr") + ";1\n";
-        }
+
+            Exportgruppe = "SKR04 "+csvRow.getValue("Exportgruppe").toString();
+            if (buchungenCSV[Exportgruppe] === undefined) buchungenCSV[Exportgruppe] = "Datum;Betrag;Konto (Soll);Gegenkonto (Haben);Buchungstext;Beleg-Nr;BchgNr;USt-IDNr;Automatiksperre\n";
+            var datum = isoDate(csvRow.getValue("Datum"));
+            buchungenCSV[Exportgruppe] +=
+              datum + ";" +
+              formatBetrag(csvRow.getValue("Betrag")) + ";" +
+              csvRow.getValue("SKR04 (Soll)") + ";" +
+              csvRow.getValue("SKR04 (Haben)") + ";" +
+              csvRow.getValue("Buchungstext") + ";" +
+              belegNrInSimbaFormat(csvRow.getValue("BelegNr")as string) + ";" +
+              csvRow.getId() + ";" +
+              csvRow.getValue("USt-IDNr") + ";1\n";
+          }
       }
     }
     const timestampCSV = new Date().toISOString();
