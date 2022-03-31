@@ -9,7 +9,7 @@ export class DriveConnector {
   static rangeValues = {};
   static konfiguration: Object;
   static oooVersionsRangeFileMap = {
-    "0059": {
+    "0060": {
       RechnungSchreibenD: "1 Rechnung schreiben",
       GutschriftenD: "1 Rechnung schreiben",
       EURechnungenD: "1 Rechnung schreiben",
@@ -34,7 +34,7 @@ export class DriveConnector {
       Konfiguration: "00 Office",
       log:"00 Office"
     },
-    "0058": {
+    "0059": {
       RechnungSchreibenD: "1 Rechnung schreiben",
       GutschriftenD: "1 Rechnung schreiben",
       EURechnungenD: "1 Rechnung schreiben",
@@ -61,7 +61,7 @@ export class DriveConnector {
     }
   }
   static oooVersionValueFileMap = {
-    "0059": {
+    "0060": {
       GutschriftenDatei: "1 Rechnung schreiben",
       HilfeRechnungFertigstellen: "1 Rechnung schreiben",
       HilfeRechnungSchreiben: "1 Rechnung schreiben",
@@ -69,7 +69,7 @@ export class DriveConnector {
       Rechnungsnummer: "1 Rechnung schreiben",
       Rechnungsvorlagelink: "1 Rechnung schreiben"
     },
-    "0058": {
+    "0059": {
       GutschriftenDatei: "1 Rechnung schreiben",
       HilfeRechnungFertigstellen: "1 Rechnung schreiben",
       HilfeRechnungSchreiben: "1 Rechnung schreiben",
