@@ -498,7 +498,7 @@ function kontenStammdatenErgaenzenExportgruppeAnlagenCSV(a: agent) {
   }
 }
 
-function kontoStammdatenErgaenzenCSV(a: agent, csvRow) {
+function kontoStammdatenErgaenzenCSV(a: agent, csvRow:CSVExport) {
   const soll = getOrCreateKontoRow(a, csvRow.getValue("Konto (Soll)"));
   const haben = getOrCreateKontoRow(a, csvRow.getValue("Konto (Haben)"));
 
