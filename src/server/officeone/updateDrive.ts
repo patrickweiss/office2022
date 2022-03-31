@@ -19,7 +19,10 @@ export function updateDrive(rootFolderId: string) {
   let oooPreviousVersion = getPreviousVersion();
   //copy DataTable Data
   for (let rangeName of Object.keys(DriveConnector.oooVersionsRangeFileMap[oooPreviousVersion])) {
-    if (rangeName !== ooTables.ElsterTransferD && rangeName !== ooTables.InstallationenD) {
+    if (
+      rangeName !== ooTables.ElsterTransferD && 
+      rangeName !== ooTables.InstallationenD && 
+      rangeName !== ooTables.log) {
       const dataOldVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, oooPreviousVersion);
       const dataNewVersion = DriveConnector.getNamedRangeData(rootFolderId, rangeName as ooTables, currentOOversion);
       //Wenn die neue Tabelle mehr oder weniger Spalten hat, dann werden die Daten spaltenweise kopiert

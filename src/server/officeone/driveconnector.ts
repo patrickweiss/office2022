@@ -32,7 +32,7 @@ export class DriveConnector {
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
       Konfiguration: "00 Office",
-      log:"00 Office"
+      log: "00 Office"
     },
     "0059": {
       RechnungSchreibenD: "1 Rechnung schreiben",
@@ -57,7 +57,7 @@ export class DriveConnector {
       GdpduD: "7 Datenschlürfer",
       DataFileD: "7 Datenschlürfer",
       Konfiguration: "00 Office",
-      log:"00 Office"
+      log: "00 Office"
     }
   }
   static oooVersionValueFileMap = {
@@ -129,41 +129,47 @@ export class DriveConnector {
     SpreadsheetApp.flush()
   }
   static saveNamedRangeData(rootFolderId: string, rangeName: ooTables, loadRowCount, dataArray: Object[][], backgroundArray: string[][], formulaArray: Object[][], version: ooVersions) {
-    var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
-    let dataRange = spreadsheet.getRangeByName(rangeName);
-    // wenn nötig Zeilen einfügen oder löschen
-    var rowDifference = dataArray.length - loadRowCount;
-    if (rowDifference > 0) dataRange.getSheet().insertRowsBefore(dataRange.getRow() + 1, rowDifference);
+    try {
+      var spreadsheet = this.getSpreadsheet(rootFolderId, rangeName, version);
+      let dataRange = spreadsheet.getRangeByName(rangeName);
+      // wenn nötig Zeilen einfügen oder löschen
+      var rowDifference = dataArray.length - loadRowCount;
+      if (rowDifference > 0) dataRange.getSheet().insertRowsBefore(dataRange.getRow() + 1, rowDifference);
 
-    //Range erzeugen um Daten einzufügen und DataRange neu setzen
-    var currentSheet = dataRange.getSheet();
+      //Range erzeugen um Daten einzufügen und DataRange neu setzen
+      var currentSheet = dataRange.getSheet();
 
 
-    //Wenn es keine Daten gibt muss trotzdem eine Zeile stehen bleiben und deren inhalt muss gelöscht werden
-    if (dataArray.length < 2) {
-      if ((-rowDifference - 1) != 0) currentSheet.deleteRows(dataRange.getRow() + 1, -rowDifference - 1);
-      currentSheet.getRange(dataRange.getRow() + 1, dataRange.getColumn(), 1, dataRange.getNumColumns()).clearContent();
-      currentSheet.getRange(dataRange.getRow(), dataRange.getColumn(), 1, dataRange.getNumColumns()).setValues(dataArray);
-      return;
-    }
-    else
-      if (rowDifference < 0) dataRange.getSheet().deleteRows(dataRange.getRow() + 1, -rowDifference);
+      //Wenn es keine Daten gibt muss trotzdem eine Zeile stehen bleiben und deren inhalt muss gelöscht werden
+      if (dataArray.length < 2) {
+        if ((-rowDifference - 1) != 0) currentSheet.deleteRows(dataRange.getRow() + 1, -rowDifference - 1);
+        currentSheet.getRange(dataRange.getRow() + 1, dataRange.getColumn(), 1, dataRange.getNumColumns()).clearContent();
+        currentSheet.getRange(dataRange.getRow(), dataRange.getColumn(), 1, dataRange.getNumColumns()).setValues(dataArray);
+        return;
+      }
+      else
+        if (rowDifference < 0) dataRange.getSheet().deleteRows(dataRange.getRow() + 1, -rowDifference);
 
-    //DataRange aktualisieren
-    dataRange = spreadsheet.getRangeByName(rangeName);
+      //DataRange aktualisieren
+      dataRange = spreadsheet.getRangeByName(rangeName);
 
-    //alle vorhandenen Formeln in das DataArray kopieren um "setFormulas" nach setValues zu sparen
+      //alle vorhandenen Formeln in das DataArray kopieren um "setFormulas" nach setValues zu sparen
 
-    for (var zeilen in dataArray) {
-      for (var spalten in dataArray[zeilen]) {
-        if (formulaArray[zeilen][spalten] != "" && formulaArray[zeilen][spalten] != undefined) {
-          dataArray[zeilen][spalten] = formulaArray[zeilen][spalten];
+      for (var zeilen in dataArray) {
+        for (var spalten in dataArray[zeilen]) {
+          if (formulaArray[zeilen][spalten] != "" && formulaArray[zeilen][spalten] != undefined) {
+            dataArray[zeilen][spalten] = formulaArray[zeilen][spalten];
+          }
         }
       }
+      dataRange.setValues(dataArray);
+      dataRange.setBackgrounds(backgroundArray).setBorder(true, true, true, true, true, true, "#b7b7b7", SpreadsheetApp.BorderStyle.SOLID);
+      SpreadsheetApp.flush();
+    } catch (e) {
+       const fehler = new Error(`driveconnector.saveNamedRangeData(${rootFolderId},${rangeName},${loadRowCount},${version})`)
+        throw fehler
     }
-    dataRange.setValues(dataArray);
-    dataRange.setBackgrounds(backgroundArray).setBorder(true, true, true, true, true, true, "#b7b7b7", SpreadsheetApp.BorderStyle.SOLID);
-    SpreadsheetApp.flush();
+
   }
   public static getSpreadsheet(rootFolderId: string, rangeName: ooTables, version: ooVersions) {
     try {
@@ -185,8 +191,8 @@ export class DriveConnector {
       }
       return spreadsheet as GoogleAppsScript.Spreadsheet.Spreadsheet;
     } catch (e) {
-      const activeSpreadsheet =  SpreadsheetApp.getActive();
-      if (!activeSpreadsheet)throw e
+      const activeSpreadsheet = SpreadsheetApp.getActive();
+      if (!activeSpreadsheet) throw e
       return activeSpreadsheet;
     }
   }

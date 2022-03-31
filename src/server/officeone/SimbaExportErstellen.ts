@@ -504,6 +504,9 @@ function kontoStammdatenErgaenzenCSV(a: agent, csvRow:CSVExport) {
 
   csvRow.setValue("SKR03 (Soll)", soll.getSKR03());
   csvRow.setValue("SKR03 (Haben)", haben.getSKR03());
+  csvRow.setValue("SKR04 (Soll)", soll.getSKR04());
+  csvRow.setValue("SKR04 (Haben)", haben.getSKR04());
+  
   if (soll.getGruppe() == "Anlage") csvRow.setValue("Exportgruppe", exportgruppe.Anlage);
 
   if (csvRow.getValue("Datum") < a.geschaeftsjahr) ebBuchungAnpassen(a, csvRow, soll, haben);
