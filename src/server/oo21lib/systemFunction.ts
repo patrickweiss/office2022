@@ -60,6 +60,7 @@ export function kiSwitch() {
         }
     } catch (e) {
         result["error"] = e;
+
         return JSON.stringify(result);
     }
     return JSON.stringify(result);
@@ -141,12 +142,13 @@ function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     if (Session.getEffectiveUser().getEmail() !== folderOwnerUser.getEmail()) return false;
     //Nur bei eigenen Instanzen erfolgt ein automatisches Update durch Daily, weil das Update immer mit dem eigenen Benutzer durchgeführt werden muss
     //Damit der Benutzer Eigentümer der Template Files wird
-    const driveVersion = folder.getName().substr(-4);
+    let driveVersion = folder.getName().substr(-4);
     if (getPreviousVersion() === driveVersion) {
         //folder has to be updated first
         updateDrive(folderId);
     }
     //throw error if version is still wrong
+    driveVersion = folder.getName().substr(-4);
     if (currentOOversion !== driveVersion) throw new Error("OO Instance with ID" + folderId + " could not be updated to version " + currentOOversion);
     return true
 }
