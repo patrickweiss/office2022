@@ -42,6 +42,12 @@ export function kiSwitch() {
         }
         else {
             const rootFolderIds = daily();
+            if (rootFolderIds.length===0){
+                //entweder keine Instanzen oder keine Instanzen mit eigenem Benutzer, oder es wurden nur Updates durchgeführt
+                //das sollte dem Benutzer noch irgendwie angezeigt werden ...
+                result.triggers = "0";
+                return;
+            }
             const rootFolderNames:string[]=new Array<string>();
             rootFolderIds.forEach((folderId:string) => {
                 rootFolderNames.push(DriveApp.getFolderById(folderId).getName())
@@ -106,18 +112,25 @@ export function daily(): string[] {
         for (let rootId of folderIds) {
             const bmServer = new BusinessModel(rootId, `Buchungsautomatik von ${Session.getEffectiveUser().getEmail()}`);
             try {
-                bmServer.addLogMessage("alle Ausgaben Ordner scannen")
+                bmServer.addLogMessage("Beginn daily()")
+
                 alleAusgabenFolderScannen(bmServer);
-                bmServer.addLogMessage("alle Gutschriften Ordner scannen")
+                const anzahlAusgabenVorher = bmServer.getAusgabenTableCache().loadRowCount;
+                const anzahlAusgabenNachher = bmServer.getAusgabenTableCache().dataArray.length;
+                bmServer.addLogMessage( `${anzahlAusgabenNachher - anzahlAusgabenVorher}alle Ausgaben Ordner scannen`)
+
                 alleGutschriftenFolderScannen(bmServer);
-                bmServer.addLogMessage("E-Mail nach UStVA Beleg scannen");
+                const anzahlGutschriftenVorher = bmServer.getGutschriftenTableCache().loadRowCount;
+                const anzahlGutschriftenNachher = bmServer.getGutschriftenTableCache().dataArray.length;
+                bmServer.addLogMessage( `${anzahlGutschriftenNachher - anzahlGutschriftenVorher}alle Gutschriften Ordner scannen`)
+
                 UStVAbuchenBM(bmServer);
                 bmServer.kontoSummenAktualisieren();
                 bmServer.save();
                 //wenn neue Belege gefunden wurden, Mail schicken
                 if (
-                    bmServer.getAusgabenTableCache().loadRowCount < bmServer.getAusgabenTableCache().dataArray.length ||
-                    bmServer.getGutschriftenTableCache().loadRowCount < bmServer.getGutschriftenTableCache().dataArray.length ||
+                    anzahlAusgabenVorher < anzahlAusgabenNachher ||
+                    anzahlGutschriftenVorher < anzahlGutschriftenNachher ||
                     getTestDatum().getDate() === 1) {
                     //Mail schicken, mit aktuellem Status
                     sendStatusMail(bmServer);
@@ -146,10 +159,12 @@ function folderIsOwnedCurrentByUserAndCurrentVersion(folderId: string) {
     if (getPreviousVersion() === driveVersion) {
         //folder has to be updated first
         updateDrive(folderId);
+        //Workaround für das Problem, dass mehrere Updates fehlen, weil ich nicht weiß wie ich den Fehler besser behandeln kann
+        return false;
     }
     //throw error if version is still wrong
-    driveVersion = folder.getName().substr(-4);
-    if (currentOOversion !== driveVersion) throw new Error("OO Instance with ID" + folderId + " could not be updated to version " + currentOOversion);
+    //driveVersion = folder.getName().substr(-4);
+    //if (currentOOversion !== driveVersion) throw new Error("OO Instance with ID" + folderId + " could not be updated to version " + currentOOversion);
     return true
 }
 
