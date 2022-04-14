@@ -1,20 +1,20 @@
 //Aktuelle version (die mit der höheren Nummer) und Vorgängerversion. Die Vorgängerversion wird benötigt, um daraus die Daten zu kopieren
 export const developmentYear = "2022";
 export enum ooVersions {
-    oo59 = "0059",
     oo60 = "0060",
+    oo61 = "0061",
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
-export const currentOOversion = ooVersions.oo60;
-export const codeVersion = "009";
+export const currentOOversion = ooVersions.oo61;
+export const codeVersion = "000";
 
 //Master für "00 System - Version:0057", bisher keine Änderung seit Version 0057, es gibt noch keinen Update Mechanismus!!!
 //https://docs.google.com/spreadsheets/d/1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU/edit#gid=0
 export const clientSystemMasterId = "1V07fdHjmW0eUDd2pwN-8r6sCwY0Cy2KQOSFgtNdmirU"
 
 export enum systemMasterProperty {
-    //Muss bei jedem Update aktualisiert werden. Folder der alle Spreadsheet Templates enthält, die von Clients kopiert werden: 2022 My Business.Office 0060
-    officeOne2022_TemplateFolderId = "1Virwy2kkFBZjJj2cN-Gd2If6WfI8GmFm",
+    //Muss bei jedem Update aktualisiert werden. Folder der alle Spreadsheet Templates enthält, die von Clients kopiert werden: 2022 My Business.Office 0061
+    officeOne2022_TemplateFolderId = "1GCP3HgIJ0jwSLnkLzofGhOhh_1pqrIr1",
     //Bleibt ab Version 0059 für alle Produktivsystem Nutzer gleich. Erzwingt in Kombination mit "daily" ein Update aller Instanzen in der Nacht? (Testen)
     webApp_URL = "https://script.google.com/macros/s/AKfycbxiMhdxDyK0IZFV2ZfRbL4bAlF0fOELD0Da2QlvCmuVtYrT-5M/exec"
 }

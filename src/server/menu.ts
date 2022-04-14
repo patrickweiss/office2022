@@ -23,9 +23,8 @@ export const onOpen = () => {
     }
     else {
       const menu = SpreadsheetApp.getUi()
-      .createMenu('Office One 2021') // edit me!
+      .createMenu('Office One 2022') // edit me!
       .addItem('Rechnungsvorlage erstellen', 'rechnungsVorlageErstellen')
-      .addItem("OfficeOne.2021", "openOfficeOne2021")
     menu.addToUi();
     }
   } catch (e) { console.log(e) }
