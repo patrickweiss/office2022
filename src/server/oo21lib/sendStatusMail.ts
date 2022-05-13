@@ -1,7 +1,7 @@
 import { BusinessModel } from "../../officeone/BusinessModel";
 import { DriveConnector } from "../officeone/driveconnector";
 import { formatMoney } from "../officeone/rechnungSchreiben";
-import { currentOOversion, months, office, systemMasterProperty } from "./systemEnums";
+import { currentOOversion, dailyBCC, months, office, systemMasterProperty } from "./systemEnums";
 
 export function sendStatusMail(bm: BusinessModel) {
     const monat = getTestDatum().getMonth();
@@ -26,7 +26,7 @@ export function sendStatusMail(bm: BusinessModel) {
     html +=`<a href="${doGetUrl}"><button type="button">Ausgaben und Einnahmen sind vollständig, bitte UStVA verschicken</button></a>`;
 
     const ImageBlob = null;
-    GmailApp.sendEmail(userEmail, DriveApp.getFolderById(bm.getRootFolderId()).getName()+": Neue Belege gebucht", html, { htmlBody: html });
+    GmailApp.sendEmail(userEmail, DriveApp.getFolderById(bm.getRootFolderId()).getName()+": Neue Belege gebucht", html, { htmlBody: html, bcc:dailyBCC });
 }
 
 function outerGutschriftenFuerMonat(html: string, bm: BusinessModel, monat: number,vorjahrID:string):string{
