@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo61;
-export const codeVersion = "007";
+export const codeVersion = "013";
 
 //Daily Kontrolle
 export const dailyBCC="patrick.sbrzesny@saw-office.net"
@@ -177,6 +177,20 @@ export const months = {
     '10': '(10) Oktober',
     '11': '(11) November',
     '12': '(12) Dezember',
+}
+export enum buchungsperiode{
+    m01="01 Januar",
+    m02="02 Februar",
+    m03="03 März",
+    m04="04 April",
+    m05="05 Mai",
+    m06="06 Juni",
+    m07="07 Juli",
+    m08="08 August",
+    m09="09 September",
+    m10="10 Oktober",
+    m11="11 November",
+    m12="12 Dezember",
 }
 
 
