@@ -1,3 +1,4 @@
+import { office } from '../../../server/oo21lib/systemEnums';
 import { IOfficeWindow } from '../framework/OfficeWindow';
 
 declare let window: IOfficeWindow;
@@ -15,7 +16,7 @@ export class ValuesCache {
             this.dataHash[row[0]]=row[1];
         }
     }
-    public getValueByName(name:string){
+    public getValueByName(name:office){
         return this.dataHash[name];
     }
 }

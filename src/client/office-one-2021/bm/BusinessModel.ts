@@ -19,6 +19,7 @@ import { IAction, Type } from '../framework/Action';
 import { IOfficeWindow } from '../framework/OfficeWindow';
 import { IBelegZuBankbuchungZuordnen } from '../ui/Bankbuchungen';
 import { ValuesCache } from './ValuesCache';
+import { office } from '../../../server/oo21lib/systemEnums';
 declare let window: IOfficeWindow;
 function belegBuchenActionCreator(serverResponse: any) {
     // tslint:disable-next-line:only-arrow-functions
@@ -60,7 +61,7 @@ export class BusinessModel {
     public eurTableCache: EURTableCache;
     public normalisierteBuchungenTableCache: NormalisierteBuchungenTableCache;
     private gdpduTableCache:GdpduTableCache;
-    public configurationCache: ValuesCache;
+    private configurationCache: ValuesCache;
 
     // Client specific code
     // public setRootFolderId(id: string) { this.rootFolderId = id; }
@@ -99,7 +100,7 @@ export class BusinessModel {
     
      // Generic code for client and server identical 
      public endOfYear() { 
-        const jahr = this.getConfigurationCache().getValueByName("zeitraumJahr");
+        const jahr = this.getConfigurationCache().getValueByName(office.zeitraumJahr);
         if (jahr==="")throw new Error("Konfiguration:zeitraumJahr fehlt");
         return new Date(parseInt(jahr,10), 11, 31); }
     public beginOfYear() { return new Date(this.endOfYear().getFullYear(), 0, 1) }
@@ -308,7 +309,7 @@ export class BusinessModel {
         this.getKontenTableCache().bilanzSummenAktualisieren(this.getNormalisierteBuchungenArray());
         this.getEURTableCache().setKontenSpalten(this.endOfYear().getFullYear());
         this.getEURTableCache().eurSummenAktualisieren(this.getNormalisierteBuchungenArray());
-        this.getUStVATableCache().UStVASummenAktualisieren(this.getNormalisierteBuchungenArray(),this.beginOfYear(),this.getConfigurationCache().getValueByName("UStVAPeriode"));
+        this.getUStVATableCache().UStVASummenAktualisieren(this.getNormalisierteBuchungenArray(),this.beginOfYear(),this.getConfigurationCache().getValueByName(office.UStVAPeriode));
         this.getKontenTableCache().kontenEinfaerben();
 
     }
@@ -489,7 +490,7 @@ export class BusinessModel {
     }
     public germanDate(datum: Date) { return datum.getDate() + "." + (datum.getMonth() + 1) + "." + datum.getFullYear() }
     public getBankontenArray(){
-       return (this.getConfigurationCache().getValueByName("bankKonten") as string).split(",");
+       return (this.getConfigurationCache().getValueByName(office.bankKonten) as string).split(",");
     }
     public isBankkonto(kontoName:string){return this.getBankontenArray().indexOf(kontoName)>=0;}
 }
