@@ -132,7 +132,7 @@ class Bankbuchungen extends DriveLeaf {
           a={belegtyp} />
         </td>
         <td>{umbuchung.getKonto().substring(0, 40)}</td>
-        <td>{umbuchung.getId().substring(0,40)}</td>
+        <td>{umbuchung.getId().substring(0,40)} {umbuchung.getText()}</td>
       </tr>)
   }
   protected belegZuordnen(e: any) {
