@@ -6,7 +6,7 @@ export enum ooVersions {
 }
 //Die Erhöhung der Versionsnummer triggert beim nächsten Aufruf der PWA das Update aller eigenen Instanzen von OfficOne 
 export const currentOOversion = ooVersions.oo61;
-export const codeVersion = "013";
+export const codeVersion = "014";
 
 //Daily Kontrolle
 export const dailyBCC="patrick.sbrzesny@saw-office.net"
