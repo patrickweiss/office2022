@@ -138,7 +138,7 @@ function neuenBewirtungsbelegEintragen(beleg, belegWoerter, monat, BM: BusinessM
     neuerBewirtungsbelegRow.setGegenkonto('bar');
     neuerBewirtungsbelegRow.setText(beleg.getName());
     //Corona Mehrtwertsteuer
-    if (monat > new Date(2020, 5, 30) && monat < new Date(2021, 6, 1)) {
+    if (monat > new Date(2020, 5, 30)) {
         while (isNaN(belegWoerter[index].charAt(0))) {
             index++;
         }

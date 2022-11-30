@@ -715,11 +715,11 @@ export class NormalisierteBuchungenTableCache extends TableCache<NormalisierteBu
             konto.setSKR03(skrKonto.getSKR03());
             konto.setFormula("SKR04", `=VLOOKUP(INDIRECT("R[0]C[-1]";false);'SKR04'!$A$1:$C$1443;2)`);
             konto.setFormula("Exportgruppe", `=VLOOKUP(INDIRECT("R[0]C[-2]";false);'SKR04'!$A$1:$C$1443;3)`);
-            konto.setFormula("ZN", `=DSUM($E$7:$L$1000;"Summe";{"SKR03";INDIRECT("R[0]C[-6]";false)})-2*INDIRECT("R[0]C[1]";false)`);
+            konto.setFormula("ZN", `=DSUM($E$3:$L$1000;"Summe";{"SKR03";INDIRECT("R[0]C[-6]";false)})-2*INDIRECT("R[0]C[1]";false)`);
           } else {
             konto.setKontentyp("unbekannt");
             konto.setSKR03(kontoString.substring(1));
-            konto.setFormula("ZN", `=DSUM($E$7:$L$1000;"Summe";{"SKR03";INDIRECT("R[0]C[-6]";false)})-2*INDIRECT("R[0]C[1]";false)`);
+            konto.setFormula("ZN", `=DSUM($E$3:$L$1000;"Summe";{"SKR03";INDIRECT("R[0]C[-6]";false)})-2*INDIRECT("R[0]C[1]";false)`);
           }
         }
       }
